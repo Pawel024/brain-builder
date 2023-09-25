@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
+import { Theme, Button, Flex, Text, Box, Tabs } from '@radix-ui/themes';
+import '@radix-ui/themes/styles.css';
 
 function App() {
   const [message, setMessage] = useState('');
@@ -29,27 +31,54 @@ function App() {
     }, 2000);
   };
 
+
   return (
-    <div className="App-header">
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <div className="App-box">
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80%' }}>
-            <button onClick={generateMessage} style={{ backgroundColor: 'darkred', color: 'white', fontFamily: 'Aptos', fontSize: '24px', textAlign: 'center', transition: 'background-color 0.5s ease', padding: '10px 20px', borderRadius: '5px', marginBottom: '20px', marginTop: '40px' }}>
-              Click me!
-            </button>
-            {isLoading ? (
-              <div style={{ width: '80%', height: '30px', borderRadius: '5px', backgroundColor: 'white' }}>
-                <div style={{ width: `${progress}%`, height: '100%', backgroundColor: 'darkred', borderRadius: '5px' }}></div>
-              </div>
-            ) : (
-              <div style={{ color: 'black', fontFamily: 'Aptos', fontSize: '18px', textAlign: 'center', fontWeight: 'bold' }}>
-                {message}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+    <body class='dark-theme'>
+      <Theme accentColor="tomato" grayColor="olive" panelBackground="translucent" radius="large" appearance='dark'>
+        <Tabs.Root defaultValue="monty">
+          <Tabs.List size="2">
+            <Tabs.Trigger value="monty">Monty Python Quotes</Tabs.Trigger>
+            <Tabs.Trigger value="stuff">Stuff</Tabs.Trigger>
+            <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
+          </Tabs.List>
+
+          <Box px="4" pt="3" pb="2">
+            <Tabs.Content value="monty">
+            <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+              <Flex direction="column" gap="2" height={'100vh'} style={{alignItems: 'center', justifyContent: 'center'}}>
+                <div className='Click-me-button'>
+                  <Button onClick={generateMessage} variant='soft' size="3" gap="2">
+                    <Text size="5">
+                      Click me!
+                    </Text>
+                  </Button>
+                </div>
+                <div className='Click-me-text'>
+                  {isLoading ? (
+                    <div className="Progress-bar-outside">
+                      <div className="Progress-bar-inside" style={{ width: `${progress}%` }}></div>
+                    </div>
+                  ) : (
+                      <Text gap="2" style={{textAlign:'center'}}>
+                        {message}
+                      </Text>
+                  )}
+                </div>
+              </Flex>
+            </Box>
+            </Tabs.Content>
+
+            <Tabs.Content value="stuff">
+              <Text size="2">Access and update your documents.</Text>
+            </Tabs.Content>
+
+            <Tabs.Content value="settings">
+              <Text size="2">Edit your profile or update contact information.</Text>
+            </Tabs.Content>
+          </Box>
+        </Tabs.Root>
+      </Theme>
+    </body>
   );
 }
 
