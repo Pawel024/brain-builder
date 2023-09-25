@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './App.css';
 
 function App() {
   const [message, setMessage] = useState('');
@@ -29,21 +30,23 @@ function App() {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-      <div style={{ textAlign: 'center', backgroundColor: 'lightgray', height: '30vh', width: '90vh', borderRadius: '10px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80%' }}>
-          <button onClick={generateMessage} style={{ backgroundColor: 'darkred', color: 'white', fontSize: '24px', textAlign: 'center', transition: 'background-color 0.5s ease', padding: '10px 20px', borderRadius: '5px', marginBottom: '20px', marginTop: '40px' }}>
-            Click me!
-          </button>
-          {isLoading ? (
-            <div style={{ width: '80%', height: '30px', borderRadius: '5px', backgroundColor: 'white' }}>
-              <div style={{ width: `${progress}%`, height: '100%', backgroundColor: 'darkred', borderRadius: '5px' }}></div>
-            </div>
-          ) : (
-            <div style={{ color: 'black', fontFamily: 'Arial', fontSize: '18px', textAlign: 'center', fontWeight: 'bold' }}>
-              {message}
-            </div>
-          )}
+    <div className="App-header">
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div className="App-box">
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80%' }}>
+            <button onClick={generateMessage} style={{ backgroundColor: 'darkred', color: 'white', fontFamily: 'Aptos', fontSize: '24px', textAlign: 'center', transition: 'background-color 0.5s ease', padding: '10px 20px', borderRadius: '5px', marginBottom: '20px', marginTop: '40px' }}>
+              Click me!
+            </button>
+            {isLoading ? (
+              <div style={{ width: '80%', height: '30px', borderRadius: '5px', backgroundColor: 'white' }}>
+                <div style={{ width: `${progress}%`, height: '100%', backgroundColor: 'darkred', borderRadius: '5px' }}></div>
+              </div>
+            ) : (
+              <div style={{ color: 'black', fontFamily: 'Aptos', fontSize: '18px', textAlign: 'center', fontWeight: 'bold' }}>
+                {message}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
