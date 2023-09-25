@@ -34,49 +34,61 @@ function App() {
 
   return (
     <body class='dark-theme'>
-      <Theme accentColor="tomato" grayColor="olive" panelBackground="translucent" radius="large" appearance='dark'>
-        <Tabs.Root defaultValue="monty">
-          <Tabs.List size="2">
-            <Tabs.Trigger value="monty">Monty Python Quotes</Tabs.Trigger>
-            <Tabs.Trigger value="stuff">Stuff</Tabs.Trigger>
-            <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
-          </Tabs.List>
+      <Theme accentColor="cyan" grayColor="slate" panelBackground="translucent" radius="large" appearance='dark'>
+        <Flex direction="column" css={{ height: '100vh' }}>
+          <Text as='h1' css={{ textAlign: 'center', alignSelf:"center", fontSize: 48, fontWeight: 'bold', marginBottom: 16 }}>brAIn builder</Text>
+          
+          <Tabs.Root defaultValue="monty">
+            <Tabs.List size="2">
+              <Tabs.Trigger value="monty">Monty Python Quotes</Tabs.Trigger>
+              <Tabs.Trigger value="stuff">Stuff</Tabs.Trigger>
+              <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
+            </Tabs.List>
 
-          <Box px="4" pt="3" pb="2">
-            <Tabs.Content value="monty">
-            <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-              <Flex direction="column" gap="2" height={'100vh'} style={{alignItems: 'center', justifyContent: 'center'}}>
-                <div className='Click-me-button'>
-                  <Button onClick={generateMessage} variant='soft' size="3" gap="2">
-                    <Text size="5">
-                      Click me!
-                    </Text>
-                  </Button>
-                </div>
-                <div className='Click-me-text'>
-                  {isLoading ? (
-                    <div className="Progress-bar-outside">
-                      <div className="Progress-bar-inside" style={{ width: `${progress}%` }}></div>
+            <Box px="4" pt="3" pb="2">
+              <Tabs.Content value="monty">
+                <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+                  <Flex direction="column" gap="2" height={'100vh'} style={{alignItems: 'center', justifyContent: 'center'}}>
+                    <div className='Click-me-button'>
+                      <Button onClick={generateMessage} variant='surface' size="3" gap="2">
+                        <Text size="5">
+                          Click me!
+                        </Text>
+                      </Button>
                     </div>
-                  ) : (
-                      <Text gap="2" style={{textAlign:'center'}}>
-                        {message}
-                      </Text>
-                  )}
-                </div>
-              </Flex>
+                    <div className='Click-me-text'>
+                      {isLoading ? (
+                        <div className="Progress-bar-outside">
+                          <div className="Progress-bar-inside" style={{ width: `${progress}%` }}></div>
+                        </div>
+                      ) : (
+                          <Text gap="2" style={{textAlign:'center'}}>
+                            {message}
+                          </Text>
+                      )}
+                    </div>
+                  </Flex>
+                </Box>
+              </Tabs.Content>
+
+              <Tabs.Content value="stuff">
+                <Box style={{ display: 'flex', height: '100vh' }}>
+                  <Flex direction="column" gap="2">
+                    <Text size="2">Access and update your documents.</Text>
+                  </Flex>
+                </Box>
+              </Tabs.Content>
+
+              <Tabs.Content value="settings">
+                <Box style={{ display: 'flex', height: '100vh' }}>
+                  <Flex direction="column" gap="2">
+                    <Text size="2">Access and update your documents.</Text>
+                  </Flex>
+                </Box>
+              </Tabs.Content>
             </Box>
-            </Tabs.Content>
-
-            <Tabs.Content value="stuff">
-              <Text size="2">Access and update your documents.</Text>
-            </Tabs.Content>
-
-            <Tabs.Content value="settings">
-              <Text size="2">Edit your profile or update contact information.</Text>
-            </Tabs.Content>
-          </Box>
-        </Tabs.Root>
+          </Tabs.Root>
+        </Flex>
       </Theme>
     </body>
   );

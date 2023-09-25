@@ -45,7 +45,7 @@
 .Progress-bar-inside {
   height: 100%;
   border-radius: 5px;
-  background-color: var(--tomato-10);
+  background-color: var(--cyan-10);
 }
 
 .Click-me-button {
