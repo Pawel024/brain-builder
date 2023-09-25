@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import { Theme, Button, Flex, Text, Box, Tabs } from '@radix-ui/themes';
+import { Theme, Button, Flex, Text, Box, Tabs, Heading } from '@radix-ui/themes';
 import '@radix-ui/themes/styles.css';
 
 function App() {
@@ -35,9 +35,9 @@ function App() {
   return (
     <body class='dark-theme'>
       <Theme accentColor="cyan" grayColor="slate" panelBackground="translucent" radius="large" appearance='dark'>
-        <Flex direction="column" css={{ height: '100vh' }}>
-          <Text as='h1' css={{ textAlign: 'center', alignSelf:"center", fontSize: 48, fontWeight: 'bold', marginBottom: 16 }}>brAIn builder</Text>
-          
+        <Flex direction="column" gap="0" css={{ height: '100vh' }}>
+          <Heading as='h1' align='center' color='cyan' size='7' style={{marginTop: 10, marginBottom: 0}}>brAIn builder</Heading>
+
           <Tabs.Root defaultValue="monty">
             <Tabs.List size="2">
               <Tabs.Trigger value="monty">Monty Python Quotes</Tabs.Trigger>
@@ -50,7 +50,7 @@ function App() {
                 <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
                   <Flex direction="column" gap="2" height={'100vh'} style={{alignItems: 'center', justifyContent: 'center'}}>
                     <div className='Click-me-button'>
-                      <Button onClick={generateMessage} variant='surface' size="3" gap="2">
+                      <Button onClick={generateMessage} variant='outline' size="3" gap="2">
                         <Text size="5">
                           Click me!
                         </Text>
@@ -74,7 +74,7 @@ function App() {
               <Tabs.Content value="stuff">
                 <Box style={{ display: 'flex', height: '100vh' }}>
                   <Flex direction="column" gap="2">
-                    <Text size="2">Access and update your documents.</Text>
+                    <Text size="2">Take care of stuff.</Text>
                   </Flex>
                 </Box>
               </Tabs.Content>
@@ -82,7 +82,7 @@ function App() {
               <Tabs.Content value="settings">
                 <Box style={{ display: 'flex', height: '100vh' }}>
                   <Flex direction="column" gap="2">
-                    <Text size="2">Access and update your documents.</Text>
+                    <Text size="2">Change your settings.</Text>
                   </Flex>
                 </Box>
               </Tabs.Content>
