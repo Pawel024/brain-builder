@@ -14,7 +14,7 @@ import { Theme, Button, Flex, Text, Box, Tabs, Heading, Grid, Separator, Dropdow
 import '@radix-ui/themes/styles.css';
 import pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router } from 'react-router-dom';
-
+import CytoscapeComponent from 'react-cytoscapejs';
 
 function App() {
   const [message, setMessage] = useState('');
@@ -47,6 +47,18 @@ function App() {
       setIsLoading(false);
     }, 2000);
   };
+  
+  const elements = [
+      { data: { id: 'one', label: 'Node 1' }, position: { x: 100, y: 100 } },
+      { data: { id: 'two', label: 'Node 2' }, position: { x: 100, y: 180 } },
+      { data: { id: 'three', label: 'Node 3' }, position: { x: 200, y: 100 } },
+      { data: { id: 'four', label: 'Node 4' }, position: { x: 200, y: 175 } },
+      { data: { id: 'five', label: 'Node 5' }, position: { x: 200, y: 250 } },
+      { data: { source: 'one', target: 'four', label: 'Edge from Node1 to Node4' } },
+      { data: { source: 'two', target: 'three', label: 'Edge from Node2 to Node3' } },
+      { data: { source: 'one', target: 'five', label: 'Edge from Node1 to Node5' } },
+      { data: { source: 'two', target: 'five', label: 'Edge from Node1 to Node5' } }
+  ];
 
 
   return (
@@ -68,35 +80,18 @@ function App() {
         </Box>
 
         <Flex direction="column" gap="0" css={{ height: '100vh' }}>
-          <Tabs.Root defaultValue="monty">
+          <Tabs.Root defaultValue="home">
             <Tabs.List size="2">
-              <Tabs.Trigger value="monty">Monty Python Quotes</Tabs.Trigger>
+              <Tabs.Trigger value="home">Home</Tabs.Trigger>
               <Tabs.Trigger value="stuff">Stuff</Tabs.Trigger>
               <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
             </Tabs.List>
 
             <Box px="4" pt="3" pb="2">
-              <Tabs.Content value="monty">
+              <Tabs.Content value="home">
                 <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
                   <Flex direction="column" gap="2" height={'100vh'} style={{alignItems: 'center', justifyContent: 'center'}}>
-                    <div className='Click-me-button'>
-                      <Button onClick={generateMessage} variant='surface' size="3" gap="2">
-                        <Text size="5">
-                          Click me!
-                        </Text>
-                      </Button>
-                    </div>
-                    <div className='Click-me-text'>
-                      {isLoading ? (
-                        <div className="Progress-bar-outside">
-                          <div className="Progress-bar-inside" style={{ width: `${progress}%` }}></div>
-                        </div>
-                      ) : (
-                          <Text gap="2" style={{textAlign:'center'}}>
-                            {message}
-                          </Text>
-                      )}
-                    </div>
+                    <CytoscapeComponent elements={elements} style={ { width: '600px', height: '600px' } } />
                   </Flex>
                 </Box>
               </Tabs.Content>
@@ -162,4 +157,25 @@ export default App;
     </DropdownMenu.Item>
   </DropdownMenu.Content>
 </DropdownMenu.Root>
+*/
+
+/*
+<div className='Click-me-button'>
+  <Button onClick={generateMessage} variant='surface' size="3" gap="2">
+    <Text size="5">
+      Click me!
+    </Text>
+  </Button>
+</div>
+<div className='Click-me-text'>
+  {isLoading ? (
+    <div className="Progress-bar-outside">
+      <div className="Progress-bar-inside" style={{ width: `${progress}%` }}></div>
+    </div>
+  ) : (
+      <Text gap="2" style={{textAlign:'center'}}>
+        {message}
+      </Text>
+  )}
+</div>
 */
