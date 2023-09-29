@@ -60,7 +60,7 @@ function App() {
                 <img src={pic} alt='Tu Delft Logo' width='auto' height='30' />
               </Link>
             </Box>
-            <Link to="https://www.tudelft.nl/en/" style={{ textDecoration: 'none' }}>
+            <Link to="https://test-app-brain-builder-3dfb98072440.herokuapp.com/" style={{ textDecoration: 'none' }}>
               <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
             </Link>
             <Box></Box>
