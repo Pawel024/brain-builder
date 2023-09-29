@@ -40,15 +40,25 @@ function App() {
   }, []);  
   
   const cytoElements = [
-      { data: { id: '1', label: 'Node 1' }, position: { x: 100, y: 100 } },
-      { data: { id: '2', label: 'Node 2' }, position: { x: 100, y: 180 } },
+      { data: { id: '1', label: 'Node 1' }, position: { x: 100, y: 138 } },
+      { data: { id: '2', label: 'Node 2' }, position: { x: 100, y: 213 } },
       { data: { id: '3', label: 'Node 3' }, position: { x: 200, y: 100 } },
       { data: { id: '4', label: 'Node 4' }, position: { x: 200, y: 175 } },
       { data: { id: '5', label: 'Node 5' }, position: { x: 200, y: 250 } },
+      { data: { id: '6', label: 'Node 6' }, position: { x: 300, y: 138 } },
+      { data: { id: '7', label: 'Node 7' }, position: { x: 300, y: 213 } },
+      { data: { source: '1', target: '3'} },
       { data: { source: '1', target: '4'} },
-      { data: { source: '2', target: '3'} },
       { data: { source: '1', target: '5'} },
-      { data: { source: '2', target: '5'} }
+      { data: { source: '2', target: '3'} },
+      { data: { source: '2', target: '4'} },
+      { data: { source: '2', target: '5'} },
+      { data: { source: '3', target: '6'} },
+      { data: { source: '4', target: '6'} },
+      { data: { source: '5', target: '6'} },
+      { data: { source: '3', target: '7'} },
+      { data: { source: '4', target: '7'} },
+      { data: { source: '5', target: '7'} }
   ];
 
   const cytoStyle = [ // the stylesheet for the graph
@@ -72,7 +82,7 @@ function App() {
 
   return (
     <Router>
-    <body class='light-theme'>
+    <body class='light-theme' >
       <Theme accentColor="cyan" grayColor="slate" panelBackground="translucent" radius="large" appearance='light'>
         <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
           <Grid columns='3' mt='1'>
@@ -96,17 +106,11 @@ function App() {
               <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
             </Tabs.List>
 
-            <Box align="center" px="3" pt="3" pb="3">
+            <Box px="4" pt="3" pb="0">
               <Tabs.Content value="home">
-                <Box style={{ display: 'flex', height: '100%' }}>
-                  <CytoscapeComponent elements={cytoElements} stylesheet={cytoStyle} style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-4)", height: 0.82*windowSize.innerHeight, width: "100%", margin: "auto" }} />
-                </Box>
-              </Tabs.Content>
-
-              <Tabs.Content value="stuff">
-                <Box style={{ display: 'flex', height: '100vh' }}>
-                  <Flex direction="column" gap="2">
-                    <Text size="2">Take care of stuff.</Text>
+                <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
+                  <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
+                    <CytoscapeComponent elements={cytoElements} stylesheet={cytoStyle} panningEnabled={false} style={ { width: window.innerWidth*0.97, height: window.innerHeight-130, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
                   </Flex>
                 </Box>
               </Tabs.Content>
