@@ -7,7 +7,7 @@
  * The component uses the @radix-ui/themes library for styling.
  * @returns {JSX.Element} The JSX element representing the App component.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import { Theme, Button, Flex, Text, Box, Tabs, Heading, Grid, Separator, DropdownMenu, IconButton } from '@radix-ui/themes';
 // import { DotsHorizontalIcon } from '@radix-ui/react-icons'
@@ -21,45 +21,54 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const messages = [
-    'Strange women lying in ponds distributing swords is no basis for a system of government.',
-    'What makes you think she is a witch?',
-    'Nobody expects the Spanish Inquisition!',
-    'Look, you stupid bastard, you’ve got no arms left!',
-    'I fart in your general direction!',
-    'Tis but a scratch!'
-  ];
+  const [windowSize, setWindowSize] = useState(getWindowSize());
 
-  /**
-   * Generates a random message from the list of messages and sets it as the current message.
-   * Also displays a loading bar while the message is being generated.
-   */
-  const generateMessage = () => {
-    setIsLoading(true);
-    setProgress(0);
-    const interval = setInterval(() => {
-      setProgress(progress => progress + 10);
-    }, 200);
-    setTimeout(() => {
-      clearInterval(interval);
-      const randomIndex = Math.floor(Math.random() * messages.length);
-      setMessage(messages[randomIndex]);
-      setIsLoading(false);
-    }, 2000);
-  };
+  function getWindowSize() {
+    const {innerWidth, innerHeight} = window;
+    return {innerWidth, innerHeight};
+  }
+
+  useEffect(() => {
+    function handleWindowResize() {
+      setWindowSize(getWindowSize());
+    }
+
+    window.addEventListener('resize', handleWindowResize);
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, []);  
   
-  const elements = [
-      { data: { id: 'one', label: 'Node 1' }, position: { x: 100, y: 100 } },
-      { data: { id: 'two', label: 'Node 2' }, position: { x: 100, y: 180 } },
-      { data: { id: 'three', label: 'Node 3' }, position: { x: 200, y: 100 } },
-      { data: { id: 'four', label: 'Node 4' }, position: { x: 200, y: 175 } },
-      { data: { id: 'five', label: 'Node 5' }, position: { x: 200, y: 250 } },
-      { data: { source: 'one', target: 'four', label: 'Edge from Node1 to Node4' } },
-      { data: { source: 'two', target: 'three', label: 'Edge from Node2 to Node3' } },
-      { data: { source: 'one', target: 'five', label: 'Edge from Node1 to Node5' } },
-      { data: { source: 'two', target: 'five', label: 'Edge from Node1 to Node5' } }
+  const cytoElements = [
+      { data: { id: '1', label: 'Node 1' }, position: { x: 100, y: 100 } },
+      { data: { id: '2', label: 'Node 2' }, position: { x: 100, y: 180 } },
+      { data: { id: '3', label: 'Node 3' }, position: { x: 200, y: 100 } },
+      { data: { id: '4', label: 'Node 4' }, position: { x: 200, y: 175 } },
+      { data: { id: '5', label: 'Node 5' }, position: { x: 200, y: 250 } },
+      { data: { source: '1', target: '4'} },
+      { data: { source: '2', target: '3'} },
+      { data: { source: '1', target: '5'} },
+      { data: { source: '2', target: '5'} }
   ];
 
+  const cytoStyle = [ // the stylesheet for the graph
+    {
+      selector: 'node',
+      style: {
+        'background-color': '#666'
+      }
+    },
+
+    {
+      selector: 'edge',
+      style: {
+        'width': 3,
+        'line-color': '#ccc',
+        'target-arrow-color': '#ccc',
+        'curve-style': 'bezier'
+      }
+    }
+  ];
 
   return (
     <Router>
@@ -87,12 +96,10 @@ function App() {
               <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
             </Tabs.List>
 
-            <Box px="4" pt="3" pb="2">
+            <Box align="center" px="3" pt="3" pb="3">
               <Tabs.Content value="home">
-                <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-                  <Flex direction="column" gap="2" height={'100vh'} style={{alignItems: 'center', justifyContent: 'center'}}>
-                    <CytoscapeComponent elements={elements} style={ { width: '600px', height: '600px' } } />
-                  </Flex>
+                <Box style={{ display: 'flex', height: '100%' }}>
+                  <CytoscapeComponent elements={cytoElements} stylesheet={cytoStyle} style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-4)", height: 0.82*windowSize.innerHeight, width: "100%", margin: "auto" }} />
                 </Box>
               </Tabs.Content>
 
@@ -178,4 +185,31 @@ export default App;
       </Text>
   )}
 </div>
+*/
+
+/*
+const messages = [
+    'Strange women lying in ponds distributing swords is no basis for a system of government.',
+    'What makes you think she is a witch?',
+    'Nobody expects the Spanish Inquisition!',
+    'Look, you stupid bastard, you’ve got no arms left!',
+    'I fart in your general direction!',
+    'Tis but a scratch!'
+  ];
+*/
+
+/*
+const generateMessage = () => {
+  setIsLoading(true);
+  setProgress(0);
+  const interval = setInterval(() => {
+    setProgress(progress => progress + 10);
+  }, 200);
+  setTimeout(() => {
+    clearInterval(interval);
+    const randomIndex = Math.floor(Math.random() * messages.length);
+    setMessage(messages[randomIndex]);
+    setIsLoading(false);
+  }, 2000);
+};
 */
