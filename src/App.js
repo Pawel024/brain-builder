@@ -7,34 +7,58 @@
  * The component uses the @radix-ui/themes library for styling.
  * @returns {JSX.Element} The JSX element representing the App component.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './App.css';
-import { Theme, Button, Flex, Text, Box, Tabs, Heading, Grid, Separator, DropdownMenu, IconButton } from '@radix-ui/themes';
+import { Theme, Button, Flex, Text, Box, Tabs, Heading, Grid } from '@radix-ui/themes';
 // import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import '@radix-ui/themes/styles.css';
 import pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
+import { PlusIcon, MinusIcon } from '@radix-ui/react-icons';
+import { styled } from '@stitches/react';
 
-function generateCytoElements(list) {
+
+
+function getWindowSize() {
+  const {innerWidth, innerHeight} = window;
+  return {innerWidth, innerHeight};
+}
+
+const FloatingButton = styled(Button, {
+  position: 'fixed',
+  zIndex: 9999,
+  borderRadius: '50%',
+  width: 40,
+  height: 40,
+  backgroundColor: 'var(--cyan-11)',
+  color: 'white',
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+  '&:hover': {
+    backgroundColor: 'var(--cyan-10)',
+  },
+});
+
+function useGenerateCytoElements(list = []) {
+  const memoizedList = useMemo(() => list, [list]);
   const cElements = [];
 
   // Generate nodes
-  list.forEach((nodesPerLayer, i) => {
+  memoizedList.forEach((nodesPerLayer, i) => {
     for (let j = 0; j < nodesPerLayer; j++) {
-      const id = list.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
+      const id = memoizedList.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
       const label = `Node ${id}`;
-      const position = { x: 100 + i * 100, y: Math.round((Math.max(...list)-nodesPerLayer) * 0.5 * 75) + 75 + j * 75 };
+      const position = { x: 100 + i * 100, y: Math.round( 0.5 * (window.innerHeight-130) - 30 + (-nodesPerLayer) * 0.5 * 60) + 60 + j * 60 };
       cElements.push({ data: { id, label }, position });
     }
   });
 
   // Generate edges
-  list.forEach((nodesPerLayer, i) => {
+  memoizedList.forEach((nodesPerLayer, i) => {
     for (let j = 0; j < nodesPerLayer; j++) {
-      const source = list.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
-      for (let k = 0; k < list[i+1]; k++) {
-        const target = list.slice(0, i+1).reduce((acc, curr) => acc + curr, 0) + k;
+      const source = memoizedList.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
+      for (let k = 0; k < memoizedList[i+1]; k++) {
+        const target = memoizedList.slice(0, i+1).reduce((acc, curr) => acc + curr, 0) + k;
         if (target <= cElements.length) {
           cElements.push({ data: { source, target } });
         }
@@ -42,18 +66,30 @@ function generateCytoElements(list) {
     }
   });
 
-  console.log(cElements);
-
   return cElements;
 }
 
 function App() {
   const [windowSize, setWindowSize] = useState(getWindowSize());
+  const [cytoLayers, setCytoLayers] = useState([1, 2, 3, 3, 3, 3, 3, 3, 2, 1]);
 
-  function getWindowSize() {
-    const {innerWidth, innerHeight} = window;
-    return {innerWidth, innerHeight};
-  }
+  const cytoElements = useGenerateCytoElements(cytoLayers);
+
+  const addNode = useCallback((column) => {
+    setCytoLayers(prevLayers => {
+      const newLayers = [...prevLayers];
+      newLayers[column] += 1;
+      return newLayers;
+    });
+  }, []);
+
+  const removeNode = useCallback((column) => {
+    setCytoLayers(prevLayers => {
+      const newLayers = [...prevLayers];
+      newLayers[column] -= 1;
+      return newLayers;
+    });
+  }, []);
 
   useEffect(() => {
     function handleWindowResize() {
@@ -64,9 +100,7 @@ function App() {
     return () => {
       window.removeEventListener('resize', handleWindowResize);
     };
-  }, []);  
-  
-  const cytoElements = generateCytoElements([4, 7, 6, 4, 3, 5, 7, 5, 6, 3]); // generate elements using a list with the number of nodes for each layer
+  }, []);
 
   const cytoStyle = [ // the stylesheet for the graph
     {
@@ -118,6 +152,69 @@ function App() {
                 <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
                   <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
                     <CytoscapeComponent elements={cytoElements} stylesheet={cytoStyle} panningEnabled={false} style={ { width: window.innerWidth*0.97, height: window.innerHeight-130, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
+                    <FloatingButton onClick={ () => addNode(0) } style={{ top: 130, left: 90}}>
+                      <PlusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => addNode(1) } style={{ top: 130, left: 190}}>
+                      <PlusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => addNode(2) } style={{ top: 130, left: 290}}>
+                      <PlusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => addNode(3) } style={{ top: 130, left: 390}}>
+                      <PlusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => addNode(4) } style={{ top: 130, left: 490}}>
+                      <PlusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => addNode(5) } style={{ top: 130, left: 590}}>
+                      <PlusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => addNode(6) } style={{ top: 130, left: 690}}>
+                      <PlusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => addNode(7) } style={{ top: 130, left: 790}}>
+                      <PlusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => addNode(8) } style={{ top: 130, left: 890}}>
+                      <PlusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => addNode(9) } style={{ top: 130, left: 990}}>
+                      <PlusIcon />
+                    </FloatingButton>
+
+
+                    <FloatingButton onClick={ () => removeNode(0) } style={{ top: 640, left: 90}}>
+                      <MinusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => removeNode(1) } style={{ top: 640, left: 190}}>
+                      <MinusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => removeNode(2) } style={{ top: 640, left: 290}}>
+                      <MinusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => removeNode(3) } style={{ top: 640, left: 390}}>
+                      <MinusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => removeNode(4) } style={{ top: 640, left: 490}}>
+                      <MinusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => removeNode(5) } style={{ top: 640, left: 590}}>
+                      <MinusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => removeNode(6) } style={{ top: 640, left: 690}}>
+                      <MinusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => removeNode(7) } style={{ top: 640, left: 790}}>
+                      <MinusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => removeNode(8) } style={{ top: 640, left: 890}}>
+                      <MinusIcon />
+                    </FloatingButton>
+                    <FloatingButton onClick={ () => removeNode(9) } style={{ top: 640, left: 990}}>
+                      <MinusIcon />
+                    </FloatingButton>
+
                   </Flex>
                 </Box>
               </Tabs.Content>
