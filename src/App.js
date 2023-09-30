@@ -16,11 +16,38 @@ import pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
 
-function App() {
-  const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
+function generateCytoElements(list) {
+  const cElements = [];
 
+  // Generate nodes
+  list.forEach((nodesPerLayer, i) => {
+    for (let j = 0; j < nodesPerLayer; j++) {
+      const id = list.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
+      const label = `Node ${id}`;
+      const position = { x: 100 + i * 100, y: Math.round((Math.max(...list)-nodesPerLayer) * 0.5 * 75) + 75 + j * 75 };
+      cElements.push({ data: { id, label }, position });
+    }
+  });
+
+  // Generate edges
+  list.forEach((nodesPerLayer, i) => {
+    for (let j = 0; j < nodesPerLayer; j++) {
+      const source = list.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
+      for (let k = 0; k < list[i+1]; k++) {
+        const target = list.slice(0, i+1).reduce((acc, curr) => acc + curr, 0) + k;
+        if (target <= cElements.length) {
+          cElements.push({ data: { source, target } });
+        }
+      }
+    }
+  });
+
+  console.log(cElements);
+
+  return cElements;
+}
+
+function App() {
   const [windowSize, setWindowSize] = useState(getWindowSize());
 
   function getWindowSize() {
@@ -39,27 +66,7 @@ function App() {
     };
   }, []);  
   
-  const cytoElements = [
-      { data: { id: '1', label: 'Node 1' }, position: { x: 100, y: 138 } },
-      { data: { id: '2', label: 'Node 2' }, position: { x: 100, y: 213 } },
-      { data: { id: '3', label: 'Node 3' }, position: { x: 200, y: 100 } },
-      { data: { id: '4', label: 'Node 4' }, position: { x: 200, y: 175 } },
-      { data: { id: '5', label: 'Node 5' }, position: { x: 200, y: 250 } },
-      { data: { id: '6', label: 'Node 6' }, position: { x: 300, y: 138 } },
-      { data: { id: '7', label: 'Node 7' }, position: { x: 300, y: 213 } },
-      { data: { source: '1', target: '3'} },
-      { data: { source: '1', target: '4'} },
-      { data: { source: '1', target: '5'} },
-      { data: { source: '2', target: '3'} },
-      { data: { source: '2', target: '4'} },
-      { data: { source: '2', target: '5'} },
-      { data: { source: '3', target: '6'} },
-      { data: { source: '4', target: '6'} },
-      { data: { source: '5', target: '6'} },
-      { data: { source: '3', target: '7'} },
-      { data: { source: '4', target: '7'} },
-      { data: { source: '5', target: '7'} }
-  ];
+  const cytoElements = generateCytoElements([4, 7, 6, 4, 3, 5, 7, 5, 6, 3]); // generate elements using a list with the number of nodes for each layer
 
   const cytoStyle = [ // the stylesheet for the graph
     {
@@ -216,4 +223,34 @@ const generateMessage = () => {
     setIsLoading(false);
   }, 2000);
 };
+*/
+
+/*
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+*/
+
+/*
+const cytoElements = [
+      { data: { id: '1', label: 'Node 1' }, position: { x: 100, y: 138 } },
+      { data: { id: '2', label: 'Node 2' }, position: { x: 100, y: 213 } },
+      { data: { id: '3', label: 'Node 3' }, position: { x: 200, y: 100 } },
+      { data: { id: '4', label: 'Node 4' }, position: { x: 200, y: 175 } },
+      { data: { id: '5', label: 'Node 5' }, position: { x: 200, y: 250 } },
+      { data: { id: '6', label: 'Node 6' }, position: { x: 300, y: 138 } },
+      { data: { id: '7', label: 'Node 7' }, position: { x: 300, y: 213 } },
+      { data: { source: '1', target: '3'} },
+      { data: { source: '1', target: '4'} },
+      { data: { source: '1', target: '5'} },
+      { data: { source: '2', target: '3'} },
+      { data: { source: '2', target: '4'} },
+      { data: { source: '2', target: '5'} },
+      { data: { source: '3', target: '6'} },
+      { data: { source: '4', target: '6'} },
+      { data: { source: '5', target: '6'} },
+      { data: { source: '3', target: '7'} },
+      { data: { source: '4', target: '7'} },
+      { data: { source: '5', target: '7'} }
+  ];
 */
