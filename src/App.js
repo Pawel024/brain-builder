@@ -1,16 +1,6 @@
-/**
- * This is the main component of the app.
- * It displays a header with a logo and a title, and a tabbed interface with three tabs.
- * The first tab displays a button that generates a random quote from a list of Monty Python quotes.
- * The second tab displays a message to take care of stuff.
- * The third tab displays a message to change your settings.
- * The component uses the @radix-ui/themes library for styling.
- * @returns {JSX.Element} The JSX element representing the App component.
- */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './App.css';
 import { Theme, Button, Flex, Text, Box, Tabs, Heading, Grid } from '@radix-ui/themes';
-// import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import '@radix-ui/themes/styles.css';
 import pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router } from 'react-router-dom';
@@ -19,11 +9,6 @@ import { PlusIcon, MinusIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 
 
-
-function getWindowSize() {
-  const {innerWidth, innerHeight} = window;
-  return {innerWidth, innerHeight};
-}
 
 const FloatingButton = styled(Button, {
   position: 'fixed',
@@ -39,70 +24,8 @@ const FloatingButton = styled(Button, {
   },
 });
 
-function useGenerateCytoElements(list = []) {
-  const memoizedList = useMemo(() => list, [list]);
-  const cElements = [];
 
-  // Generate nodes
-  memoizedList.forEach((nodesPerLayer, i) => {
-    for (let j = 0; j < nodesPerLayer; j++) {
-      const id = memoizedList.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
-      const label = `Node ${id}`;
-      const position = { x: 100 + i * 100, y: Math.round( 0.5 * (window.innerHeight-130) - 30 + (-nodesPerLayer) * 0.5 * 60) + 60 + j * 60 };
-      cElements.push({ data: { id, label }, position });
-    }
-  });
-
-  // Generate edges
-  memoizedList.forEach((nodesPerLayer, i) => {
-    for (let j = 0; j < nodesPerLayer; j++) {
-      const source = memoizedList.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
-      for (let k = 0; k < memoizedList[i+1]; k++) {
-        const target = memoizedList.slice(0, i+1).reduce((acc, curr) => acc + curr, 0) + k;
-        if (target <= cElements.length) {
-          cElements.push({ data: { source, target } });
-        }
-      }
-    }
-  });
-
-  return cElements;
-}
-
-function App() {
-  const [windowSize, setWindowSize] = useState(getWindowSize());
-  const [cytoLayers, setCytoLayers] = useState([1, 2, 3, 3, 3, 3, 3, 3, 2, 1]);
-
-  const cytoElements = useGenerateCytoElements(cytoLayers);
-
-  const addNode = useCallback((column) => {
-    setCytoLayers(prevLayers => {
-      const newLayers = [...prevLayers];
-      newLayers[column] += 1;
-      return newLayers;
-    });
-  }, []);
-
-  const removeNode = useCallback((column) => {
-    setCytoLayers(prevLayers => {
-      const newLayers = [...prevLayers];
-      newLayers[column] -= 1;
-      return newLayers;
-    });
-  }, []);
-
-  useEffect(() => {
-    function handleWindowResize() {
-      setWindowSize(getWindowSize());
-    }
-
-    window.addEventListener('resize', handleWindowResize);
-    return () => {
-      window.removeEventListener('resize', handleWindowResize);
-    };
-  }, []);
-
-  const cytoStyle = [ // the stylesheet for the graph
+const cytoStyle = [ // the stylesheet for the graph
     {
       selector: 'node',
       style: {
@@ -121,6 +44,86 @@ function App() {
     }
   ];
 
+
+
+function getWindowSize() {
+  const {innerWidth, innerHeight} = window;
+  return {innerWidth, innerHeight};
+}
+
+  
+function useGenerateCytoElements(list = []) {
+  const memoizedList = useMemo(() => list, [list]);
+  const cElements = [];
+
+  // Generate nodes
+  memoizedList.forEach((nodesPerLayer, i) => {
+    for (let j = 0; j < nodesPerLayer; j++) {
+      const id = memoizedList.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
+      const label = `Node ${id}`;
+      const position = { x: 100 + i * 100, y: Math.round( 0.5 * (window.innerHeight-130) - 30 + (-nodesPerLayer) * 0.5 * 60) + 60 + j * 60 };
+      cElements.push({ data: { id, label }, position });
+    }
+  });
+
+  // Generate lines between nodes
+  memoizedList.forEach((nodesPerLayer, i) => {
+    for (let j = 0; j < nodesPerLayer; j++) {
+      const source = memoizedList.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
+      for (let k = 0; k < memoizedList[i+1]; k++) {
+        const target = memoizedList.slice(0, i+1).reduce((acc, curr) => acc + curr, 0) + k;
+        if (target <= cElements.length) {
+          cElements.push({ data: { source, target } });
+        }
+      }
+    }
+  });
+
+  return cElements;
+}
+
+
+function App() {
+  const [windowSize, setWindowSize] = useState(getWindowSize());
+
+  // make a list of nodes per layer that can be updated
+  const [cytoLayers, setCytoLayers] = useState([1, 2, 3, 3, 3, 3, 3, 3, 2, 1]);
+
+  // make a list of cytoscape elements that can be updated
+  const cytoElements = useGenerateCytoElements(cytoLayers);
+
+  // function to add a node to a layer
+  const addNode = useCallback((column) => {
+    setCytoLayers(prevLayers => {
+      const newLayers = [...prevLayers];
+      newLayers[column] += 1;
+      return newLayers;
+    });
+  }, []);
+
+  // function to remove a node from a layer
+  const removeNode = useCallback((column) => {
+    setCytoLayers(prevLayers => {
+      const newLayers = [...prevLayers];
+      newLayers[column] -= 1;
+      return newLayers;
+    });
+  }, []);
+
+  // update window size when window is resized
+  useEffect(() => {
+    function handleWindowResize() {
+      setWindowSize(getWindowSize());
+    }
+
+    window.addEventListener('resize', handleWindowResize);
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, []);
+
+
+  // actual content of the app
   return (
     <Router>
     <body class='light-theme' >
