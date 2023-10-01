@@ -101,16 +101,15 @@
   align-items: center;
   user-select: none;
   touch-action: none;
-  width: 200px;
   height: 20px;
 }
 
 .SliderTrack {
-  background-color: var(--slate-a12);
+  background-color: var(--slate-a11);
   position: relative;
   flex-grow: 1;
   border-radius: 9999px;
-  height: 3px;
+  height: 4px;
 }
 
 .SliderRange {

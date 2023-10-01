@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './App.css';
-import { Theme, Button, Flex, Text, Box, Tabs, Heading, Grid } from '@radix-ui/themes';
+import { Theme, Button, Flex, Text, Box, Tabs, Heading, Grid, IconButton, Separator } from '@radix-ui/themes';
 import * as Slider from '@radix-ui/react-slider';
 import '@radix-ui/themes/styles.css';
 import pic from "./tud_black_new.png";
@@ -9,39 +9,14 @@ import CytoscapeComponent from 'react-cytoscapejs';
 import { PlusIcon, MinusIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 
-const FloatingButton = styled(Button, {
+const FloatingButton = styled(IconButton, {
   position: 'absolute',
   zIndex: 9999,
-  borderRadius: '50%',
-  width: 40,
-  height: 40,
-  backgroundColor: 'var(--slate-a12)',
-  color: 'white',
-  boxShadow: '0 3px 10px var(--slate-a11)',
-  '&:hover': {
-    backgroundColor: 'var(--cyan-a11)',
-  },
+  borderRadius: 'var(--radius-3)',
+  width: 35,
+  height: 35,
+  boxShadow: '0 3px 10px var(--slate-a10)'
 });
-
-
-const cytoStyle = [ // the stylesheet for the graph
-    {
-      selector: 'node',
-      style: {
-        'background-color': '#666'
-      }
-    },
-
-    {
-      selector: 'edge',
-      style: {
-        'width': 3,
-        'line-color': '#ccc',
-        'target-arrow-color': '#ccc',
-        'curve-style': 'bezier'
-      }
-    }
-  ];
 
 
 
@@ -61,8 +36,10 @@ function useGenerateCytoElements(list = []) {
       const id = memoizedList.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
       const label = `Node ${id}`;
       const hAvailable = window.innerHeight - 300;
-      const distBetweenNodes = hAvailable/Math.max(...memoizedList);
-      const position = { x: 100 + i * 100, y: Math.round( 0.5 * (window.innerHeight-10) - 60 - 0.5*distBetweenNodes + (-nodesPerLayer) * 0.5 * distBetweenNodes + distBetweenNodes + j * distBetweenNodes) };
+      const wAvailable = Math.round(0.7 * (window.innerWidth * 0.97));
+      const xDistBetweenNodes = Math.round(wAvailable/memoizedList.length);
+      const yDistBetweenNodes = Math.round(hAvailable/Math.max(...memoizedList));
+      const position = { x: Math.round((0.78 * window.innerWidth * 0.97) + (i-memoizedList.length) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
       cElements.push({ data: { id, label }, position });
     }
   });
@@ -84,14 +61,41 @@ function useGenerateCytoElements(list = []) {
 }
 
 
+function useGenerateCytoStyle(list = []) {
+  const memoizedList = useMemo(() => list, [list]);
+  const cStyle = [ // the base stylesheet for the graph
+    {
+      selector: 'node',
+      style: {
+        'background-color': '#666',
+        'width': 180/Math.max(...list),
+        'height': 180/Math.max(...list)
+      }
+    },
+
+    {
+      selector: 'edge',
+      style: {
+        'width': 1,
+        'line-color': 'var(--slate-a10)',
+        'curve-style': 'bezier'
+      }
+    }
+  ];
+  return cStyle;
+}
+
+
+
 function App() {
   const [windowSize, setWindowSize] = useState(getWindowSize());
 
   // make a list of nodes per layer that can be updated
-  const [cytoLayers, setCytoLayers] = useState([1, 2, 3, 3, 3, 3, 3, 3, 2, 1]);
+  const [cytoLayers, setCytoLayers] = useState([1, 2, 3, 3, 64, 3, 3, 3, 2, 1]);
 
   // make a list of cytoscape elements that can be updated
   const cytoElements = useGenerateCytoElements(cytoLayers);
+  const cytoStyle = useGenerateCytoStyle(cytoLayers);
 
   // function to add a node to a layer
   const addNode = useCallback((column) => {
@@ -156,93 +160,96 @@ function App() {
                 <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
                   <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
                     <CytoscapeComponent elements={cytoElements} stylesheet={cytoStyle} panningEnabled={false} style={ { width: window.innerWidth*0.97, height: window.innerHeight-130, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
-                    <FloatingButton onClick={ () => addNode(0) } style={{ top: 20, left: 80}}>
+                    <FloatingButton variant="outline" onClick={ () => addNode(0) } style={{ top: 20, left: 98}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(1) } style={{ top: 20, left: 180}}>
+                    <FloatingButton variant="outline" onClick={ () => addNode(1) } style={{ top: 20, left: 198}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(2) } style={{ top: 20, left: 280}}>
+                    <FloatingButton variant="outline" onClick={ () => addNode(2) } style={{ top: 20, left: 298}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(3) } style={{ top: 20, left: 380}}>
+                    <FloatingButton variant="outline" onClick={ () => addNode(3) } style={{ top: 20, left: 398}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(4) } style={{ top: 20, left: 480}}>
+                    <FloatingButton variant="outline" onClick={ () => addNode(4) } style={{ top: 20, left: 498}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(5) } style={{ top: 20, left: 580}}>
+                    <FloatingButton variant="outline" onClick={ () => addNode(5) } style={{ top: 20, left: 598}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(6) } style={{ top: 20, left: 680}}>
+                    <FloatingButton variant="outline" onClick={ () => addNode(6) } style={{ top: 20, left: 698}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(7) } style={{ top: 20, left: 780}}>
+                    <FloatingButton variant="outline" onClick={ () => addNode(7) } style={{ top: 20, left: 798}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(8) } style={{ top: 20, left: 880}}>
+                    <FloatingButton variant="outline" onClick={ () => addNode(8) } style={{ top: 20, left: 898}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(9) } style={{ top: 20, left: 980}}>
+                    <FloatingButton variant="outline" onClick={ () => addNode(9) } style={{ top: 20, left: 998}}>
                       <PlusIcon />
                     </FloatingButton>
 
 
-                    <FloatingButton onClick={ () => removeNode(0) } style={{ top: 550, left: 80}}>
+                    <FloatingButton variant="outline" onClick={ () => removeNode(0) } style={{ top: 550, left: 98}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(1) } style={{ top: 550, left: 180}}>
+                    <FloatingButton variant="outline" onClick={ () => removeNode(1) } style={{ top: 550, left: 198}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(2) } style={{ top: 550, left: 280}}>
+                    <FloatingButton variant="outline" onClick={ () => removeNode(2) } style={{ top: 550, left: 298}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(3) } style={{ top: 550, left: 380}}>
+                    <FloatingButton variant="outline" onClick={ () => removeNode(3) } style={{ top: 550, left: 398}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(4) } style={{ top: 550, left: 480}}>
+                    <FloatingButton variant="outline" onClick={ () => removeNode(4) } style={{ top: 550, left: 498}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(5) } style={{ top: 550, left: 580}}>
+                    <FloatingButton variant="outline" onClick={ () => removeNode(5) } style={{ top: 550, left: 598}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(6) } style={{ top: 550, left: 680}}>
+                    <FloatingButton variant="outline" onClick={ () => removeNode(6) } style={{ top: 550, left: 698}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(7) } style={{ top: 550, left: 780}}>
+                    <FloatingButton variant="outline" onClick={ () => removeNode(7) } style={{ top: 550, left: 798}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(8) } style={{ top: 550, left: 880}}>
+                    <FloatingButton variant="outline" onClick={ () => removeNode(8) } style={{ top: 550, left: 898}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(9) } style={{ top: 550, left: 980}}>
+                    <FloatingButton variant="outline" onClick={ () => removeNode(9) } style={{ top: 550, left: 998}}>
                       <MinusIcon />
                     </FloatingButton>
 
                   </Flex>
                 </Box>
+                
+                <Separator orientation='vertical' style = {{ position:"absolute", top: Math.round(0.05 * (window.innerHeight-140)), left: Math.round(0.8 * (window.innerWidth * 0.97)), height: 0.9 * (window.innerHeight-140) }}/>
 
-                <Box style={{ position:"absolute", top: 80, left: 1150, alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
-                <form>
-                  <Slider.Root className="SliderRoot" defaultValue={[50]} max={100} step={1}>
-                    <Slider.Track className="SliderTrack" >
-                      <Slider.Range className="SliderRange"/>
-                    </Slider.Track>
-                    <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
-                  </Slider.Root>
-                </form>
+                <Box style={{ position:"absolute", top: 0.15 * (window.innerHeight-140), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
+                  <form>
+                    <Slider.Root className="SliderRoot" defaultValue={[50]} max={100} step={1} style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}  >
+                      <Slider.Track className="SliderTrack" style={{ height: 3 }}>
+                        <Slider.Range className="SliderRange"/>
+                      </Slider.Track>
+                      <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
+                    </Slider.Root>
+                  </form>
                 </Box>
 
-                <Box style={{ position:"absolute", top: 180, left: 1150, alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
-                <form>
-                  <Slider.Root className="SliderRoot" defaultValue={[50]} max={100} step={1}>
-                    <Slider.Track className="SliderTrack" >
-                      <Slider.Range className="SliderRange"/>
-                    </Slider.Track>
-                    <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
-                  </Slider.Root>
-                </form>
+                <Box style={{ position:"absolute", top: Math.round(0.30 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
+                  <form>
+                    <Slider.Root className="SliderRoot" defaultValue={[50]} max={100} step={1} style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}>
+                      <Slider.Track className="SliderTrack" style={{ height: 3 }}>
+                        <Slider.Range className="SliderRange"/>
+                      </Slider.Track>
+                      <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
+                    </Slider.Root>
+                  </form>
                 </Box>
+                
               </Tabs.Content>
 
               <Tabs.Content value="settings">
