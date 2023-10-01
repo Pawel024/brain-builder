@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './App.css';
 import { Theme, Button, Flex, Text, Box, Tabs, Heading, Grid } from '@radix-ui/themes';
+import * as Slider from '@radix-ui/react-slider';
 import '@radix-ui/themes/styles.css';
 import pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router } from 'react-router-dom';
@@ -8,19 +9,17 @@ import CytoscapeComponent from 'react-cytoscapejs';
 import { PlusIcon, MinusIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 
-
-
 const FloatingButton = styled(Button, {
-  position: 'fixed',
+  position: 'absolute',
   zIndex: 9999,
   borderRadius: '50%',
   width: 40,
   height: 40,
-  backgroundColor: 'var(--cyan-11)',
+  backgroundColor: 'var(--slate-a12)',
   color: 'white',
-  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+  boxShadow: '0 3px 10px var(--slate-a11)',
   '&:hover': {
-    backgroundColor: 'var(--cyan-10)',
+    backgroundColor: 'var(--cyan-a11)',
   },
 });
 
@@ -61,7 +60,9 @@ function useGenerateCytoElements(list = []) {
     for (let j = 0; j < nodesPerLayer; j++) {
       const id = memoizedList.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
       const label = `Node ${id}`;
-      const position = { x: 100 + i * 100, y: Math.round( 0.5 * (window.innerHeight-130) - 30 + (-nodesPerLayer) * 0.5 * 60) + 60 + j * 60 };
+      const hAvailable = window.innerHeight - 300;
+      const distBetweenNodes = hAvailable/Math.max(...memoizedList);
+      const position = { x: 100 + i * 100, y: Math.round( 0.5 * (window.innerHeight-10) - 60 - 0.5*distBetweenNodes + (-nodesPerLayer) * 0.5 * distBetweenNodes + distBetweenNodes + j * distBetweenNodes) };
       cElements.push({ data: { id, label }, position });
     }
   });
@@ -135,7 +136,7 @@ function App() {
                 <img src={pic} alt='Tu Delft Logo' width='auto' height='30' />
               </Link>
             </Box>
-            <Link to="https://test-app-brain-builder-3dfb98072440.herokuapp.com/" style={{ textDecoration: 'none' }}>
+            <Link to="https://test-app-brain-builder-3dfb91072440.herokuapp.com/" style={{ textDecoration: 'none' }}>
               <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
             </Link>
             <Box></Box>
@@ -155,77 +156,99 @@ function App() {
                 <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
                   <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
                     <CytoscapeComponent elements={cytoElements} stylesheet={cytoStyle} panningEnabled={false} style={ { width: window.innerWidth*0.97, height: window.innerHeight-130, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
-                    <FloatingButton onClick={ () => addNode(0) } style={{ top: 130, left: 90}}>
+                    <FloatingButton onClick={ () => addNode(0) } style={{ top: 20, left: 80}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(1) } style={{ top: 130, left: 190}}>
+                    <FloatingButton onClick={ () => addNode(1) } style={{ top: 20, left: 180}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(2) } style={{ top: 130, left: 290}}>
+                    <FloatingButton onClick={ () => addNode(2) } style={{ top: 20, left: 280}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(3) } style={{ top: 130, left: 390}}>
+                    <FloatingButton onClick={ () => addNode(3) } style={{ top: 20, left: 380}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(4) } style={{ top: 130, left: 490}}>
+                    <FloatingButton onClick={ () => addNode(4) } style={{ top: 20, left: 480}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(5) } style={{ top: 130, left: 590}}>
+                    <FloatingButton onClick={ () => addNode(5) } style={{ top: 20, left: 580}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(6) } style={{ top: 130, left: 690}}>
+                    <FloatingButton onClick={ () => addNode(6) } style={{ top: 20, left: 680}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(7) } style={{ top: 130, left: 790}}>
+                    <FloatingButton onClick={ () => addNode(7) } style={{ top: 20, left: 780}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(8) } style={{ top: 130, left: 890}}>
+                    <FloatingButton onClick={ () => addNode(8) } style={{ top: 20, left: 880}}>
                       <PlusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => addNode(9) } style={{ top: 130, left: 990}}>
+                    <FloatingButton onClick={ () => addNode(9) } style={{ top: 20, left: 980}}>
                       <PlusIcon />
                     </FloatingButton>
 
 
-                    <FloatingButton onClick={ () => removeNode(0) } style={{ top: 640, left: 90}}>
+                    <FloatingButton onClick={ () => removeNode(0) } style={{ top: 550, left: 80}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(1) } style={{ top: 640, left: 190}}>
+                    <FloatingButton onClick={ () => removeNode(1) } style={{ top: 550, left: 180}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(2) } style={{ top: 640, left: 290}}>
+                    <FloatingButton onClick={ () => removeNode(2) } style={{ top: 550, left: 280}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(3) } style={{ top: 640, left: 390}}>
+                    <FloatingButton onClick={ () => removeNode(3) } style={{ top: 550, left: 380}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(4) } style={{ top: 640, left: 490}}>
+                    <FloatingButton onClick={ () => removeNode(4) } style={{ top: 550, left: 480}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(5) } style={{ top: 640, left: 590}}>
+                    <FloatingButton onClick={ () => removeNode(5) } style={{ top: 550, left: 580}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(6) } style={{ top: 640, left: 690}}>
+                    <FloatingButton onClick={ () => removeNode(6) } style={{ top: 550, left: 680}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(7) } style={{ top: 640, left: 790}}>
+                    <FloatingButton onClick={ () => removeNode(7) } style={{ top: 550, left: 780}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(8) } style={{ top: 640, left: 890}}>
+                    <FloatingButton onClick={ () => removeNode(8) } style={{ top: 550, left: 880}}>
                       <MinusIcon />
                     </FloatingButton>
-                    <FloatingButton onClick={ () => removeNode(9) } style={{ top: 640, left: 990}}>
+                    <FloatingButton onClick={ () => removeNode(9) } style={{ top: 550, left: 980}}>
                       <MinusIcon />
                     </FloatingButton>
 
                   </Flex>
+                </Box>
+
+                <Box style={{ position:"absolute", top: 80, left: 1150, alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
+                <form>
+                  <Slider.Root className="SliderRoot" defaultValue={[50]} max={100} step={1}>
+                    <Slider.Track className="SliderTrack" >
+                      <Slider.Range className="SliderRange"/>
+                    </Slider.Track>
+                    <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
+                  </Slider.Root>
+                </form>
+                </Box>
+
+                <Box style={{ position:"absolute", top: 180, left: 1150, alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
+                <form>
+                  <Slider.Root className="SliderRoot" defaultValue={[50]} max={100} step={1}>
+                    <Slider.Track className="SliderTrack" >
+                      <Slider.Range className="SliderRange"/>
+                    </Slider.Track>
+                    <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
+                  </Slider.Root>
+                </form>
                 </Box>
               </Tabs.Content>
 
               <Tabs.Content value="settings">
                 <Box style={{ display: 'flex', height: '100vh' }}>
                   <Flex direction="column" gap="2">
-                    <Text size="2">Change your settings.</Text>
+                    <Text size="2">Change your settings.</Text> 
                   </Flex>
                 </Box>
               </Tabs.Content>
