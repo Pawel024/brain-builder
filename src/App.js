@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './App.css';
-import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator } from '@radix-ui/themes';
+import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator, Callout } from '@radix-ui/themes';
 import * as Slider from '@radix-ui/react-slider';
 import '@radix-ui/themes/styles.css';
 import pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
-import { PlusIcon, MinusIcon, PlayIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, PlayIcon, InfoCircledIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import monty_python_pic from "./monty-python.jpeg";
@@ -303,7 +303,17 @@ function App() {
               <Tabs.Content value="stuff">
                 <Flex direction="column" gap="2">
                 <label className="Label" htmlFor="stuff" style={{ paddingRight: 15 }}>
-                  {isMontyPythonLover ? "stuff." : "A Monty Python hater does not deserve stuff. Go to settings and change your mode."}
+                  {isMontyPythonLover ?
+                  "stuff." :
+                  <Callout.Root>
+                    <Callout.Icon>
+                      <InfoCircledIcon />
+                    </Callout.Icon>
+                    <Callout.Text>
+                      You have to be a Monty Python lover to see the stuff. Turn on Monty Python lover mode in the settings.
+                    </Callout.Text>
+                  </Callout.Root>
+                  }
                 </label>
                 {isMontyPythonLover && <img src={monty_python_pic} alt="Monty Python"/>}
                 </Flex>
