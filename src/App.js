@@ -6,9 +6,13 @@ import '@radix-ui/themes/styles.css';
 import pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
-import { PlusIcon, MinusIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, PlayIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
+import monty_python_pic from "./monty-python.jpeg";
+
+
+// ------- STYLED COMPONENTS -------
 
 const FloatingButton = styled(IconButton, {
   position: 'absolute',
@@ -20,12 +24,10 @@ const FloatingButton = styled(IconButton, {
 });
 
 
-function getWindowSize() {
-  const {innerWidth, innerHeight} = window;
-  return {innerWidth, innerHeight};
-}
 
-  
+// ------- CYTOSCAPE FUNCTIONS -------
+
+// function to generate cytoscape elements
 function useGenerateCytoElements(list = []) {
   const memoizedList = useMemo(() => list, [list]);
   const cElements = [];
@@ -61,6 +63,7 @@ function useGenerateCytoElements(list = []) {
 }
 
 
+// function to generate cytoscape style
 function useGenerateCytoStyle(list = []) {
   const cStyle = [ // the base stylesheet for the graph
     {
@@ -85,8 +88,17 @@ function useGenerateCytoStyle(list = []) {
 }
 
 
+// ------- APP FUNCTION -------
 
 function App() {
+
+  // ------- WINDOW RESIZING -------
+
+  function getWindowSize() {
+    const {innerWidth, innerHeight} = window;
+    return {innerWidth, innerHeight};
+  }
+  
   const [windowSize, setWindowSize] = useState(getWindowSize());
 
   // update window size when window is resized
@@ -100,6 +112,10 @@ function App() {
       window.removeEventListener('resize', handleWindowResize);
     };
   }, []);
+
+
+
+  // ------- CYTOSCAPE EDITING -------
 
   // make a list of nodes per layer that can be updated
   const [cytoLayers, setCytoLayers] = useState([1, 2, 3, 3, 24, 3, 3, 3, 2, 1]);
@@ -126,6 +142,10 @@ function App() {
     });
   }, []);
 
+
+
+  // ------- FLOATING BUTTONS -------
+
   // function to generate floating buttons
   function generateFloatingButtons(top, left, dist, layers, isItPlus) {
     const buttons = [];
@@ -150,6 +170,10 @@ function App() {
     return buttons;
   }
 
+
+
+  // ------- SWITCHES -------
+
   const [isMontyPythonLover, setIsMontyPythonLover] = useState(true);
 
   const MontyPythonSwitch = () => {
@@ -160,9 +184,15 @@ function App() {
     )
   }
 
+
+
+  // ------- SLIDERS -------
+
+  // initiate iterations and learning rate as variables with a useState hook
   const [iterations, setIterations] = useState(50);
   const [learningRate, setLearningRate] = useState(0.00001);
 
+  // create a slider for iterations
   const iterationsSlider = useMemo(() => {
     return (
       <Slider.Root
@@ -181,11 +211,12 @@ function App() {
     );
   }, [iterations, setIterations]);
 
+  // create a slider for learning rate
   const learningRateSlider = useMemo(() => {
     return (
-      <Slider.Root
+      <Slider.Root id="learningRateSlider"
         className="SliderRoot"
-        defaultValue={[50]}
+        defaultValue={[Math.round(-10*Math.log10(learningRate))]}
         onValueChange={(value) => setLearningRate((10 ** Math.round(value[0] / -10)).toFixed(Math.round(value[0] / 10)))}
         max={100}
         step={10}
@@ -197,13 +228,17 @@ function App() {
         <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
       </Slider.Root>
     );
-  }, [setLearningRate]);
+  }, [learningRate, setLearningRate]);
 
-  // actual content of the app
+
+
+
+  // ------- RETURN THE APP CONTENT -------
   return (
     <Router>
     <body class='light-theme' >
       <Theme accentColor="cyan" grayColor="slate" panelBackground="solid" radius="large" appearance='light'>
+        
         <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
           <Grid columns='3' mt='1'>
             <Box align='start' ml='3' >
@@ -218,15 +253,20 @@ function App() {
           </Grid>
         </Box>
 
+
         <Flex direction="column" gap="0" css={{ height: '100vh' }}>
+
           <Tabs.Root defaultValue="home">
+
             <Tabs.List size="2">
-              <Tabs.Trigger value="home">Home</Tabs.Trigger>
+              <Tabs.Trigger value="home" >Home</Tabs.Trigger>
               <Tabs.Trigger value="stuff">Stuff</Tabs.Trigger>
               <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
             </Tabs.List>
 
             <Box px="4" pt="3" pb="0">
+
+
               <Tabs.Content value="home">
                 <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
                   <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
@@ -250,33 +290,47 @@ function App() {
                   <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', borderRadius: 'var(--radius-3)'}}>{learningRate}</div>
                 </Box>
                 
-                <IconButton variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: 'bold' }}>
-                  Start training!
+                <IconButton variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                  <Flex direction="horizontal" gap="2" style={{alignItems: "center"}}>
+                    <PlayIcon width="18" height="18" />Start training!
+                  </Flex>
                 </IconButton>
 
               </Tabs.Content>
 
+
+
               <Tabs.Content value="stuff">
+                <Flex direction="column" gap="2">
                 <label className="Label" htmlFor="stuff" style={{ paddingRight: 15 }}>
-                  stuff.
+                  {isMontyPythonLover ? "stuff." : "A Monty Python hater does not deserve stuff. Go to settings and change your mode."}
                 </label>
+                {isMontyPythonLover && <img src={monty_python_pic} alt="Monty Python"/>}
+                </Flex>
               </Tabs.Content>
+
+
 
               <Tabs.Content value="settings">
                 <Box style={{ display: 'flex', height: '100vh' }}>
                 <form>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <label className="Label" htmlFor="monty-python-mode" style={{ paddingRight: 15 }}>
-                      {isMontyPythonLover ? 'Monty Python lover' : 'Monty Python hater'}
+                      Monty Python lover mode
                     </label>
                     <MontyPythonSwitch />
                   </div>
                 </form>
                 </Box>
               </Tabs.Content>
+
+
             </Box>
+
           </Tabs.Root>
+
         </Flex>
+
       </Theme>
     </body>
     </Router>
