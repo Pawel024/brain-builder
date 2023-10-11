@@ -128,7 +128,7 @@ function App() {
   const addNode = useCallback((column) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      newLayers[column] < 128 ? newLayers[column] += 1 : newLayers[column] = 128;
+      newLayers[column] < 16 ? newLayers[column] += 1 : newLayers[column] = 16;
       document.getElementById("input" + column).value = newLayers[column];
       return newLayers;
     });
@@ -150,8 +150,8 @@ function App() {
     if (nodeInput && Number.isInteger(nodeInput)) {
       if (nodeInput < 1) {
         nodeInput = 1;
-      } else if (nodeInput > 128) {
-        nodeInput = 128;
+      } else if (nodeInput > 16) {
+        nodeInput = 16;
       }
       setCytoLayers(prevLayers => {
         const newLayers = [...prevLayers];
@@ -176,7 +176,7 @@ function App() {
         <div>
           <FloatingButton
             variant="outline"
-            disabled={(isItPlus && cytoLayers[i] > 127) | (!isItPlus && cytoLayers[i] < 2)}
+            disabled={(isItPlus && cytoLayers[i] >= 16) | (!isItPlus && cytoLayers[i] < 2)}
             onClick = {isItPlus ? () => addNode(i) : () => removeNode(i)}
             style={{...style}}
             key={i}
