@@ -10,6 +10,7 @@ import { PlusIcon, MinusIcon, PlayIcon, InfoCircledIcon } from '@radix-ui/react-
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import monty_python_pic from "./monty-python.jpeg";
+import { eventWrapper } from '@testing-library/user-event/dist/utils';
 
 
 // ------- STYLED COMPONENTS -------
@@ -87,7 +88,6 @@ function useGenerateCytoStyle(list = []) {
   return cStyle;
 }
 
-
 // ------- APP FUNCTION -------
 
 function App() {
@@ -128,7 +128,8 @@ function App() {
   const addNode = useCallback((column) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      newLayers[column] += 1;
+      newLayers[column] < 128 ? newLayers[column] += 1 : newLayers[column] = 128;
+      document.getElementById("input" + column).value = newLayers[column];
       return newLayers;
     });
   }, []);
@@ -137,12 +138,31 @@ function App() {
   const removeNode = useCallback((column) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      newLayers[column] -= 1;
+      newLayers[column] > 1 ? newLayers[column] -= 1 : newLayers[column] = 1;
+      document.getElementById("input" + column).value = newLayers[column];
       return newLayers;
     });
   }, []);
 
-
+  // function to set a custom number of nodes for a layer
+  const setNodes = useCallback((column) => {
+    var nodeInput = Number(document.getElementById("input" + column).value)
+    if (nodeInput && Number.isInteger(nodeInput)) {
+      if (nodeInput < 1) {
+        nodeInput = 1;
+      } else if (nodeInput > 128) {
+        nodeInput = 128;
+      }
+      setCytoLayers(prevLayers => {
+        const newLayers = [...prevLayers];
+        newLayers[column] = nodeInput;
+        return newLayers;
+      });
+    } else {
+      nodeInput = cytoLayers[column];
+    }
+    document.getElementById("input" + column).value = nodeInput;
+  }, [cytoLayers]);
 
   // ------- FLOATING BUTTONS -------
 
@@ -156,13 +176,41 @@ function App() {
         <div>
           <FloatingButton
             variant="outline"
+            disabled={(isItPlus && cytoLayers[i] > 127) | (!isItPlus && cytoLayers[i] < 2)}
             onClick = {isItPlus ? () => addNode(i) : () => removeNode(i)}
             style={{...style}}
             key={i}
           >
             {icon}
           </FloatingButton>
-          {isItPlus && <div style={{ position: 'absolute', top: window.innerHeight - 258, left: left + i * dist + 16.5, transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--cyan-12)', fontWeight: 'bold' }}>{layers[i]}</div>}
+          {isItPlus &&
+          <form>
+            <input
+            id={"input" + i}
+            type="text"
+            defaultValue={layers[i]}
+            style={{
+              border: 'none',
+              width: 0.02 * (window.innerWidth * 0.97),
+              textAlign: 'center',
+              position: 'absolute',
+              top: window.innerHeight - 258,
+              left: left + i * dist + 16.5,
+              transform: 'translateX(-50%)',
+              fontSize: '14px',
+              color: 'var(--cyan-12)',
+              fontWeight: 'bold'
+            }}
+            onBlur={() => setNodes(i)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                setNodes(i);
+              }
+            }}
+            />
+          </form>
+          }
         </div>
       );
       buttons.push(button);
@@ -174,7 +222,7 @@ function App() {
 
   // ------- SWITCHES -------
 
-  const [isMontyPythonLover, setIsMontyPythonLover] = useState(true);
+  const [isMontyPythonLover, setIsMontyPythonLover] = useState(false);
 
   const MontyPythonSwitch = () => {
     return (
