@@ -164,6 +164,8 @@ function App() {
     document.getElementById("input" + column).value = nodeInput;
   }, [cytoLayers]);
 
+
+
   // ------- FLOATING BUTTONS -------
 
   // function to generate floating buttons
@@ -432,82 +434,4 @@ export default App;
     </DropdownMenu.Item>
   </DropdownMenu.Content>
 </DropdownMenu.Root>
-*/
-
-/*
-<div className='Click-me-button'>
-  <Button onClick={generateMessage} variant='surface' size="3" gap="2">
-    <Text size="5">
-      Click me!
-    </Text>
-  </Button>
-</div>
-<div className='Click-me-text'>
-  {isLoading ? (
-    <div className="Progress-bar-outside">
-      <div className="Progress-bar-inside" style={{ width: `${progress}%` }}></div>
-    </div>
-  ) : (
-      <Text gap="2" style={{textAlign:'center'}}>
-        {message}
-      </Text>
-  )}
-</div>
-*/
-
-/*
-const messages = [
-    'Strange women lying in ponds distributing swords is no basis for a system of government.',
-    'What makes you think she is a witch?',
-    'Nobody expects the Spanish Inquisition!',
-    'Look, you stupid bastard, you’ve got no arms left!',
-    'I fart in your general direction!',
-    'Tis but a scratch!'
-  ];
-*/
-
-/*
-const generateMessage = () => {
-  setIsLoading(true);
-  setProgress(0);
-  const interval = setInterval(() => {
-    setProgress(progress => progress + 10);
-  }, 200);
-  setTimeout(() => {
-    clearInterval(interval);
-    const randomIndex = Math.floor(Math.random() * messages.length);
-    setMessage(messages[randomIndex]);
-    setIsLoading(false);
-  }, 2000);
-};
-*/
-
-/*
-  const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
-*/
-
-/*
-const cytoElements = [
-      { data: { id: '1', label: 'Node 1' }, position: { x: 100, y: 138 } },
-      { data: { id: '2', label: 'Node 2' }, position: { x: 100, y: 213 } },
-      { data: { id: '3', label: 'Node 3' }, position: { x: 200, y: 100 } },
-      { data: { id: '4', label: 'Node 4' }, position: { x: 200, y: 175 } },
-      { data: { id: '5', label: 'Node 5' }, position: { x: 200, y: 250 } },
-      { data: { id: '6', label: 'Node 6' }, position: { x: 300, y: 138 } },
-      { data: { id: '7', label: 'Node 7' }, position: { x: 300, y: 213 } },
-      { data: { source: '1', target: '3'} },
-      { data: { source: '1', target: '4'} },
-      { data: { source: '1', target: '5'} },
-      { data: { source: '2', target: '3'} },
-      { data: { source: '2', target: '4'} },
-      { data: { source: '2', target: '5'} },
-      { data: { source: '3', target: '6'} },
-      { data: { source: '4', target: '6'} },
-      { data: { source: '5', target: '6'} },
-      { data: { source: '3', target: '7'} },
-      { data: { source: '4', target: '7'} },
-      { data: { source: '5', target: '7'} }
-  ];
 */
