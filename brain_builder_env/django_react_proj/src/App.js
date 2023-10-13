@@ -3,13 +3,14 @@ import './App.css';
 import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator, Callout } from '@radix-ui/themes';
 import * as Slider from '@radix-ui/react-slider';
 import '@radix-ui/themes/styles.css';
-import pic from "./tud_black_new.png";
+import tu_delft_pic from "./tud_black_new.png";
+import monty_python_pic from "./monty-python.jpeg";
 import { Link, BrowserRouter as Router } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { PlusIcon, MinusIcon, PlayIcon, InfoCircledIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
-import monty_python_pic from "./monty-python.jpeg";
+import axios from "axios";
 
 
 // ------- STYLED COMPONENTS -------
@@ -165,6 +166,23 @@ function App() {
 
 
 
+  // ------- POST REQUEST -------
+  const postRequest = (e) => {
+    e.preventDefault();
+    const trainingData = {
+      learning_rate: learningRate,
+      epochs: iterations,
+      network_setup: JSON.stringify(cytoLayers),
+      nn_input: JSON.stringify([]),
+      action: 1,
+      error_list: JSON.stringify([]),
+    };
+    axios.put("http://127.0.0.1:8000/api/students/1", trainingData).then((response) => {
+      console.log(response.status, response.data.token);
+    });
+  };
+
+
   // ------- FLOATING BUTTONS -------
 
   // function to generate floating buttons
@@ -292,7 +310,7 @@ function App() {
           <Grid columns='3' mt='1'>
             <Box align='start' ml='3' >
               <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none' }}>
-                <img src={pic} alt='Tu Delft Logo' width='auto' height='30' />
+                <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30' />
               </Link>
             </Box>
             <Link to="https://test-app-brain-builder-3dfb98072440.herokuapp.com/" style={{ textDecoration: 'none' }}>
@@ -339,7 +357,7 @@ function App() {
                   <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', borderRadius: 'var(--radius-3)'}}>{learningRate}</div>
                 </Box>
                 
-                <IconButton variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                <IconButton onClick={postRequest} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
                   <Flex direction="horizontal" gap="2" style={{alignItems: "center"}}>
                     <PlayIcon width="18" height="18" />Start training!
                   </Flex>
