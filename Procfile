@@ -1,2 +1,2 @@
 release: python manage.py migrate
-web: gunicorn Hogwarts.wsgi --log-file -
+web: gunicorn django_react_proj.wsgi --log-file -
