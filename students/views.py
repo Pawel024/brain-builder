@@ -6,6 +6,11 @@ from .models import Row
 from .serializers import *
 from .process_data import process
 
+from django.shortcuts import render
+
+def index(request):
+    return render(request, 'index.html')
+
 @api_view(['GET', 'POST'])
 def query_list(request):
     if request.method == 'GET':

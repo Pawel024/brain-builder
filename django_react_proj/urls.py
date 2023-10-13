@@ -19,6 +19,7 @@ from students import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.index, name='index'),
     re_path(r'^api/students/$', views.query_list),
     re_path(r'^api/students/(?P<pk>[0-9]+)$', views.query_detail),
 ]
