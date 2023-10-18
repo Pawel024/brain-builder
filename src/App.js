@@ -12,7 +12,6 @@ import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import axios from "axios";
 
-
 // ------- STYLED COMPONENTS -------
 
 const FloatingButton = styled(IconButton, {
@@ -177,7 +176,7 @@ function App() {
       action: 1,
       error_list: JSON.stringify([]),
     };
-    axios.put("http://127.0.0.1:8000/api/students/1", trainingData).then((response) => {
+    axios.put(window.location.href + "/api/students/1", trainingData).then((response) => {
       console.log(response.status, response.data.token);
     });
   };
