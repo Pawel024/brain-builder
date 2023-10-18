@@ -7,10 +7,11 @@ import tu_delft_pic from "./tud_black_new.png";
 import monty_python_pic from "./monty-python.jpeg";
 import { Link, BrowserRouter as Router } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
-import { PlusIcon, MinusIcon, PlayIcon, InfoCircledIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, PlayIcon, InfoCircledIcon, ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import axios from "axios";
+
 
 // ------- STYLED COMPONENTS -------
 
@@ -123,6 +124,24 @@ function App() {
   const cytoElements = useGenerateCytoElements(cytoLayers);
   const cytoStyle = useGenerateCytoStyle(cytoLayers);
 
+  // function to add a layer
+  const addLayer = useCallback((column) => {
+    setCytoLayers(prevLayers => {
+      const newLayers = [...prevLayers];
+      if (newLayers.length < 10) {newLayers.push(1)};
+      return newLayers;
+    });
+  }, []);
+
+  // function to remove a layer
+  const removeLayer = useCallback((column) => {
+    setCytoLayers(prevLayers => {
+      const newLayers = [...prevLayers];
+      if (newLayers.length > 2) {newLayers.pop()}
+      return newLayers;
+    });
+  }, []);
+
   // function to add a node to a layer
   const addNode = useCallback((column) => {
     setCytoLayers(prevLayers => {
@@ -176,7 +195,7 @@ function App() {
       action: 1,
       error_list: JSON.stringify([]),
     };
-    axios.put("api/students/1", trainingData).then((response) => {
+    axios.put(window.location.href + "api/students/1", trainingData).then((response) => {
       console.log(response.status, response.data.token);
     });
   };
@@ -185,10 +204,10 @@ function App() {
   // ------- FLOATING BUTTONS -------
 
   // function to generate floating buttons
-  function generateFloatingButtons(top, left, dist, layers, isItPlus) {
+  function generateFloatingButtons(top, left, dist, layers, isItPlus, nLayers) {
     const buttons = [];
     const icon = isItPlus ? <PlusIcon /> : <MinusIcon />;
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < nLayers; i++) {
       const style = { top: top, left: left + i * dist };
       const button = (
         <div>
@@ -338,8 +357,47 @@ function App() {
                   <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
                     <CytoscapeComponent elements={cytoElements} stylesheet={cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-130, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
                     
-                    {generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/cytoLayers.length, cytoLayers, true)}                    
-                    {generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/cytoLayers.length, cytoLayers, false)}
+                    {console.log(cytoLayers.length)}
+                    {generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/cytoLayers.length, cytoLayers, true, cytoLayers.length)}                    
+                    {generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/cytoLayers.length, cytoLayers, false, cytoLayers.length)}
+
+                    <FloatingButton
+                      variant="outline"
+                      onClick = {addLayer}
+                      size="0"
+                      style={{top: window.innerHeight*0.285, 
+                              left: window.innerWidth*0.74, 
+                              position: 'absolute',
+                              zIndex: 9999,
+                              borderRadius: 'var(--radius-5)',
+                              width: 35,
+                              height: 60,
+                              boxShadow: '0 2px 8px var(--slate-a11)'}}
+                    >
+                      {<ChevronRightIcon 
+                      style={{height: 30, width: 30}}
+                      /> }
+                    </FloatingButton>
+
+                    <FloatingButton
+                      variant="outline"
+                      onClick = {removeLayer}
+                      size="0"
+                      style= {{ top: window.innerHeight*0.285, 
+                                left: window.innerWidth*0.71,
+                                position: 'absolute',
+                                zIndex: 9999,
+                                borderRadius: 'var(--radius-5)',
+                                width: 35,
+                                height: 60,
+                                boxShadow: '0 2px 8px var(--slate-a11)'
+                              }}
+                    >
+                      {<ChevronLeftIcon 
+                      style={{height: 30, width: 30}}
+                      />}
+                    </FloatingButton>
+
 
                   </Flex>
                 </Box>
@@ -356,7 +414,7 @@ function App() {
                   <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', borderRadius: 'var(--radius-3)'}}>{learningRate}</div>
                 </Box>
                 
-                <IconButton onClick={postRequest} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                <IconButton variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
                   <Flex direction="horizontal" gap="2" style={{alignItems: "center"}}>
                     <PlayIcon width="18" height="18" />Start training!
                   </Flex>
