@@ -9,7 +9,7 @@ from .process_data import process
 from django.shortcuts import render
 
 def index(request):
-    return render(request, 'build/index.html')
+    return render(request, 'index.html')
 
     
 @api_view(['GET', 'POST'])
