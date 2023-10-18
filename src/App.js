@@ -176,7 +176,7 @@ function App() {
       action: 1,
       error_list: JSON.stringify([]),
     };
-    axios.put(window.location.href + "/api/students/1", trainingData).then((response) => {
+    axios.put(window.location.href + "api/students/1", trainingData).then((response) => {
       console.log(response.status, response.data.token);
     });
   };
