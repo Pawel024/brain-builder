@@ -39,7 +39,6 @@ threadpoolctl==3.2.0
 --find-links https://download.pytorch.org/whl/torch_stable.html
 
 torch==2.1.0+cpu
-triton==2.1.0
 typing_extensions==4.8.0
 tzdata==2023.3
 whitenoise==6.6.0
