@@ -177,3 +177,100 @@ button {
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
   color: var(--cyan-12);
 }
+
+
+
+@import "@radix-ui/colors/black-alpha.css";
+@import "@radix-ui/colors/violet.css";
+@import "@radix-ui/colors/mauve.css";
+
+/* reset */
+input,
+textarea,
+button {
+  all: unset;
+  box-sizing: border-box;
+}
+
+.FormRoot {
+  width: 450px;
+}
+
+.FormField {
+  display: grid;
+  margin-bottom: 10px;
+}
+
+.FormLabel {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 35px;
+  color: black;
+}
+
+.FormMessage {
+  font-size: 13px;
+  color: black;
+  opacity: 0.8;
+}
+
+.FormInput,
+.FormTextarea {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+
+  font-size: 15px;
+  color: black;
+  background-color: var(--black-a2);
+  box-shadow: 0 0 0 1px var(--black-a9);
+}
+.FormInput:hover,
+.FormTextarea:hover {
+  box-shadow: 0 0 0 1px black;
+}
+.FormInput:focus,
+.FormTextarea:focus {
+  box-shadow: 0 0 0 2px black;
+}
+.FormInput::selection,
+.FormTextarea::selection {
+  background-color: var(--black-a9);
+  color: black;
+}
+
+.FormInput {
+  padding: 0 10px;
+  height: 35px;
+  line-height: 1;
+}
+
+.FormTextarea {
+  resize: none;
+  padding: 10px;
+}
+
+.FormButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 0 15px;
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 500;
+  height: 35px;
+  width: 100%;
+
+  background-color: white;
+  color: var(--violet-11);
+  box-shadow: 0 2px 10px var(--black-a7);
+}
+.FormButton:hover {
+  background-color: var(--mauve-3);
+}
+.FormButton:focus {
+  box-shadow: 0 0 0 2px black;
+}
