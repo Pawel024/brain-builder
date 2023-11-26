@@ -25,6 +25,7 @@
     "react-scripts": "^5.0.1",
     "react-spectrum": "^1.2.6",
     "reactstrap": "^9.2.0",
+    "retry": "^0.13.1",
     "stitches": "^1.2.11",
     "web-vitals": "^2.1.4"
   },
