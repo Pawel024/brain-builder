@@ -2,15 +2,16 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './App.css';
 import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator, Callout } from '@radix-ui/themes';
 import * as Slider from '@radix-ui/react-slider';
+import * as Form from '@radix-ui/react-form';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
-import monty_python_pic from "./monty-python.jpeg";
 import { Link, BrowserRouter as Router } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { PlusIcon, MinusIcon, PlayIcon, InfoCircledIcon, ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
-import axios from "axios";
+import axios from 'axios';
+import retry from 'retry';
 
 
 // ------- STYLED COMPONENTS -------
@@ -115,10 +116,62 @@ function App() {
 
 
 
+  // ------- API EXPONENTIAL BACKOFF LISTENER -------
+  const [apiData, setApiData] = useState(null);
+  const [isTraining, setIsTraining] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
+  const [isResponding, setIsResponding] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
+  const [accuracy, setAccuracy] = useState(null);
+
+  // Define the API endpoint
+  const apiEndpoint = window.location.href + "api/students";
+
+  // Define the functions to fetch API data
+  const fetchTrainingData = () => {
+    axios.get(apiEndpoint)
+      .then((response) => {
+        setApiData(response.data[0]);
+        setAccuracy(parseFloat(JSON.parse(apiData["error_list"])[1]))
+        console.log(response.data[0]);
+      })
+      .catch((error) => {
+        console.log(`Error fetching API data: ${error}`);
+      });
+    setIsTraining(2);
+    console.log("Training finished")
+  };
+
+  const fetchQueryResponse = () => {
+    axios.get(apiEndpoint)
+      .then((response) => {
+        setApiData(response.data[0]);
+        console.log(response.data[0]);
+      })
+      .catch((error) => {
+        console.log(`Error fetching API data: ${error}`);
+      });
+    setIsResponding(2);
+    console.log("Training finished")
+  };
+
+  let accuracyColor = 'var(--slate-11)';
+
   // ------- CYTOSCAPE EDITING -------
 
-  // make a list of nodes per layer that can be updated
-  const [cytoLayers, setCytoLayers] = useState([1, 2, 3, 3, 16, 3, 3, 3, 2, 1]);
+  const [cytoLayers, setCytoLayers] = useState([]);
+
+  useEffect(() => {
+    let data;
+    axios.get(window.location.href + "api/students/?limit=1")
+      .then((response) => {
+        data = response.data[0];
+        console.log(data);
+        setApiData(data);
+        setCytoLayers(JSON.parse(data["network_setup"]));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
   // make a list of cytoscape elements that can be updated
   const cytoElements = useGenerateCytoElements(cytoLayers);
@@ -195,8 +248,11 @@ function App() {
       action: 1,
       error_list: JSON.stringify([]),
     };
+    setAccuracy(null);
+    setIsTraining(1);
     axios.put(window.location.href + "api/students/1", trainingData).then((response) => {
-      console.log(response.status, response.data.token);
+      console.log(response.status);
+      fetchTrainingData();
     });
   };
 
@@ -255,6 +311,37 @@ function App() {
     return buttons;
   }
 
+  // ------- FORMS -------
+  const [formValues, setFormValues] = useState([]);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setIsResponding(1);
+    axios.get(window.location.href + "api/students/?limit=1")
+      .then((response) => {
+        const studentData = response.data[0];
+        const formData = new FormData(event.target);
+        const values = Array.from(formData.values()).map((value) => Number(value));
+        console.log("values");
+        console.log(values);
+        studentData.nn_input = JSON.stringify(values);
+        studentData.action = 2;
+        console.log("updated student data");
+        console.log(studentData);
+        axios.put(window.location.href + "api/students/1", studentData)
+          .then((response) => {
+            console.log(response.status);
+            fetchQueryResponse();
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
 
 
   // ------- SWITCHES -------
@@ -274,8 +361,8 @@ function App() {
   // ------- SLIDERS -------
 
   // initiate iterations and learning rate as variables with a useState hook
-  const [iterations, setIterations] = useState(50);
-  const [learningRate, setLearningRate] = useState(0.00001);
+  const [iterations, setIterations] = useState(200);
+  const [learningRate, setLearningRate] = useState(0.01);
 
   // create a slider for iterations
   const iterationsSlider = useMemo(() => {
@@ -283,9 +370,9 @@ function App() {
       <Slider.Root
         className="SliderRoot"
         defaultValue={[iterations]}
-        onValueChange={(value) => setIterations(value[0])}
+        onValueChange={(value) => setIterations(value[0]*2)}
         max={100}
-        step={1}
+        step={0.5}
         style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
       >
         <Slider.Track className="SliderTrack" style={{ height: 3 }}>
@@ -301,9 +388,9 @@ function App() {
     return (
       <Slider.Root id="learningRateSlider"
         className="SliderRoot"
-        defaultValue={[Math.round(-10*Math.log10(learningRate))]}
-        onValueChange={(value) => setLearningRate((10 ** Math.round(value[0] / -10)).toFixed(Math.round(value[0] / 10)))}
-        max={100}
+        defaultValue={[30]}
+        onValueChange={(value) => setLearningRate((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
+        max={70}
         step={10}
         style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
       >
@@ -313,7 +400,7 @@ function App() {
         <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
       </Slider.Root>
     );
-  }, [learningRate, setLearningRate]);
+  }, [setLearningRate]);
 
 
 
@@ -345,7 +432,7 @@ function App() {
 
             <Tabs.List size="2">
               <Tabs.Trigger value="home" >Home</Tabs.Trigger>
-              <Tabs.Trigger value="stuff">Stuff</Tabs.Trigger>
+              <Tabs.Trigger value="stuff">Testing</Tabs.Trigger>
               <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
             </Tabs.List>
 
@@ -414,6 +501,19 @@ function App() {
                   <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', borderRadius: 'var(--radius-3)'}}>{learningRate}</div>
                 </Box>
                 
+                <Box style={{ position:"absolute", top: Math.round(0.50 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
+                <div id="api-data" style={{ color: accuracyColor }}>
+                    {isTraining===2 ? (
+                      <pre>Accuracy: {(parseFloat(JSON.parse(apiData["error_list"])[1])*100).toFixed(2)}%</pre>
+                    ) : (isTraining===1 ? (
+                      <pre>Training...</pre>
+                    ) : (
+                      <div></div>
+                    )
+                    )}
+                  </div>
+                </Box>
+
                 <IconButton onClick={postRequest} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
                   <Flex direction="horizontal" gap="2" style={{alignItems: "center"}}>
                     <PlayIcon width="18" height="18" />Start training!
@@ -428,7 +528,7 @@ function App() {
                 <Flex direction="column" gap="2">
                 <label className="Label" htmlFor="stuff" style={{ paddingRight: 15 }}>
                   {isMontyPythonLover ?
-                  "stuff." :
+                  "" :
                   <Callout.Root>
                     <Callout.Icon>
                       <InfoCircledIcon />
@@ -439,7 +539,85 @@ function App() {
                   </Callout.Root>
                   }
                 </label>
-                {isMontyPythonLover && <img src={monty_python_pic} alt="Monty Python"/>}
+                {isMontyPythonLover &&
+                <Form.Root className="FormRoot" onSubmit={handleSubmit}>
+                  <Form.Field className="FormField" name="s-m_axis">
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                      <Form.Label className="FormLabel">Semi-Major Axis [km]</Form.Label>
+                      <Form.Message className="FormMessage" match="valueMissing">
+                        Please enter the semi-major axis
+                      </Form.Message>
+                      <Form.Message className="FormMessage" match="typeMismatch">
+                        Please provide a valid semi-major axis
+                      </Form.Message>
+                    </div>
+                    <Form.Control asChild>
+                      <input className="FormInput" type="number" required />
+                    </Form.Control>
+                  </Form.Field>
+
+                  <Form.Field className="FormField" name="inclination">
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                      <Form.Label className="FormLabel">Inclination [degrees]</Form.Label>
+                      <Form.Message className="FormMessage" match="valueMissing">
+                        Please enter the inclination
+                      </Form.Message>
+                      <Form.Message className="FormMessage" match="typeMismatch">
+                        Please provide a valid inclination
+                      </Form.Message>
+                    </div>
+                    <Form.Control asChild>
+                      <input className="FormInput" type="number" required />
+                    </Form.Control>
+                  </Form.Field>
+
+                  <Form.Field className="FormField" name="expected_life">
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                      <Form.Label className="FormLabel">Expected Life [years]</Form.Label>
+                      <Form.Message className="FormMessage" match="valueMissing">
+                        Please enter the expected life
+                      </Form.Message>
+                      <Form.Message className="FormMessage" match="typeMismatch">
+                        Please provide a valid expected life
+                      </Form.Message>
+                    </div>
+                    <Form.Control asChild>
+                      <input className="FormInput" type="number" required />
+                    </Form.Control>
+                  </Form.Field>
+
+                  <Form.Field className="FormField" name="launch_mass">
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                      <Form.Label className="FormLabel">Launch Mass [kg]</Form.Label>
+                      <Form.Message className="FormMessage" match="valueMissing">
+                        Please enter the launch mass
+                      </Form.Message>
+                      <Form.Message className="FormMessage" match="typeMismatch">
+                        Please provide a valid launch mass
+                      </Form.Message>
+                    </div>
+                    <Form.Control asChild>
+                      <input className="FormInput" type="number" required />
+                    </Form.Control>
+                  </Form.Field>
+
+                  <Form.Submit asChild>
+                    <button className="FormButton" style={{ marginTop: 10 }}>
+                      Post query
+                    </button>
+                  </Form.Submit>
+                </Form.Root>
+                }
+                <div id="query-response">
+                    {isResponding===2 ? (
+                      <pre>Output: {apiData["nn_input"]}</pre>
+                    ) : (isResponding===1 ? (
+                      <pre>Getting your reply...</pre>
+                    ) : (
+                      <div></div>
+                    )
+                    )}
+                  </div>
                 </Flex>
               </Tabs.Content>
 
