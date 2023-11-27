@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/brain_builder_env
+brain_builder_env/
 /node_modules
 /.pnp
 .pnp.js
@@ -13,6 +13,11 @@
 /build
 
 # misc
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
 .DS_Store
 .env.local
 .env.development.local
