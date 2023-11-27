@@ -14,7 +14,7 @@ def process(data):
         # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
 
     elif data['action'] == 2:  # classify a given input
-        if 'nn.txt' is not None:
+        if 'nn.txt':
             # load neural network from json using nn_path
             with open('nn.txt', 'rb') as input:
                 nn = pickle.load(input)
