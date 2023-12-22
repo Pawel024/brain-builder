@@ -431,7 +431,7 @@ function App() {
                     <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30' />
                   </Link>
                 </Box>
-                <Link to="https://test-app-brain-builder-3dfb98072440.herokuapp.com/" style={{ textDecoration: 'none' }}>
+                <Link to="https://brain-builder-f6e4dc8afc4d.herokuapp.com/" style={{ textDecoration: 'none' }}>
                   <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
                 </Link>
                 <Box></Box>
@@ -474,7 +474,7 @@ function App() {
                     <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30' />
                   </Link>
                 </Box>
-                <Link to="https://test-app-brain-builder-3dfb98072440.herokuapp.com/" style={{ textDecoration: 'none' }}>
+                <Link to="https://brain-builder-f6e4dc8afc4d.herokuapp.com/" style={{ textDecoration: 'none' }}>
                   <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
                 </Link>
                 <Box></Box>
