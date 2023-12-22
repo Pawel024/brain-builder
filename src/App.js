@@ -495,7 +495,7 @@ function App() {
               <Tabs.Content value="building">
                 <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
                   <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
-                    <CytoscapeComponent elements={cytoElements} stylesheet={cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-130, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
+                    <CytoscapeComponent elements={cytoElements} stylesheet={cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
                     
                     {console.log(cytoLayers.length)}
                     {generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/cytoLayers.length, cytoLayers, true, cytoLayers.length)}                    
@@ -555,7 +555,7 @@ function App() {
                 </Box>
                 
                 <Box style={{ position:"absolute", top: Math.round(0.50 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
-                <div id="api-data" style={{ color: accuracyColor }}>
+                  <div id="api-data" style={{ color: accuracyColor }}>
                     {isTraining===2 ? (
                       <pre>Accuracy: {(parseFloat(JSON.parse(apiData["error_list"])[1])*100).toFixed(2)}%</pre>
                     ) : (isTraining===1 ? (
