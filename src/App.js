@@ -5,7 +5,7 @@ import * as Slider from '@radix-ui/react-slider';
 import * as Form from '@radix-ui/react-form';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
-import { Link, BrowserRouter as Router } from 'react-router-dom';
+import { Link, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { PlusIcon, MinusIcon, PlayIcon, InfoCircledIcon, ChevronLeftIcon, ChevronRightIcon, RocketIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
@@ -86,6 +86,18 @@ function useGenerateCytoStyle(list = []) {
     }
   ];
   return cStyle;
+}
+
+
+// ------- 404 PAGE -------
+
+function NotFound() {
+  return (
+    <div>
+      <h1>404</h1>
+      <p>Page not found</p>
+    </div>
+  );
 }
 
 // ------- APP FUNCTION -------
@@ -406,61 +418,80 @@ function App() {
 
   // ------- RETURN THE APP CONTENT -------
   return (
-    <Router>
     <body class='light-theme' >
       <Theme accentColor="cyan" grayColor="slate" panelBackground="solid" radius="large" appearance='light'>
-        
-        <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
-          <Grid columns='3' mt='1'>
-            <Box align='start' ml='3' >
-              <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none' }}>
-                <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30' />
+      <Router>
+        <Routes>
+          <Route path="/" element={
+          <div>
+            <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
+              <Grid columns='3' mt='1'>
+                <Box align='start' ml='3' >
+                  <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none' }}>
+                    <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30' />
+                  </Link>
+                </Box>
+                <Link to="https://test-app-brain-builder-3dfb98072440.herokuapp.com/" style={{ textDecoration: 'none' }}>
+                  <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
+                </Link>
+                <Box></Box>
+              </Grid>
+            </Box>
+            <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '20px', alignItems: 'start', justifyContent: 'center', height: '100vh', padding: '20px' }}>
+              <Link to="building" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                  <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <label>Game 1</label>
+                    <div><RocketIcon width="35" height="35" /></div>
+                  </Flex>
+                </Button>
+              </Link>
+              <Link to="building" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                  <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <label>Game 2</label>
+                    <div><RocketIcon width="35" height="35" /></div>
+                  </Flex>
+                </Button>
+              </Link>
+              <Link to="building" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                  <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <label>Game 3</label>
+                    <div><RocketIcon width="35" height="35" /></div>
+                  </Flex>
+                </Button>
               </Link>
             </Box>
-            <Link to="https://test-app-brain-builder-3dfb98072440.herokuapp.com/" style={{ textDecoration: 'none' }}>
-              <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
-            </Link>
-            <Box></Box>
-          </Grid>
-        </Box>
-
-
-        <Flex direction="column" gap="0" css={{ height: '100vh' }}>
-
-          <Tabs.Root defaultValue="home">
-
-            <Tabs.List size="2">
-              <Tabs.Trigger value="home" >Home</Tabs.Trigger>
-              <Tabs.Trigger value="building">Building</Tabs.Trigger>
-              <Tabs.Trigger value="stuff">Testing</Tabs.Trigger>
-              <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
-            </Tabs.List>
-
-            <Box px="4" pt="3" pb="0">
-
-              <Tabs.Content value="home">
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '20px', alignItems: 'start', justifyContent: 'center', height: '100vh', padding: '20px' }}>
-                  <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
-                      <label>Game 1</label>
-                      <div><RocketIcon width="35" height="35" /></div>
-                    </Flex>
-                  </Button>
-                  <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
-                      <label>Game 2</label>
-                      <div><RocketIcon width="35" height="35" /></div>
-                    </Flex>
-                  </Button>
-                  <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
-                      <label>Game 3</label>
-                      <div><RocketIcon width="35" height="35" /></div>
-                    </Flex>
-                  </Button>
+          </div>
+          } />
+          <Route path="/building" element={
+          <div>
+            <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
+              <Grid columns='3' mt='1'>
+                <Box align='start' ml='3' >
+                  <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none' }}>
+                    <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30' />
+                  </Link>
                 </Box>
-              </Tabs.Content>
+                <Link to="https://test-app-brain-builder-3dfb98072440.herokuapp.com/" style={{ textDecoration: 'none' }}>
+                  <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
+                </Link>
+                <Box></Box>
+              </Grid>
+            </Box>
+            
+            
 
+            <Tabs.Root defaultValue="building">
+
+              <Tabs.List size="2">
+                <Tabs.Trigger value="building" >Build</Tabs.Trigger>
+                <Tabs.Trigger value="stuff">Test</Tabs.Trigger>
+                <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
+              </Tabs.List>
+
+              <Box px="4" pt="3" pb="0">
               <Tabs.Content value="building">
                 <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
                   <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
@@ -543,9 +574,7 @@ function App() {
                 </IconButton>
 
               </Tabs.Content>
-
-
-
+            
               <Tabs.Content value="stuff">
                 <Flex direction="column" gap="2">
                 
@@ -644,17 +673,15 @@ function App() {
                 </form>
                 </Box>
               </Tabs.Content>
-
-
-            </Box>
-
-          </Tabs.Root>
-
-        </Flex>
-
+              </Box>
+            </Tabs.Root>
+          </div>
+          } />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
       </Theme>
     </body>
-    </Router>
   );
 }
 
