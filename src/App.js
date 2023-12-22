@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './App.css';
-import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator, Callout } from '@radix-ui/themes';
+import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator, Button } from '@radix-ui/themes';
 import * as Slider from '@radix-ui/react-slider';
 import * as Form from '@radix-ui/react-form';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
-import { PlusIcon, MinusIcon, PlayIcon, InfoCircledIcon, ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, PlayIcon, InfoCircledIcon, ChevronLeftIcon, ChevronRightIcon, RocketIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
-import retry from 'retry';
 
 
 // ------- STYLED COMPONENTS -------
@@ -432,14 +431,37 @@ function App() {
 
             <Tabs.List size="2">
               <Tabs.Trigger value="home" >Home</Tabs.Trigger>
+              <Tabs.Trigger value="building">Building</Tabs.Trigger>
               <Tabs.Trigger value="stuff">Testing</Tabs.Trigger>
               <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
             </Tabs.List>
 
             <Box px="4" pt="3" pb="0">
 
-
               <Tabs.Content value="home">
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '20px', alignItems: 'start', justifyContent: 'center', height: '100vh', padding: '20px' }}>
+                  <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                      <label>Game 1</label>
+                      <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                  </Button>
+                  <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                      <label>Game 2</label>
+                      <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                  </Button>
+                  <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                      <label>Game 3</label>
+                      <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                  </Button>
+                </Box>
+              </Tabs.Content>
+
+              <Tabs.Content value="building">
                 <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
                   <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
                     <CytoscapeComponent elements={cytoElements} stylesheet={cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-130, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
@@ -526,20 +548,7 @@ function App() {
 
               <Tabs.Content value="stuff">
                 <Flex direction="column" gap="2">
-                <label className="Label" htmlFor="stuff" style={{ paddingRight: 15 }}>
-                  {isMontyPythonLover ?
-                  "" :
-                  <Callout.Root>
-                    <Callout.Icon>
-                      <InfoCircledIcon />
-                    </Callout.Icon>
-                    <Callout.Text>
-                      You have to be a Monty Python lover to see the stuff. Turn on Monty Python lover mode in the settings.
-                    </Callout.Text>
-                  </Callout.Root>
-                  }
-                </label>
-                {isMontyPythonLover &&
+                
                 <Form.Root className="FormRoot" onSubmit={handleSubmit}>
                   <Form.Field className="FormField" name="s-m_axis">
                     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
@@ -607,7 +616,7 @@ function App() {
                     </button>
                   </Form.Submit>
                 </Form.Root>
-                }
+                
                 <div id="query-response">
                     {isResponding===2 ? (
                       <pre>Output: {apiData["nn_input"]}</pre>
