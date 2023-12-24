@@ -174,7 +174,13 @@ function App() {
     let data;
     axios.get(window.location.href + "api/students/?limit=1")
       .then((response) => {
-        data = response.data[0];
+        // check if there is anything in the data
+        if (response.data.length === 0) {
+          data = [4, 10, 10, 10, 3]
+        }
+        else {
+          data = response.data[0];
+        }
         console.log(data);
         setApiData(data);
         setCytoLayers(JSON.parse(data["network_setup"]));
