@@ -125,7 +125,7 @@ function App() {
     };
   }, []);
 
-
+  console.log(window.location.origin);
 
   // ------- API EXPONENTIAL BACKOFF LISTENER -------
   const [apiData, setApiData] = useState(null);
