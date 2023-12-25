@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'my_backend',
+    'backend',
     'webpack_loader',
 ]
 
