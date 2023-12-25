@@ -483,7 +483,13 @@ function App() {
                 <Link to="https://brain-builder-f6e4dc8afc4d.herokuapp.com/" style={{ textDecoration: 'none' }}>
                   <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
                 </Link>
-                <Box></Box>
+                <Box>  
+                  <Link to="/">
+                    <IconButton aria-label="navigate to home" style={{justify: "end", color: 'inherit', textDecoration: 'none' }}>
+                      <HomeIcon color="white" />
+                    </IconButton>
+                  </Link>
+                </Box>
               </Grid>
             </Box>
             
