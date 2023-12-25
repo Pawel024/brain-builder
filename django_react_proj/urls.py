@@ -16,10 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, re_path
 from students import views
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index),
     re_path(r'^api/students/$', views.query_list),
     re_path(r'^api/students/(?P<pk>[0-9]+)$', views.query_detail),
+    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
 ]
