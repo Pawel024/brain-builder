@@ -134,7 +134,7 @@ function App() {
   const [accuracy, setAccuracy] = useState(null);
 
   // Define the API endpoint
-  const apiEndpoint = window.location.href + "api/students";
+  const apiEndpoint = window.location.origin + "api/students";
 
   // Define the functions to fetch API data
   const fetchTrainingData = () => {
@@ -172,7 +172,7 @@ function App() {
 
   useEffect(() => {
     let data;
-    axios.get(window.location.href + "api/students/?limit=1")
+    axios.get(window.location.origin + "api/students/?limit=1")
       .then((response) => {
         // check if there is anything in the data
         if (response.data.length === 0) {
@@ -267,7 +267,7 @@ function App() {
     };
     setAccuracy(null);
     setIsTraining(1);
-    axios.put(window.location.href + "api/students/1", trainingData).then((response) => {
+    axios.put(window.location.origin + "api/students/1", trainingData).then((response) => {
       console.log(response.status);
       fetchTrainingData();
     });
@@ -334,7 +334,7 @@ function App() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setIsResponding(1);
-    axios.get(window.location.href + "api/students/?limit=1")
+    axios.get(window.location.origin + "api/students/?limit=1")
       .then((response) => {
         const studentData = response.data[0];
         const formData = new FormData(event.target);
@@ -345,7 +345,7 @@ function App() {
         studentData.action = 2;
         console.log("updated student data");
         console.log(studentData);
-        axios.put(window.location.href + "api/students/1", studentData)
+        axios.put(window.location.origin + "api/students/1", studentData)
           .then((response) => {
             console.log(response.status);
             fetchQueryResponse();
