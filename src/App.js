@@ -485,7 +485,7 @@ function App() {
                 </Link>
                 <Box>  
                   <Link to="/">
-                    <IconButton aria-label="navigate to home" style={{justify: "end", color: 'inherit', textDecoration: 'none' }}>
+                    <IconButton aria-label="navigate to home" style={{ marginLeft: 'auto', color: 'inherit', textDecoration: 'none' }}>
                       <HomeIcon color="white" />
                     </IconButton>
                   </Link>
