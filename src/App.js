@@ -11,7 +11,7 @@ import { PlusIcon, MinusIcon, PlayIcon, InfoCircledIcon, ChevronLeftIcon, Chevro
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
-import Building from './Building';
+import BuildView from './buildView';
 
 
 // ------- STYLED COMPONENTS -------
@@ -97,6 +97,7 @@ function NotFound() {
     <div>
       <h1>404</h1>
       <p>Page not found</p>
+      <img src={require('./monty-python.jpeg')} alt="Monty Python" />
     </div>
   );
 }
@@ -339,16 +340,16 @@ function App() {
     setIsResponding(1);
     axios.get(window.location.origin + "/api/backend/?limit=1")
       .then((response) => {
-        const studentData = response.data[0];
+        const networkData = response.data[0];
         const formData = new FormData(event.target);
         const values = Array.from(formData.values()).map((value) => Number(value));
         console.log("values");
         console.log(values);
-        studentData.nn_input = JSON.stringify(values);
-        studentData.action = 2;
-        console.log("updated student data");
-        console.log(studentData);
-        axios.put(window.location.origin + "/api/backend/1", studentData)
+        networkData.nn_input = JSON.stringify(values);
+        networkData.action = 2;
+        console.log("updated network data");
+        console.log(networkData);
+        axios.put(window.location.origin + "/api/backend/1", networkData)
           .then((response) => {
             console.log(response.status);
             fetchQueryResponse();
@@ -455,7 +456,7 @@ function App() {
                     <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30' />
                   </Link>
                 </Box>
-                <Link to="https://brain-builder-f6e4dc8afc4d.herokuapp.com/" style={{ textDecoration: 'none' }}>
+                <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
                   <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
                 </Link>
                 <Box></Box>
@@ -490,7 +491,8 @@ function App() {
           </div>
           } />
           <Route path="/game1" element={
-            <Building 
+            <BuildView
+            currentGame={"game1"} 
             n_of_inputs={4}
             n_of_outputs={3}
             cytoElements={cytoElements}
@@ -516,7 +518,8 @@ function App() {
           />
           } />
           <Route path="/game2" element={
-            <Building 
+            <BuildView
+            currentGame={"game2"} 
             n_of_inputs={2}
             n_of_outputs={5}
             cytoElements={cytoElements}
@@ -542,7 +545,8 @@ function App() {
           />
           } />
           <Route path="/game3" element={
-            <Building 
+            <BuildView
+            currentGame={"game3"} 
             n_of_inputs={10}
             n_of_outputs={1}
             cytoElements={cytoElements}
