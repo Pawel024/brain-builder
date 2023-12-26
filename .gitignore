@@ -17,6 +17,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.sqlite3
 
 .DS_Store
 .env.local
