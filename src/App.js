@@ -523,7 +523,7 @@ function App() {
             cytoStyle={cytoStyle}
             generateFloatingButtons={generateFloatingButtons}
             cytoLayers={cytoLayers}
-            setCytoLayersMethod={setCytoLayers}
+            setCytoLayers={setCytoLayers}
             updateCytoLayers={updateCytoLayers}
             FloatingButton={FloatingButton}
             addLayer={addLayer}
@@ -549,7 +549,7 @@ function App() {
             cytoStyle={cytoStyle}
             generateFloatingButtons={generateFloatingButtons}
             cytoLayers={cytoLayers}
-            setCytoLayersMethod={setCytoLayers}
+            setCytoLayers={setCytoLayers}
             updateCytoLayers={updateCytoLayers}
             FloatingButton={FloatingButton}
             addLayer={addLayer}
