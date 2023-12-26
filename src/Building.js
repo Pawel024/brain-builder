@@ -13,7 +13,7 @@ import { PlayIcon, ChevronLeftIcon, ChevronRightIcon, HomeIcon } from '@radix-ui
 class Building extends React.Component {
 
   componentDidMount() {
-    this.updateCytoLayers(this.props.setCytoLayers, this.props.n_of_inputs, this.props.n_of_outputs);
+    this.props.updateCytoLayers(this.props.setCytoLayers, this.props.n_of_inputs, this.props.n_of_outputs);
   }
 
   // Common functionality for all games can go here
