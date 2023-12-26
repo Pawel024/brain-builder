@@ -100,6 +100,8 @@ function NotFound() {
   );
 }
 
+
+
 // ------- APP FUNCTION -------
 
 function App() {
@@ -420,6 +422,21 @@ function App() {
   }, [setLearningRate]);
 
 
+  const updateCytoLayers = (n_of_inputs, n_of_outputs) => {
+    setCytoLayers(prevCytoLayers => {
+      const newCytoLayers = prevCytoLayers.map((layer, index) => {
+        if (index === 0) {
+          return n_of_inputs;
+        } else if (index === prevCytoLayers.length - 1) {
+          return n_of_outputs;
+        } else {
+          return layer;
+        }
+      });
+
+      return newCytoLayers;
+    });
+  };
 
 
   // ------- RETURN THE APP CONTENT -------
@@ -472,7 +489,7 @@ function App() {
           </div>
           } />
           <Route path="/building" element={
-          <div>
+            <div>
             <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
               <Grid columns='3' mt='1'>
                 <Box align='start' ml='3' >
@@ -494,15 +511,15 @@ function App() {
             </Box>
             
             
-
+    
             <Tabs.Root defaultValue="building">
-
+    
               <Tabs.List size="2">
                 <Tabs.Trigger value="building" >Build</Tabs.Trigger>
                 <Tabs.Trigger value="stuff">Test</Tabs.Trigger>
                 <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
               </Tabs.List>
-
+    
               <Box px="4" pt="3" pb="0">
               <Tabs.Content value="building">
                 <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
@@ -512,7 +529,7 @@ function App() {
                     {console.log(cytoLayers.length)}
                     {generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/cytoLayers.length, cytoLayers, true, cytoLayers.length)}                    
                     {generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/cytoLayers.length, cytoLayers, false, cytoLayers.length)}
-
+    
                     <FloatingButton
                       variant="outline"
                       onClick = {addLayer}
@@ -530,7 +547,7 @@ function App() {
                       style={{height: 30, width: 30}}
                       /> }
                     </FloatingButton>
-
+    
                     <FloatingButton
                       variant="outline"
                       onClick = {removeLayer}
@@ -549,18 +566,18 @@ function App() {
                       style={{height: 30, width: 30}}
                       />}
                     </FloatingButton>
-
-
+    
+    
                   </Flex>
                 </Box>
                 
                 <Separator orientation='vertical' style = {{ position:"absolute", top: Math.round(0.03 * (window.innerHeight-140)), left: Math.round(0.8 * (window.innerWidth * 0.97)), height: 0.96 * (window.innerHeight-140) }}/>
-
+    
                 <Box style={{ position:"absolute", top: 0.14 * (window.innerHeight-140), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
                   {iterationsSlider}
                   <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', borderRadius: 'var(--radius-3)' }}>{iterations}</div>
                 </Box>
-
+    
                 <Box style={{ position:"absolute", top: Math.round(0.30 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
                   {learningRateSlider}
                   <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', borderRadius: 'var(--radius-3)'}}>{learningRate}</div>
@@ -578,13 +595,13 @@ function App() {
                     )}
                   </div>
                 </Box>
-
+    
                 <IconButton onClick={postRequest} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
                   <Flex direction="horizontal" gap="2" style={{alignItems: "center"}}>
                     <PlayIcon width="18" height="18" />Start training!
                   </Flex>
                 </IconButton>
-
+    
               </Tabs.Content>
             
               <Tabs.Content value="stuff">
@@ -605,7 +622,7 @@ function App() {
                       <input className="FormInput" type="number" required />
                     </Form.Control>
                   </Form.Field>
-
+    
                   <Form.Field className="FormField" name="inclination">
                     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
                       <Form.Label className="FormLabel">Inclination [degrees]</Form.Label>
@@ -620,7 +637,7 @@ function App() {
                       <input className="FormInput" type="number" required />
                     </Form.Control>
                   </Form.Field>
-
+    
                   <Form.Field className="FormField" name="expected_life">
                     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
                       <Form.Label className="FormLabel">Expected Life [years]</Form.Label>
@@ -635,7 +652,7 @@ function App() {
                       <input className="FormInput" type="number" required />
                     </Form.Control>
                   </Form.Field>
-
+    
                   <Form.Field className="FormField" name="launch_mass">
                     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
                       <Form.Label className="FormLabel">Launch Mass [kg]</Form.Label>
@@ -650,7 +667,7 @@ function App() {
                       <input className="FormInput" type="number" required />
                     </Form.Control>
                   </Form.Field>
-
+    
                   <Form.Submit asChild>
                     <button className="FormButton" style={{ marginTop: 10 }}>
                       Post query
@@ -670,9 +687,9 @@ function App() {
                   </div>
                 </Flex>
               </Tabs.Content>
-
-
-
+    
+    
+    
               <Tabs.Content value="settings">
                 <Box style={{ display: 'flex', height: '100vh' }}>
                 <form>
