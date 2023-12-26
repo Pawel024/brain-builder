@@ -1,17 +1,21 @@
-// will use updateCytoLayers
+// will use updatethis.props.cytoLayers
+
+import React from 'react'
+import './App.css';
+import { Flex, Box, Tabs, Heading, Grid, IconButton, Separator } from '@radix-ui/themes';
+import * as Form from '@radix-ui/react-form';
+import '@radix-ui/themes/styles.css';
+import tu_delft_pic from "./tud_black_new.png";
+import { Link } from 'react-router-dom';
+import CytoscapeComponent from 'react-cytoscapejs';
+import { PlayIcon, ChevronLeftIcon, ChevronRightIcon, HomeIcon } from '@radix-ui/react-icons';
 
 class Building extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            cytoLayers: [], // Initialize cytoLayers here
-        };
-    }
 
     // Common functionality for all games can go here
     render() {
-        
-        const { n_of_inputs, n_of_outputs } = this.props;
+
+        this.updateCytoLayers(this.props.setCytoLayers, this.props.n_of_inputs, this.props.n_of_outputs)
 
         return(
         <div>
@@ -49,15 +53,15 @@ class Building extends React.Component {
           <Tabs.Content value="building">
             <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
               <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
-                <CytoscapeComponent elements={cytoElements} stylesheet={cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
+                <CytoscapeComponent elements={this.props.cytoElements} stylesheet={this.props.cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
                 
-                {console.log(cytoLayers.length)}
-                {generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/cytoLayers.length, cytoLayers, true, cytoLayers.length)}                    
-                {generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/cytoLayers.length, cytoLayers, false, cytoLayers.length)}
+                {console.log(this.props.cytoLayers.length)}
+                {this.props.generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, this.props.cytoLayers, true, this.props.cytoLayers.length)}                    
+                {this.props.generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, this.props.cytoLayers, false, this.props.cytoLayers.length)}
 
-                <FloatingButton
+                <this.props.FloatingButton
                   variant="outline"
-                  onClick = {addLayer}
+                  onClick = {this.props.addLayer}
                   size="0"
                   style={{top: window.innerHeight*0.285, 
                           left: window.innerWidth*0.74, 
@@ -71,11 +75,11 @@ class Building extends React.Component {
                   {<ChevronRightIcon 
                   style={{height: 30, width: 30}}
                   /> }
-                </FloatingButton>
+                </this.props.FloatingButton>
 
-                <FloatingButton
+                <this.props.FloatingButton
                   variant="outline"
-                  onClick = {removeLayer}
+                  onClick = {this.props.removeLayer}
                   size="0"
                   style= {{ top: window.innerHeight*0.285, 
                             left: window.innerWidth*0.71,
@@ -90,7 +94,7 @@ class Building extends React.Component {
                   {<ChevronLeftIcon 
                   style={{height: 30, width: 30}}
                   />}
-                </FloatingButton>
+                </this.props.FloatingButton>
 
 
               </Flex>
@@ -99,20 +103,20 @@ class Building extends React.Component {
             <Separator orientation='vertical' style = {{ position:"absolute", top: Math.round(0.03 * (window.innerHeight-140)), left: Math.round(0.8 * (window.innerWidth * 0.97)), height: 0.96 * (window.innerHeight-140) }}/>
 
             <Box style={{ position:"absolute", top: 0.14 * (window.innerHeight-140), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
-              {iterationsSlider}
-              <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', borderRadius: 'var(--radius-3)' }}>{iterations}</div>
+              {this.props.iterationsSlider}
+              <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', borderRadius: 'var(--radius-3)' }}>{this.props.iterations}</div>
             </Box>
 
             <Box style={{ position:"absolute", top: Math.round(0.30 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
-              {learningRateSlider}
-              <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', borderRadius: 'var(--radius-3)'}}>{learningRate}</div>
+              {this.props.learningRateSlider}
+              <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', borderRadius: 'var(--radius-3)'}}>{this.props.learningRate}</div>
             </Box>
             
             <Box style={{ position:"absolute", top: Math.round(0.50 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
-              <div id="/api-data" style={{ color: accuracyColor }}>
-                {isTraining===2 ? (
-                  <pre>Accuracy: {(parseFloat(JSON.parse(apiData["error_list"])[1])*100).toFixed(2)}%</pre>
-                ) : (isTraining===1 ? (
+              <div id="/api-data" style={{ color: this.props.accuracyColor }}>
+                {this.props.isTraining===2 ? (
+                  <pre>Accuracy: {(parseFloat(JSON.parse(this.props.apiData["error_list"])[1])*100).toFixed(2)}%</pre>
+                ) : (this.props.isTraining===1 ? (
                   <pre>Training...</pre>
                 ) : (
                   <div></div>
@@ -121,7 +125,7 @@ class Building extends React.Component {
               </div>
             </Box>
 
-            <IconButton onClick={postRequest} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+            <IconButton onClick={this.props.postRequest} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
               <Flex direction="horizontal" gap="2" style={{alignItems: "center"}}>
                 <PlayIcon width="18" height="18" />Start training!
               </Flex>
@@ -132,7 +136,7 @@ class Building extends React.Component {
           <Tabs.Content value="stuff">
             <Flex direction="column" gap="2">
             
-            <Form.Root className="FormRoot" onSubmit={handleSubmit}>
+            <Form.Root className="FormRoot" onSubmit={this.props.handleSubmit}>
               <Form.Field className="FormField" name="s-m_axis">
                 <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
                   <Form.Label className="FormLabel">Semi-Major Axis [km]</Form.Label>
@@ -201,9 +205,9 @@ class Building extends React.Component {
             </Form.Root>
             
             <div id="query-response">
-                {isResponding===2 ? (
-                  <pre>Output: {apiData["nn_input"]}</pre>
-                ) : (isResponding===1 ? (
+                {this.props.isResponding===2 ? (
+                  <pre>Output: {this.props.apiData["nn_input"]}</pre>
+                ) : (this.props.isResponding===1 ? (
                   <pre>Getting your reply...</pre>
                 ) : (
                   <div></div>
@@ -222,7 +226,7 @@ class Building extends React.Component {
                 <label className="Label" htmlFor="monty-python-mode" style={{ paddingRight: 15 }}>
                   Monty Python lover mode
                 </label>
-                <MontyPythonSwitch />
+                <this.props.MontyPythonSwitch />
               </div>
             </form>
             </Box>
