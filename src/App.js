@@ -462,7 +462,7 @@ function App() {
               </Grid>
             </Box>
             <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '20px', alignItems: 'start', justifyContent: 'center', height: '100vh', padding: '20px' }}>
-              <Link to="building" style={{ color: 'inherit', textDecoration: 'none' }}>
+              <Link to="game1" style={{ color: 'inherit', textDecoration: 'none' }}>
                 <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
                   <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
                     <label>Game 1</label>
@@ -470,7 +470,7 @@ function App() {
                   </Flex>
                 </Button>
               </Link>
-              <Link to="building" style={{ color: 'inherit', textDecoration: 'none' }}>
+              <Link to="game2" style={{ color: 'inherit', textDecoration: 'none' }}>
                 <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
                   <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
                     <label>Game 2</label>
@@ -478,7 +478,7 @@ function App() {
                   </Flex>
                 </Button>
               </Link>
-              <Link to="building" style={{ color: 'inherit', textDecoration: 'none' }}>
+              <Link to="game3" style={{ color: 'inherit', textDecoration: 'none' }}>
                 <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
                   <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
                     <label>Game 3</label>
@@ -489,10 +489,62 @@ function App() {
             </Box>
           </div>
           } />
-          <Route path="/building" element={
+          <Route path="/game1" element={
             <Building 
             n_of_inputs={4}
             n_of_outputs={3}
+            cytoElements={cytoElements}
+            cytoStyle={cytoStyle}
+            generateFloatingButtons={generateFloatingButtons}
+            cytoLayers={cytoLayers}
+            setCytoLayersMethod={setCytoLayers}
+            updateCytoLayers={updateCytoLayers}
+            FloatingButton={FloatingButton}
+            addLayer={addLayer}
+            removeLayer={removeLayer}
+            iterationsSlider={iterationsSlider}
+            iterations={iterations}
+            learningRateSlider={learningRateSlider}
+            learningRate={learningRate}
+            isTraining={isTraining}
+            apiData={apiData}
+            postRequest={postRequest}
+            accuracyColor={accuracyColor}
+            handleSubmit={handleSubmit}
+            isResponding={isResponding}
+            MontyPythonSwitch={MontyPythonSwitch}
+          />
+          } />
+          <Route path="/game2" element={
+            <Building 
+            n_of_inputs={2}
+            n_of_outputs={5}
+            cytoElements={cytoElements}
+            cytoStyle={cytoStyle}
+            generateFloatingButtons={generateFloatingButtons}
+            cytoLayers={cytoLayers}
+            setCytoLayersMethod={setCytoLayers}
+            updateCytoLayers={updateCytoLayers}
+            FloatingButton={FloatingButton}
+            addLayer={addLayer}
+            removeLayer={removeLayer}
+            iterationsSlider={iterationsSlider}
+            iterations={iterations}
+            learningRateSlider={learningRateSlider}
+            learningRate={learningRate}
+            isTraining={isTraining}
+            apiData={apiData}
+            postRequest={postRequest}
+            accuracyColor={accuracyColor}
+            handleSubmit={handleSubmit}
+            isResponding={isResponding}
+            MontyPythonSwitch={MontyPythonSwitch}
+          />
+          } />
+          <Route path="/game3" element={
+            <Building 
+            n_of_inputs={10}
+            n_of_outputs={1}
             cytoElements={cytoElements}
             cytoStyle={cytoStyle}
             generateFloatingButtons={generateFloatingButtons}
