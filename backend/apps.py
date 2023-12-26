@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class QueryConfig(AppConfig):
-    name = 'students'
+    name = 'backend'

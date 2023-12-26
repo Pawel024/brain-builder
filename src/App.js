@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './App.css';
-import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator, Callout } from '@radix-ui/themes';
+import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator, Button } from '@radix-ui/themes';
 import * as Slider from '@radix-ui/react-slider';
 import * as Form from '@radix-ui/react-form';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
-import { Link, BrowserRouter as Router } from 'react-router-dom';
+import { Link, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
-import { PlusIcon, MinusIcon, PlayIcon, InfoCircledIcon, ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, PlayIcon, InfoCircledIcon, ChevronLeftIcon, ChevronRightIcon, RocketIcon, HomeIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
-import retry from 'retry';
+import Building from './Building';
 
 
 // ------- STYLED COMPONENTS -------
@@ -89,6 +89,20 @@ function useGenerateCytoStyle(list = []) {
   return cStyle;
 }
 
+
+// ------- 404 PAGE -------
+
+function NotFound() {
+  return (
+    <div>
+      <h1>404</h1>
+      <p>Page not found</p>
+    </div>
+  );
+}
+
+
+
 // ------- APP FUNCTION -------
 
 function App() {
@@ -114,7 +128,7 @@ function App() {
     };
   }, []);
 
-
+  console.log(window.location.origin);
 
   // ------- API EXPONENTIAL BACKOFF LISTENER -------
   const [apiData, setApiData] = useState(null);
@@ -123,7 +137,7 @@ function App() {
   const [accuracy, setAccuracy] = useState(null);
 
   // Define the API endpoint
-  const apiEndpoint = window.location.href + "api/students";
+  const apiEndpoint = window.location.origin + "/api/backend";
 
   // Define the functions to fetch API data
   const fetchTrainingData = () => {
@@ -161,9 +175,15 @@ function App() {
 
   useEffect(() => {
     let data;
-    axios.get(window.location.href + "api/students/?limit=1")
+    axios.get(window.location.origin + "/api/backend/?limit=1")
       .then((response) => {
-        data = response.data[0];
+        // check if there is anything in the data
+        if (response.data.length === 0) {
+          data = [4, 10, 10, 10, 3]
+        }
+        else {
+          data = response.data[0];
+        }
         console.log(data);
         setApiData(data);
         setCytoLayers(JSON.parse(data["network_setup"]));
@@ -250,7 +270,7 @@ function App() {
     };
     setAccuracy(null);
     setIsTraining(1);
-    axios.put(window.location.href + "api/students/1", trainingData).then((response) => {
+    axios.put(window.location.origin + "/api/backend/1", trainingData).then((response) => {
       console.log(response.status);
       fetchTrainingData();
     });
@@ -317,7 +337,7 @@ function App() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setIsResponding(1);
-    axios.get(window.location.href + "api/students/?limit=1")
+    axios.get(window.location.origin + "/api/backend/?limit=1")
       .then((response) => {
         const studentData = response.data[0];
         const formData = new FormData(event.target);
@@ -328,7 +348,7 @@ function App() {
         studentData.action = 2;
         console.log("updated student data");
         console.log(studentData);
-        axios.put(window.location.href + "api/students/1", studentData)
+        axios.put(window.location.origin + "/api/backend/1", studentData)
           .then((response) => {
             console.log(response.status);
             fetchQueryResponse();
@@ -403,249 +423,155 @@ function App() {
   }, [setLearningRate]);
 
 
+  const updateCytoLayers = (setCytoLayersMethod, n_of_inputs, n_of_outputs) => {
+    setCytoLayersMethod(prevCytoLayers => {
+      const newCytoLayers = prevCytoLayers.map((layer, index) => {
+        if (index === 0) {
+          return n_of_inputs;
+        } else if (index === prevCytoLayers.length - 1) {
+          return n_of_outputs;
+        } else {
+          return layer;
+        }
+      });
+
+      return newCytoLayers;
+    });
+  };
 
 
   // ------- RETURN THE APP CONTENT -------
   return (
-    <Router>
     <body class='light-theme' >
       <Theme accentColor="cyan" grayColor="slate" panelBackground="solid" radius="large" appearance='light'>
-        
-        <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
-          <Grid columns='3' mt='1'>
-            <Box align='start' ml='3' >
-              <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none' }}>
-                <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30' />
+      <Router>
+        <Routes>
+          <Route path="/" element={
+          <div>
+            <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
+              <Grid columns='3' mt='1'>
+                <Box align='start' ml='3' >
+                  <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none' }}>
+                    <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30' />
+                  </Link>
+                </Box>
+                <Link to="https://brain-builder-f6e4dc8afc4d.herokuapp.com/" style={{ textDecoration: 'none' }}>
+                  <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
+                </Link>
+                <Box></Box>
+              </Grid>
+            </Box>
+            <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '20px', alignItems: 'start', justifyContent: 'center', height: '100vh', padding: '20px' }}>
+              <Link to="game1" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                  <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <label>Game 1</label>
+                    <div><RocketIcon width="35" height="35" /></div>
+                  </Flex>
+                </Button>
+              </Link>
+              <Link to="game2" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                  <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <label>Game 2</label>
+                    <div><RocketIcon width="35" height="35" /></div>
+                  </Flex>
+                </Button>
+              </Link>
+              <Link to="game3" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                  <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <label>Game 3</label>
+                    <div><RocketIcon width="35" height="35" /></div>
+                  </Flex>
+                </Button>
               </Link>
             </Box>
-            <Link to="https://test-app-brain-builder-3dfb98072440.herokuapp.com/" style={{ textDecoration: 'none' }}>
-              <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
-            </Link>
-            <Box></Box>
-          </Grid>
-        </Box>
-
-
-        <Flex direction="column" gap="0" css={{ height: '100vh' }}>
-
-          <Tabs.Root defaultValue="home">
-
-            <Tabs.List size="2">
-              <Tabs.Trigger value="home" >Home</Tabs.Trigger>
-              <Tabs.Trigger value="stuff">Testing</Tabs.Trigger>
-              <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
-            </Tabs.List>
-
-            <Box px="4" pt="3" pb="0">
-
-
-              <Tabs.Content value="home">
-                <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
-                  <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
-                    <CytoscapeComponent elements={cytoElements} stylesheet={cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-130, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
-                    
-                    {console.log(cytoLayers.length)}
-                    {generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/cytoLayers.length, cytoLayers, true, cytoLayers.length)}                    
-                    {generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/cytoLayers.length, cytoLayers, false, cytoLayers.length)}
-
-                    <FloatingButton
-                      variant="outline"
-                      onClick = {addLayer}
-                      size="0"
-                      style={{top: window.innerHeight*0.285, 
-                              left: window.innerWidth*0.74, 
-                              position: 'absolute',
-                              zIndex: 9999,
-                              borderRadius: 'var(--radius-5)',
-                              width: 35,
-                              height: 60,
-                              boxShadow: '0 2px 8px var(--slate-a11)'}}
-                    >
-                      {<ChevronRightIcon 
-                      style={{height: 30, width: 30}}
-                      /> }
-                    </FloatingButton>
-
-                    <FloatingButton
-                      variant="outline"
-                      onClick = {removeLayer}
-                      size="0"
-                      style= {{ top: window.innerHeight*0.285, 
-                                left: window.innerWidth*0.71,
-                                position: 'absolute',
-                                zIndex: 9999,
-                                borderRadius: 'var(--radius-5)',
-                                width: 35,
-                                height: 60,
-                                boxShadow: '0 2px 8px var(--slate-a11)'
-                              }}
-                    >
-                      {<ChevronLeftIcon 
-                      style={{height: 30, width: 30}}
-                      />}
-                    </FloatingButton>
-
-
-                  </Flex>
-                </Box>
-                
-                <Separator orientation='vertical' style = {{ position:"absolute", top: Math.round(0.03 * (window.innerHeight-140)), left: Math.round(0.8 * (window.innerWidth * 0.97)), height: 0.96 * (window.innerHeight-140) }}/>
-
-                <Box style={{ position:"absolute", top: 0.14 * (window.innerHeight-140), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
-                  {iterationsSlider}
-                  <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', borderRadius: 'var(--radius-3)' }}>{iterations}</div>
-                </Box>
-
-                <Box style={{ position:"absolute", top: Math.round(0.30 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
-                  {learningRateSlider}
-                  <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', borderRadius: 'var(--radius-3)'}}>{learningRate}</div>
-                </Box>
-                
-                <Box style={{ position:"absolute", top: Math.round(0.50 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
-                <div id="api-data" style={{ color: accuracyColor }}>
-                    {isTraining===2 ? (
-                      <pre>Accuracy: {(parseFloat(JSON.parse(apiData["error_list"])[1])*100).toFixed(2)}%</pre>
-                    ) : (isTraining===1 ? (
-                      <pre>Training...</pre>
-                    ) : (
-                      <div></div>
-                    )
-                    )}
-                  </div>
-                </Box>
-
-                <IconButton onClick={postRequest} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                  <Flex direction="horizontal" gap="2" style={{alignItems: "center"}}>
-                    <PlayIcon width="18" height="18" />Start training!
-                  </Flex>
-                </IconButton>
-
-              </Tabs.Content>
-
-
-
-              <Tabs.Content value="stuff">
-                <Flex direction="column" gap="2">
-                <label className="Label" htmlFor="stuff" style={{ paddingRight: 15 }}>
-                  {isMontyPythonLover ?
-                  "" :
-                  <Callout.Root>
-                    <Callout.Icon>
-                      <InfoCircledIcon />
-                    </Callout.Icon>
-                    <Callout.Text>
-                      You have to be a Monty Python lover to see the stuff. Turn on Monty Python lover mode in the settings.
-                    </Callout.Text>
-                  </Callout.Root>
-                  }
-                </label>
-                {isMontyPythonLover &&
-                <Form.Root className="FormRoot" onSubmit={handleSubmit}>
-                  <Form.Field className="FormField" name="s-m_axis">
-                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                      <Form.Label className="FormLabel">Semi-Major Axis [km]</Form.Label>
-                      <Form.Message className="FormMessage" match="valueMissing">
-                        Please enter the semi-major axis
-                      </Form.Message>
-                      <Form.Message className="FormMessage" match="typeMismatch">
-                        Please provide a valid semi-major axis
-                      </Form.Message>
-                    </div>
-                    <Form.Control asChild>
-                      <input className="FormInput" type="number" required />
-                    </Form.Control>
-                  </Form.Field>
-
-                  <Form.Field className="FormField" name="inclination">
-                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                      <Form.Label className="FormLabel">Inclination [degrees]</Form.Label>
-                      <Form.Message className="FormMessage" match="valueMissing">
-                        Please enter the inclination
-                      </Form.Message>
-                      <Form.Message className="FormMessage" match="typeMismatch">
-                        Please provide a valid inclination
-                      </Form.Message>
-                    </div>
-                    <Form.Control asChild>
-                      <input className="FormInput" type="number" required />
-                    </Form.Control>
-                  </Form.Field>
-
-                  <Form.Field className="FormField" name="expected_life">
-                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                      <Form.Label className="FormLabel">Expected Life [years]</Form.Label>
-                      <Form.Message className="FormMessage" match="valueMissing">
-                        Please enter the expected life
-                      </Form.Message>
-                      <Form.Message className="FormMessage" match="typeMismatch">
-                        Please provide a valid expected life
-                      </Form.Message>
-                    </div>
-                    <Form.Control asChild>
-                      <input className="FormInput" type="number" required />
-                    </Form.Control>
-                  </Form.Field>
-
-                  <Form.Field className="FormField" name="launch_mass">
-                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                      <Form.Label className="FormLabel">Launch Mass [kg]</Form.Label>
-                      <Form.Message className="FormMessage" match="valueMissing">
-                        Please enter the launch mass
-                      </Form.Message>
-                      <Form.Message className="FormMessage" match="typeMismatch">
-                        Please provide a valid launch mass
-                      </Form.Message>
-                    </div>
-                    <Form.Control asChild>
-                      <input className="FormInput" type="number" required />
-                    </Form.Control>
-                  </Form.Field>
-
-                  <Form.Submit asChild>
-                    <button className="FormButton" style={{ marginTop: 10 }}>
-                      Post query
-                    </button>
-                  </Form.Submit>
-                </Form.Root>
-                }
-                <div id="query-response">
-                    {isResponding===2 ? (
-                      <pre>Output: {apiData["nn_input"]}</pre>
-                    ) : (isResponding===1 ? (
-                      <pre>Getting your reply...</pre>
-                    ) : (
-                      <div></div>
-                    )
-                    )}
-                  </div>
-                </Flex>
-              </Tabs.Content>
-
-
-
-              <Tabs.Content value="settings">
-                <Box style={{ display: 'flex', height: '100vh' }}>
-                <form>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label className="Label" htmlFor="monty-python-mode" style={{ paddingRight: 15 }}>
-                      Monty Python lover mode
-                    </label>
-                    <MontyPythonSwitch />
-                  </div>
-                </form>
-                </Box>
-              </Tabs.Content>
-
-
-            </Box>
-
-          </Tabs.Root>
-
-        </Flex>
-
+          </div>
+          } />
+          <Route path="/game1" element={
+            <Building 
+            n_of_inputs={4}
+            n_of_outputs={3}
+            cytoElements={cytoElements}
+            cytoStyle={cytoStyle}
+            generateFloatingButtons={generateFloatingButtons}
+            cytoLayers={cytoLayers}
+            setCytoLayers={setCytoLayers}
+            updateCytoLayers={updateCytoLayers}
+            FloatingButton={FloatingButton}
+            addLayer={addLayer}
+            removeLayer={removeLayer}
+            iterationsSlider={iterationsSlider}
+            iterations={iterations}
+            learningRateSlider={learningRateSlider}
+            learningRate={learningRate}
+            isTraining={isTraining}
+            apiData={apiData}
+            postRequest={postRequest}
+            accuracyColor={accuracyColor}
+            handleSubmit={handleSubmit}
+            isResponding={isResponding}
+            MontyPythonSwitch={MontyPythonSwitch}
+          />
+          } />
+          <Route path="/game2" element={
+            <Building 
+            n_of_inputs={2}
+            n_of_outputs={5}
+            cytoElements={cytoElements}
+            cytoStyle={cytoStyle}
+            generateFloatingButtons={generateFloatingButtons}
+            cytoLayers={cytoLayers}
+            setCytoLayers={setCytoLayers}
+            updateCytoLayers={updateCytoLayers}
+            FloatingButton={FloatingButton}
+            addLayer={addLayer}
+            removeLayer={removeLayer}
+            iterationsSlider={iterationsSlider}
+            iterations={iterations}
+            learningRateSlider={learningRateSlider}
+            learningRate={learningRate}
+            isTraining={isTraining}
+            apiData={apiData}
+            postRequest={postRequest}
+            accuracyColor={accuracyColor}
+            handleSubmit={handleSubmit}
+            isResponding={isResponding}
+            MontyPythonSwitch={MontyPythonSwitch}
+          />
+          } />
+          <Route path="/game3" element={
+            <Building 
+            n_of_inputs={10}
+            n_of_outputs={1}
+            cytoElements={cytoElements}
+            cytoStyle={cytoStyle}
+            generateFloatingButtons={generateFloatingButtons}
+            cytoLayers={cytoLayers}
+            setCytoLayers={setCytoLayers}
+            updateCytoLayers={updateCytoLayers}
+            FloatingButton={FloatingButton}
+            addLayer={addLayer}
+            removeLayer={removeLayer}
+            iterationsSlider={iterationsSlider}
+            iterations={iterations}
+            learningRateSlider={learningRateSlider}
+            learningRate={learningRate}
+            isTraining={isTraining}
+            apiData={apiData}
+            postRequest={postRequest}
+            accuracyColor={accuracyColor}
+            handleSubmit={handleSubmit}
+            isResponding={isResponding}
+            MontyPythonSwitch={MontyPythonSwitch}
+          />
+          } />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
       </Theme>
     </body>
-    </Router>
   );
 }
 
