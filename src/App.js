@@ -12,6 +12,10 @@ import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
 import BuildView from './buildView';
+import chroma from 'chroma-js';
+
+
+const colorScale = chroma.scale(['purple', 'lightblue', 'green', 'yellow', 'darkred']).domain([-1, -0.5, 0, 0.5, 1]);
 
 
 // ------- STYLED COMPONENTS -------
@@ -55,14 +59,15 @@ function useGenerateCytoElements(list = []) {
       for (let k = 0; k < memoizedList[i+1]; k++) {
         const target = memoizedList.slice(0, i+1).reduce((acc, curr) => acc + curr, 0) + k;
         if (target <= cElements.length) {
-          cElements.push({ data: { source, target } });
+          const weight = Math.random() * 2 - 1;  
+          cElements.push({ data: { source, target, weight } });
         }
       }
     }
   });
 
   return cElements;
-}
+  }
 
 
 // function to generate cytoscape style
@@ -81,7 +86,7 @@ function useGenerateCytoStyle(list = []) {
       selector: 'edge',
       style: {
         'width': 1,
-        'line-color': 'var(--slate-a10)',
+        'line-color': ele => colorScale(ele.data('weight')).toString(),
         'curve-style': 'bezier'
       }
     }
