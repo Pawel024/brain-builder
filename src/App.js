@@ -132,30 +132,40 @@ function App() {
     };
   }, []);
 
-  const [apiData, setApiData] = useState(null);
-  const [isTraining, setIsTraining] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
-  const [isResponding, setIsResponding] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
-  const [accuracy, setAccuracy] = useState(null);
+  const [apiData1, setApiData1] = useState(null);
+  const [isTraining1, setIsTraining1] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
+  const [isResponding1, setIsResponding1] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
+  const [accuracy1, setAccuracy1] = useState(null);
+
+  const [apiData2, setApiData2] = useState(null);
+  const [isTraining2, setIsTraining2] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
+  const [isResponding2, setIsResponding2] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
+  const [accuracy2, setAccuracy2] = useState(null);
+
+  const [apiData3, setApiData3] = useState(null);
+  const [isTraining3, setIsTraining3] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
+  const [isResponding3, setIsResponding3] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
+  const [accuracy3, setAccuracy3] = useState(null);
 
   // Define the API endpoint
   const apiEndpoint = window.location.origin + "/api/backend";
 
   // Define the functions to fetch API data
-  const fetchTrainingData = () => {
+  const fetchTrainingData = (setApiData, setAccuracy) => {
     axios.get(apiEndpoint)
       .then((response) => {
         setApiData(response.data[0]);
-        setAccuracy(parseFloat(JSON.parse(apiData["error_list"])[1]))
+        setAccuracy(parseFloat(JSON.parse(apiData1["error_list"])[1]))
         console.log(response.data[0]);
       })
       .catch((error) => {
         console.log(`Error fetching API data: ${error}`);
       });
-    setIsTraining(2);
+    setIsTraining1(2);
     console.log("Training finished")
   };
 
-  const fetchQueryResponse = () => {
+  const fetchQueryResponse = (setApiData, setIsResponding) => {
     axios.get(apiEndpoint)
       .then((response) => {
         setApiData(response.data[0]);
@@ -172,46 +182,118 @@ function App() {
 
   // ------- CYTOSCAPE EDITING -------
 
-  const [cytoLayers, setCytoLayers] = useState([]);
+  const [cytoLayers1, setCytoLayers1] = useState([]);
   useEffect(() => {
-    localStorage.setItem('cytoLayers', JSON.stringify(cytoLayers));
-  }, [cytoLayers]);
+    localStorage.setItem('cytoLayers1', JSON.stringify(cytoLayers1));
+  }, [cytoLayers1]);
+
+  const [cytoLayers2, setCytoLayers2] = useState([]);
+  useEffect(() => {
+    localStorage.setItem('cytoLayers2', JSON.stringify(cytoLayers2));
+  }, [cytoLayers2]);
+
+  const [cytoLayers3, setCytoLayers3] = useState([]);
+  useEffect(() => {
+    localStorage.setItem('cytoLayers3', JSON.stringify(cytoLayers3));
+  }, [cytoLayers3]);
 
   useEffect(() => {
     // Check localStorage for a saved setting
-    const savedSetting = localStorage.getItem('cytoLayersSetting');
+    const savedSetting = localStorage.getItem('cytoLayers1');
   
     if (savedSetting) {
       // If a saved setting is found, parse it from JSON
       const cytoLayersSetting = JSON.parse(savedSetting);
   
       // Apply the setting to the CytoLayers
-      setCytoLayers(cytoLayersSetting);
+      setCytoLayers1(cytoLayersSetting);
     } else {
         axios.get(window.location.origin + "/api/backend/?limit=1")
         .then((response) => {
             // check if there is anything in the data
             if (response.data.length === 0) {
-                setCytoLayers([4, 7, 7, 3])
+                setCytoLayers1([4, 7, 7, 3])
             }
             else {
-                setApiData(response.data[0]);
-                setCytoLayers(JSON.parse(apiData["network_setup"]));
+                setApiData1(response.data[0]);
+                setCytoLayers1(JSON.parse(apiData1["network_setup"]));
             }
         })
         .catch((error) => {
             console.log(error);
         });
     }
-  }, []);
+  }, [apiData1]);
+
+  useEffect(() => {
+    // Check localStorage for a saved setting
+    const savedSetting = localStorage.getItem('cytoLayers2');
+  
+    if (savedSetting) {
+      // If a saved setting is found, parse it from JSON
+      const cytoLayersSetting = JSON.parse(savedSetting);
+  
+      // Apply the setting to the CytoLayers
+      setCytoLayers2(cytoLayersSetting);
+    } else {
+        axios.get(window.location.origin + "/api/backend/?limit=1")
+        .then((response) => {
+            // check if there is anything in the data
+            if (response.data.length === 0) {
+                setCytoLayers2([4, 7, 7, 3])
+            }
+            else {
+                setApiData2(response.data[0]);
+                setCytoLayers2(JSON.parse(apiData2["network_setup"]));
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
+  }, [apiData2]);
+
+  useEffect(() => {
+    // Check localStorage for a saved setting
+    const savedSetting = localStorage.getItem('cytoLayers3');
+  
+    if (savedSetting) {
+      // If a saved setting is found, parse it from JSON
+      const cytoLayersSetting = JSON.parse(savedSetting);
+  
+      // Apply the setting to the CytoLayers
+      setCytoLayers3(cytoLayersSetting);
+    } else {
+        axios.get(window.location.origin + "/api/backend/?limit=1")
+        .then((response) => {
+            // check if there is anything in the data
+            if (response.data.length === 0) {
+                setCytoLayers3([4, 7, 7, 3])
+            }
+            else {
+                setApiData3(response.data[0]);
+                setCytoLayers3(JSON.parse(apiData3["network_setup"]));
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
+  }, [apiData3]);
   
 
   // make a list of cytoscape elements that can be updated
-  const cytoElements = useGenerateCytoElements(cytoLayers);
-  const cytoStyle = useGenerateCytoStyle(cytoLayers);
+  const cytoElements1 = useGenerateCytoElements(cytoLayers1);
+  const cytoStyle1 = useGenerateCytoStyle(cytoLayers1);
+
+  const cytoElements2 = useGenerateCytoElements(cytoLayers2);
+  const cytoStyle2 = useGenerateCytoStyle(cytoLayers2);
+
+  const cytoElements3 = useGenerateCytoElements(cytoLayers3);
+  const cytoStyle3 = useGenerateCytoStyle(cytoLayers3);
 
   // function to add a layer
-  const addLayer = useCallback((column) => {
+  const addLayer = useCallback((setCytoLayers) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
       if (newLayers.length < 10) {newLayers.push(1)};
@@ -220,7 +302,7 @@ function App() {
   }, []);
 
   // function to remove a layer
-  const removeLayer = useCallback((column) => {
+  const removeLayer = useCallback((setCytoLayers) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
       if (newLayers.length > 2) {newLayers.pop()}
@@ -229,28 +311,28 @@ function App() {
   }, []);
 
   // function to add a node to a layer
-  const addNode = useCallback((column) => {
+  const addNode = useCallback((column, setCytoLayers, currentGameNumber) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
       newLayers[column] < 16 ? newLayers[column] += 1 : newLayers[column] = 16;
-      document.getElementById("input" + column).value = newLayers[column];
+      document.getElementById(currentGameNumber + "-input" + column).value = newLayers[column];
       return newLayers;
     });
   }, []);
 
   // function to remove a node from a layer
-  const removeNode = useCallback((column) => {
+  const removeNode = useCallback((column, setCytoLayers, currentGameNumber) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
       newLayers[column] > 1 ? newLayers[column] -= 1 : newLayers[column] = 1;
-      document.getElementById("input" + column).value = newLayers[column];
+      document.getElementById(currentGameNumber + "-input" + column).value = newLayers[column];
       return newLayers;
     });
   }, []);
 
   // function to set a custom number of nodes for a layer
-  const setNodes = useCallback((column) => {
-    var nodeInput = Number(document.getElementById("input" + column).value)
+  const setNodes = useCallback((column, setCytoLayers, currentGameNumber) => {
+    var nodeInput = Number(document.getElementById(currentGameNumber + "-input" + column).value)
     if (nodeInput && Number.isInteger(nodeInput)) {
       if (nodeInput < 1) {
         nodeInput = 1;
@@ -263,20 +345,20 @@ function App() {
         return newLayers;
       });
     } else {
-      nodeInput = cytoLayers[column];
+      nodeInput = cytoLayers1[column];
     }
-    document.getElementById("input" + column).value = nodeInput;
-  }, [cytoLayers]);
+    document.getElementById(currentGameNumber + "-input" + column).value = nodeInput;
+  }, [cytoLayers1]);
 
 
 
   // ------- POST REQUEST -------
-  const postRequest = (e) => {
+  const postRequest = (e, setApiData, setAccuracy, setIsTraining, learningRate, iterations) => {
     e.preventDefault();
     const trainingData = {
       learning_rate: learningRate,
       epochs: iterations,
-      network_setup: JSON.stringify(cytoLayers),
+      network_setup: JSON.stringify(cytoLayers1),
       nn_input: JSON.stringify([]),
       action: 1,
       error_list: JSON.stringify([]),
@@ -285,7 +367,7 @@ function App() {
     setIsTraining(1);
     axios.put(window.location.origin + "/api/backend/1", trainingData).then((response) => {
       console.log(response.status);
-      fetchTrainingData();
+      fetchTrainingData(setApiData, setAccuracy);
     });
   };
 
@@ -293,7 +375,7 @@ function App() {
   // ------- FLOATING BUTTONS -------
 
   // function to generate floating buttons
-  function generateFloatingButtons(top, left, dist, layers, isItPlus, nLayers) {
+  function generateFloatingButtons(top, left, dist, layers, isItPlus, nLayers, setCytoLayers, currentGameNumber) {
     const buttons = [];
     const icon = isItPlus ? <PlusIcon /> : <MinusIcon />;
     for (let i = 0; i < nLayers; i++) {
@@ -302,8 +384,8 @@ function App() {
         <div>
           <FloatingButton
             variant="outline"
-            disabled={(isItPlus && cytoLayers[i] >= 16) | (!isItPlus && cytoLayers[i] < 2)}
-            onClick = {isItPlus ? () => addNode(i) : () => removeNode(i)}
+            disabled={(isItPlus && cytoLayers1[i] >= 16) | (!isItPlus && cytoLayers1[i] < 2)}
+            onClick = {isItPlus ? () => addNode(i, setCytoLayers, currentGameNumber) : () => removeNode(i, setCytoLayers, currentGameNumber)}
             style={{...style}}
             key={i}
           >
@@ -312,7 +394,7 @@ function App() {
           {isItPlus &&
           <form>
             <input
-            id={"input" + i}
+            id={currentGameNumber + "-input" + i}
             type="text"
             defaultValue={layers[i]}
             style={{
@@ -327,11 +409,11 @@ function App() {
               color: 'var(--cyan-12)',
               fontWeight: 'bold'
             }}
-            onBlur={() => setNodes(i)}
+            onBlur={() => setNodes(i, setCytoLayers, currentGameNumber)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault();
-                setNodes(i);
+                setNodes(i, setCytoLayers, currentGameNumber);
               }
             }}
             />
@@ -345,9 +427,8 @@ function App() {
   }
 
   // ------- FORMS -------
-  const [formValues, setFormValues] = useState([]);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event, setIsResponding, setApiData) => {
     event.preventDefault();
     setIsResponding(1);
     axios.get(window.location.origin + "/api/backend/?limit=1")
@@ -364,7 +445,7 @@ function App() {
         axios.put(window.location.origin + "/api/backend/1", networkData)
           .then((response) => {
             console.log(response.status);
-            fetchQueryResponse();
+            fetchQueryResponse(setApiData, setIsResponding);
           })
           .catch((error) => {
             console.log(error);
@@ -394,16 +475,22 @@ function App() {
   // ------- SLIDERS -------
 
   // initiate iterations and learning rate as variables with a useState hook
-  const [iterations, setIterations] = useState(200);
-  const [learningRate, setLearningRate] = useState(0.01);
+  const [iterations1, setIterations1] = useState(200);
+  const [learningRate1, setLearningRate1] = useState(0.01);
 
-  // create a slider for iterations
-  const iterationsSlider = useMemo(() => {
+  const [iterations2, setIterations2] = useState(200);
+  const [learningRate2, setLearningRate2] = useState(0.01);
+
+  const [iterations3, setIterations3] = useState(200);
+  const [learningRate3, setLearningRate3] = useState(0.01);
+
+  // create a slider for iterations for each game
+  const iterationsSlider1 = useMemo(() => {
     return (
       <Slider.Root
         className="SliderRoot"
-        defaultValue={[iterations]}
-        onValueChange={(value) => setIterations(value[0]*2)}
+        defaultValue={[iterations1]}
+        onValueChange={(value) => setIterations1(value[0]*2)}
         max={100}
         step={0.5}
         style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
@@ -414,15 +501,52 @@ function App() {
         <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
       </Slider.Root>
     );
-  }, [iterations, setIterations]);
+  }, [iterations1, setIterations1]);
+
+  const iterationsSlider2 = useMemo(() => {
+    return (
+      <Slider.Root
+        className="SliderRoot"
+        defaultValue={[iterations2]}
+        onValueChange={(value) => setIterations2(value[0]*2)}
+        max={100}
+        step={0.5}
+        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
+      >
+        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
+          <Slider.Range className="SliderRange" />
+        </Slider.Track>
+        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
+      </Slider.Root>
+    );
+  }, [iterations2, setIterations2]);
+
+  const iterationsSlider3 = useMemo(() => {
+    return (
+      <Slider.Root
+        className="SliderRoot"
+        defaultValue={[iterations3]}
+        onValueChange={(value) => setIterations3(value[0]*2)}
+        max={100}
+        step={0.5}
+        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
+      >
+        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
+          <Slider.Range className="SliderRange" />
+        </Slider.Track>
+        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
+      </Slider.Root>
+    );
+  }, [iterations3, setIterations3]);
+
 
   // create a slider for learning rate
-  const learningRateSlider = useMemo(() => {
+  const learningRateSlider1 = useMemo(() => {
     return (
-      <Slider.Root id="learningRateSlider"
+      <Slider.Root id="learningRateSlider1"
         className="SliderRoot"
         defaultValue={[30]}
-        onValueChange={(value) => setLearningRate((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
+        onValueChange={(value) => setLearningRate1((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
         max={70}
         step={10}
         style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
@@ -433,16 +557,52 @@ function App() {
         <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
       </Slider.Root>
     );
-  }, [setLearningRate]);
+  }, []);
+
+  const learningRateSlider2 = useMemo(() => {
+    return (
+      <Slider.Root id="learningRateSlider2"
+        className="SliderRoot"
+        defaultValue={[30]}
+        onValueChange={(value) => setLearningRate2((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
+        max={70}
+        step={10}
+        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
+      >
+        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
+          <Slider.Range className="SliderRange" />
+        </Slider.Track>
+        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
+      </Slider.Root>
+    );
+  }, []);
+
+  const learningRateSlider3 = useMemo(() => {
+    return (
+      <Slider.Root id="learningRateSlider3"
+        className="SliderRoot"
+        defaultValue={[30]}
+        onValueChange={(value) => setLearningRate3((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
+        max={70}
+        step={10}
+        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
+      >
+        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
+          <Slider.Range className="SliderRange" />
+        </Slider.Track>
+        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
+      </Slider.Root>
+    );
+  }, []);
 
 
-  const updateCytoLayers = (setCytoLayersMethod, n_of_inputs, n_of_outputs) => {
-    setCytoLayersMethod(prevCytoLayers => {
+  const updateCytoLayers = (setCytoLayers, nOfInputs, nOfOutputs) => {
+    setCytoLayers(prevCytoLayers => {
       const newCytoLayers = prevCytoLayers.map((layer, index) => {
         if (index === 0) {
-          return n_of_inputs;
+          return nOfInputs;
         } else if (index === prevCytoLayers.length - 1) {
-          return n_of_outputs;
+          return nOfOutputs;
         } else {
           return layer;
         }
@@ -509,82 +669,88 @@ function App() {
           } />
           <Route path="/game1" element={
             <BuildView
-            currentGame={"game1"} 
-            n_of_inputs={4}
-            n_of_outputs={3}
-            cytoElements={cytoElements}
-            cytoStyle={cytoStyle}
+            currentGameNumber={1} 
+            nOfInputs={4}
+            nOfOutputs={3}
+            cytoElements={cytoElements1}
+            cytoStyle={cytoStyle1}
             generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers}
-            setCytoLayers={setCytoLayers}
+            cytoLayers={cytoLayers1}
+            setCytoLayers={setCytoLayers1}
             updateCytoLayers={updateCytoLayers}
             FloatingButton={FloatingButton}
             addLayer={addLayer}
             removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider}
-            iterations={iterations}
-            learningRateSlider={learningRateSlider}
-            learningRate={learningRate}
-            isTraining={isTraining}
-            apiData={apiData}
+            iterationsSlider={iterationsSlider1}
+            iterations={iterations1}
+            setIterations={setIterations1}
+            learningRateSlider={learningRateSlider1}
+            learningRate={learningRate1}
+            setLearningRate={setLearningRate2}
+            isTraining={isTraining1}
+            apiData={apiData1}
             postRequest={postRequest}
             accuracyColor={accuracyColor}
             handleSubmit={handleSubmit}
-            isResponding={isResponding}
+            isResponding={isResponding1}
             MontyPythonSwitch={MontyPythonSwitch}
           />
           } />
           <Route path="/game2" element={
             <BuildView
-            currentGame={"game2"} 
-            n_of_inputs={2}
-            n_of_outputs={5}
-            cytoElements={cytoElements}
-            cytoStyle={cytoStyle}
+            currentGameNumber={2} 
+            nOfInputs={2}
+            nOfOutputs={5}
+            cytoElements={cytoElements2}
+            cytoStyle={cytoStyle2}
             generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers}
-            setCytoLayers={setCytoLayers}
+            cytoLayers={cytoLayers2}
+            setCytoLayers={setCytoLayers2}
             updateCytoLayers={updateCytoLayers}
             FloatingButton={FloatingButton}
             addLayer={addLayer}
             removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider}
-            iterations={iterations}
-            learningRateSlider={learningRateSlider}
-            learningRate={learningRate}
-            isTraining={isTraining}
-            apiData={apiData}
+            iterationsSlider={iterationsSlider2}
+            iterations={iterations2}
+            setIterations={setIterations2}
+            learningRateSlider={learningRateSlider2}
+            learningRate={learningRate2}
+            setLearningRate={setLearningRate2}
+            isTraining={isTraining2}
+            apiData={apiData2}
             postRequest={postRequest}
             accuracyColor={accuracyColor}
             handleSubmit={handleSubmit}
-            isResponding={isResponding}
+            isResponding={isResponding2}
             MontyPythonSwitch={MontyPythonSwitch}
           />
           } />
           <Route path="/game3" element={
             <BuildView
-            currentGame={"game3"} 
-            n_of_inputs={10}
-            n_of_outputs={1}
-            cytoElements={cytoElements}
-            cytoStyle={cytoStyle}
+            currentGameNumber={3} 
+            nOfInputs={10}
+            nOfOutputs={1}
+            cytoElements={cytoElements3}
+            cytoStyle={cytoStyle3}
             generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers}
-            setCytoLayers={setCytoLayers}
+            cytoLayers={cytoLayers3}
+            setCytoLayers={setCytoLayers3}
             updateCytoLayers={updateCytoLayers}
             FloatingButton={FloatingButton}
             addLayer={addLayer}
             removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider}
-            iterations={iterations}
-            learningRateSlider={learningRateSlider}
-            learningRate={learningRate}
-            isTraining={isTraining}
-            apiData={apiData}
+            iterationsSlider={iterationsSlider3}
+            setIterations={setIterations3}
+            iterations={iterations3}
+            learningRateSlider={learningRateSlider3}
+            learningRate={learningRate3}
+            setLearningRate={setLearningRate3}
+            isTraining={isTraining3}
+            apiData={apiData3}
             postRequest={postRequest}
             accuracyColor={accuracyColor}
             handleSubmit={handleSubmit}
-            isResponding={isResponding}
+            isResponding={isResponding3}
             MontyPythonSwitch={MontyPythonSwitch}
           />
           } />
