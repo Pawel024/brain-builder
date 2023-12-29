@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './App.css';
-import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator, Button } from '@radix-ui/themes';
+import { Theme, Flex, Box, Heading, Grid, IconButton, Button } from '@radix-ui/themes';
 import * as Slider from '@radix-ui/react-slider';
-import * as Form from '@radix-ui/react-form';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import CytoscapeComponent from 'react-cytoscapejs';
-import { PlusIcon, MinusIcon, PlayIcon, InfoCircledIcon, ChevronLeftIcon, ChevronRightIcon, RocketIcon, HomeIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, RocketIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
@@ -15,7 +13,7 @@ import BuildView from './buildView';
 import chroma from 'chroma-js';
 
 
-const colorScale = chroma.scale(['purple', 'lightblue', 'green', 'yellow', 'darkred']).domain([-1, -0.5, 0, 0.5, 1]);
+const colorScale = chroma.scale(['#006383', '#348399', '#59a5b0', '#82c6c7', '#dddddd', '#efa19a', '#e36a61', '#c03b33', '#8a2111']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
 
 
 // ------- STYLED COMPONENTS -------
@@ -85,8 +83,8 @@ function useGenerateCytoStyle(list = []) {
     {
       selector: 'edge',
       style: {
-        'width': 1,
         'line-color': ele => colorScale(ele.data('weight')).toString(),
+        'width': ele => Math.abs(ele.data('weight'))*2,
         'curve-style': 'bezier'
       }
     }
@@ -106,7 +104,6 @@ function NotFound() {
     </div>
   );
 }
-
 
 
 // ------- APP FUNCTION -------
@@ -134,9 +131,6 @@ function App() {
     };
   }, []);
 
-  console.log(window.location.origin);
-
-  // ------- API EXPONENTIAL BACKOFF LISTENER -------
   const [apiData, setApiData] = useState(null);
   const [isTraining, setIsTraining] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
   const [isResponding, setIsResponding] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
@@ -178,26 +172,38 @@ function App() {
   // ------- CYTOSCAPE EDITING -------
 
   const [cytoLayers, setCytoLayers] = useState([]);
+  useEffect(() => {
+    localStorage.setItem('cytoLayers', JSON.stringify(cytoLayers));
+  }, [cytoLayers]);
 
   useEffect(() => {
-    let data;
-    axios.get(window.location.origin + "/api/backend/?limit=1")
-      .then((response) => {
-        // check if there is anything in the data
-        if (response.data.length === 0) {
-          data = [4, 10, 10, 10, 3]
-        }
-        else {
-          data = response.data[0];
-        }
-        console.log(data);
-        setApiData(data);
-        setCytoLayers(JSON.parse(data["network_setup"]));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    // Check localStorage for a saved setting
+    const savedSetting = localStorage.getItem('cytoLayersSetting');
+  
+    if (savedSetting) {
+      // If a saved setting is found, parse it from JSON
+      const cytoLayersSetting = JSON.parse(savedSetting);
+  
+      // Apply the setting to the CytoLayers
+      setCytoLayers(cytoLayersSetting);
+    } else {
+        axios.get(window.location.origin + "/api/backend/?limit=1")
+        .then((response) => {
+            // check if there is anything in the data
+            if (response.data.length === 0) {
+                setCytoLayers([4, 7, 7, 3])
+            }
+            else {
+                setApiData(response.data[0]);
+                setCytoLayers(JSON.parse(apiData["network_setup"]));
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
   }, []);
+  
 
   // make a list of cytoscape elements that can be updated
   const cytoElements = useGenerateCytoElements(cytoLayers);
@@ -456,18 +462,19 @@ function App() {
           <div>
             <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
               <Grid columns='3' mt='1'>
-                <Box align='start' ml='3' >
-                  <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none' }}>
-                    <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30' />
-                  </Link>
-                </Box>
+                <Box/>
                 <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
                   <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
                 </Link>
-                <Box></Box>
+                <Box align='end' mr='3' >
+                    <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
+                    <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
+                    </Link>
+                </Box>
               </Grid>
             </Box>
-            <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '20px', alignItems: 'start', justifyContent: 'center', height: '100vh', padding: '20px' }}>
+            <Heading as='h2' size='6' style={{ color: 'var(--gray-12)', marginLeft: 20, marginTop: 30 , marginBottom: 10 }}>&gt; Games</Heading>
+            <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '20px', alignItems: 'start', justifyContent: 'center', height: '100vh', marginLeft: 20 }}>
               <Link to="game1" style={{ color: 'inherit', textDecoration: 'none' }}>
                 <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
                   <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
