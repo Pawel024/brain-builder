@@ -11,6 +11,7 @@ import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
 import BuildView from './buildView';
 import chroma from 'chroma-js';
+import Readme from './readme';
 
 
 const colorScale = chroma.scale(['#006383', '#348399', '#59a5b0', '#82c6c7', '#dddddd', '#efa19a', '#e36a61', '#c03b33', '#8a2111']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
@@ -382,7 +383,7 @@ function App() {
 
   const MontyPythonSwitch = () => {
     return (
-      <Switch.Root className="SwitchRoot" id="airplane-mode" checked={isMontyPythonLover} onClick={() => setIsMontyPythonLover(!isMontyPythonLover)}>
+      <Switch.Root className="SwitchRoot" id="monty-python-switch" checked={isMontyPythonLover} onClick={() => setIsMontyPythonLover(!isMontyPythonLover)}>
         <Switch.Thumb className="SwitchThumb" />
       </Switch.Root>
     )
@@ -473,8 +474,8 @@ function App() {
                 </Box>
               </Grid>
             </Box>
-            <Heading as='h2' size='6' style={{ color: 'var(--gray-12)', marginLeft: 20, marginTop: 30 , marginBottom: 10 }}>&gt; Games</Heading>
-            <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '20px', alignItems: 'start', justifyContent: 'center', height: '100vh', marginLeft: 20 }}>
+            <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginLeft: 20, marginTop: 30 , marginBottom: 10 }}>&gt; Games</Heading>
+            <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '20px', alignItems: 'start', justifyContent: 'center', marginLeft: 20 }}>
               <Link to="game1" style={{ color: 'inherit', textDecoration: 'none' }}>
                 <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
                   <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
@@ -499,6 +500,10 @@ function App() {
                   </Flex>
                 </Button>
               </Link>
+            </Box>
+            <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginLeft: 20, marginTop: 30 , marginBottom: 10 }}>&gt; Readme</Heading>
+            <Box style={{ marginLeft: 20 }}>
+              <Readme />
             </Box>
           </div>
           } />

@@ -1,0 +1,12 @@
+.readme {
+    font-size: 0.8em;
+  }
+  
+  .readme h1,
+  .readme h2,
+  .readme h3,
+  .readme h4,
+  .readme h5,
+  .readme h6 {
+    font-size: inherit;
+  }
