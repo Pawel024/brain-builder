@@ -25,7 +25,7 @@ class Building extends React.Component {
         <Grid columns='3' mt='1'>
         <Box ml='3' style={{display:"flex"}}>  
             <Link to="/">
-              <IconButton variant="soft" aria-label="navigate to home" width='auto' height='21' style={{ marginLeft: 'auto', color: 'inherit', textDecoration: 'none' }}>
+              <IconButton aria-label="navigate to home" width='auto' height='21' style={{ marginLeft: 'auto', color: 'inherit', textDecoration: 'none' }}>
                 <HomeIcon color="white" width='auto' height='18' style={{ marginTop: 2 }} />
               </IconButton>
             </Link>

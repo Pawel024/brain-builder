@@ -14,7 +14,7 @@ function Readme() {
   }, []);
 
   return (
-    <div className='readme'> {/* Adjust the font size here */}
+    <div className='readme'>
       <ReactMarkdown children={readme} />
     </div>
   );
