@@ -18,4 +18,4 @@ This project was made using:
 
 Licensed under the MIT License, Copyright © 2023 Paweł Rok and Laurens Ledeganck.
 
-See [LICENSE](./LICENSE) for more information.
+See [LICENSE](https://github.com/Pawel024/brain-builder/blob/django_app/LICENSE) for more information.
