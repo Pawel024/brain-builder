@@ -688,11 +688,16 @@ function App() {
             learningRate={learningRate1}
             setLearningRate={setLearningRate2}
             isTraining={isTraining1}
+            setIsTraining={setIsTraining1}
             apiData={apiData1}
+            setApiData={setApiData1}
             postRequest={postRequest}
+            accuracy={accuracy1}
+            setAccuracy={setAccuracy1}
             accuracyColor={accuracyColor}
             handleSubmit={handleSubmit}
             isResponding={isResponding1}
+            setIsResponding={setIsResponding1}
             MontyPythonSwitch={MontyPythonSwitch}
           />
           } />
@@ -717,11 +722,16 @@ function App() {
             learningRate={learningRate2}
             setLearningRate={setLearningRate2}
             isTraining={isTraining2}
+            setIsTraining={setIsTraining2}
             apiData={apiData2}
+            setApiData={setApiData2}
             postRequest={postRequest}
+            accuracy={accuracy2}
+            setAccuracy={setAccuracy2}
             accuracyColor={accuracyColor}
             handleSubmit={handleSubmit}
             isResponding={isResponding2}
+            setIsResponding={setIsResponding2}
             MontyPythonSwitch={MontyPythonSwitch}
           />
           } />
@@ -746,11 +756,16 @@ function App() {
             learningRate={learningRate3}
             setLearningRate={setLearningRate3}
             isTraining={isTraining3}
+            setIsTraining={setIsTraining3}
             apiData={apiData3}
+            setApiData={setApiData3}
             postRequest={postRequest}
+            accuracy={accuracy3}
+            setAccuracy={setAccuracy3}
             accuracyColor={accuracyColor}
             handleSubmit={handleSubmit}
             isResponding={isResponding3}
+            setIsResponding={setIsResponding3}
             MontyPythonSwitch={MontyPythonSwitch}
           />
           } />
