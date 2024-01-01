@@ -12,6 +12,7 @@ import axios from 'axios';
 import BuildView from './buildView';
 import chroma from 'chroma-js';
 import Readme from './readme';
+import { use } from 'cytoscape';
 
 
 const colorScale = chroma.scale(['#006383', '#348399', '#59a5b0', '#82c6c7', '#dddddd', '#efa19a', '#e36a61', '#c03b33', '#8a2111']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
@@ -197,92 +198,58 @@ function App() {
     localStorage.setItem('cytoLayers3', JSON.stringify(cytoLayers3));
   }, [cytoLayers3]);
 
-  useEffect(() => {
+  
+  const loadLastCytoLayers = (setCytoLayers, apiData, setApiData, propertyName) => {
     // Check localStorage for a saved setting
-    const savedSetting = localStorage.getItem('cytoLayers1');
+    const savedSetting = localStorage.getItem(propertyName);
+    let goToStep2 = false;
   
-    if (savedSetting) {
-      // If a saved setting is found, parse it from JSON
-      const cytoLayersSetting = JSON.parse(savedSetting);
-  
-      // Apply the setting to the CytoLayers
-      setCytoLayers1(cytoLayersSetting);
-    } else {
-        axios.get(window.location.origin + "/api/backend/?limit=1")
-        .then((response) => {
-            // check if there is anything in the data
-            if (response.data.length === 0) {
-                setCytoLayers1([4, 7, 7, 3])
-            }
-            else {
-                setApiData1(response.data[0]);
-                setCytoLayers1(JSON.parse(apiData1["network_setup"]));
-            }
-        })
-        .catch((error) => {
+    if (savedSetting && savedSetting !== '[]') {
+        try {
+            // If a saved setting is found, try to parse it from JSON
+            const cytoLayersSetting = JSON.parse(savedSetting);
+            // try to set the cytoLayers to the saved setting, if there is an error, set it to default
+            setCytoLayers(cytoLayersSetting);
+        }
+        catch (error) {
             console.log(error);
-        });
+            goToStep2 = true;
+        }
     }
-  }, [apiData1]);
+    else {goToStep2 = true;};
 
-  useEffect(() => {
-    // Check localStorage for a saved setting
-    const savedSetting = localStorage.getItem('cytoLayers2');
-  
-    if (savedSetting) {
-      // If a saved setting is found, parse it from JSON
-      const cytoLayersSetting = JSON.parse(savedSetting);
-  
-      // Apply the setting to the CytoLayers
-      setCytoLayers2(cytoLayersSetting);
-    } else {
+    if (goToStep2) {
         axios.get(window.location.origin + "/api/backend/?limit=1")
         .then((response) => {
             // check if there is anything in the data
             if (response.data.length === 0) {
-                setCytoLayers2([4, 7, 7, 3])
+                setCytoLayers([4, 7, 7, 3])
             }
             else {
-                setApiData2(response.data[0]);
-                setCytoLayers2(JSON.parse(apiData2["network_setup"]));
+                setApiData(response.data[0]);
+                setCytoLayers(JSON.parse(apiData["network_setup"]));
             }
         })
         .catch((error) => {
             console.log(error);
         });
     }
+  };
+  
+  /*
+  useEffect(() => {
+    loadLastCytoLayers(setCytoLayers1, apiData1, setApiData1, 'cytoLayers1');
+  }, [apiData1]);
+  
+  useEffect(() => {
+    loadLastCytoLayers(setCytoLayers2, apiData2, setApiData2, 'cytoLayers2');
   }, [apiData2]);
 
   useEffect(() => {
-    // Check localStorage for a saved setting
-    const savedSetting = localStorage.getItem('cytoLayers3');
-  
-    if (savedSetting) {
-      // If a saved setting is found, parse it from JSON
-      const cytoLayersSetting = JSON.parse(savedSetting);
-  
-      // Apply the setting to the CytoLayers
-      setCytoLayers3(cytoLayersSetting);
-    } else {
-        axios.get(window.location.origin + "/api/backend/?limit=1")
-        .then((response) => {
-            // check if there is anything in the data
-            if (response.data.length === 0) {
-                setCytoLayers3([4, 7, 7, 3])
-            }
-            else {
-                setApiData3(response.data[0]);
-                setCytoLayers3(JSON.parse(apiData3["network_setup"]));
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-    }
+    loadLastCytoLayers(setCytoLayers3, apiData3, setApiData3, 'cytoLayers3');
   }, [apiData3]);
-  
+  */
 
-  // make a list of cytoscape elements that can be updated
   const cytoElements1 = useGenerateCytoElements(cytoLayers1);
   const cytoStyle1 = useGenerateCytoStyle(cytoLayers1);
 
@@ -678,6 +645,7 @@ function App() {
             cytoLayers={cytoLayers1}
             setCytoLayers={setCytoLayers1}
             updateCytoLayers={updateCytoLayers}
+            loadLastCytoLayers={loadLastCytoLayers}
             FloatingButton={FloatingButton}
             addLayer={addLayer}
             removeLayer={removeLayer}
@@ -712,6 +680,7 @@ function App() {
             cytoLayers={cytoLayers2}
             setCytoLayers={setCytoLayers2}
             updateCytoLayers={updateCytoLayers}
+            loadLastCytoLayers={loadLastCytoLayers}
             FloatingButton={FloatingButton}
             addLayer={addLayer}
             removeLayer={removeLayer}
@@ -746,6 +715,7 @@ function App() {
             cytoLayers={cytoLayers3}
             setCytoLayers={setCytoLayers3}
             updateCytoLayers={updateCytoLayers}
+            loadLastCytoLayers={loadLastCytoLayers}
             FloatingButton={FloatingButton}
             addLayer={addLayer}
             removeLayer={removeLayer}
