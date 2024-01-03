@@ -221,13 +221,13 @@ function App() {
     if (goToStep2) {
         axios.get(window.location.origin + "/api/backend/?limit=1")
         .then((response) => {
-            // check if there is anything in the data
-            if (response.data.length === 0) {
-                setCytoLayers([4, 7, 7, 3])
-            }
-            else {
+            try {
                 setApiData(response.data[0]);
                 setCytoLayers(JSON.parse(apiData["network_setup"]));
+            }
+            catch (error) {
+                setCytoLayers([4, 7, 7, 3]);
+                console.log(error);
             }
         })
         .catch((error) => {
@@ -589,52 +589,136 @@ function App() {
           <Route path="/" element={
           <div>
             <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
-              <Grid columns='3' mt='1'>
+            <Grid columns='3' mt='1'>
                 <Box/>
                 <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
-                  <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
+                <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
                 </Link>
                 <Box align='end' mr='3' >
                     <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
                     <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
                     </Link>
                 </Box>
-              </Grid>
+            </Grid>
             </Box>
-            <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginLeft: 20, marginTop: 30 , marginBottom: 10 }}>&gt; Games</Heading>
-            <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '20px', alignItems: 'start', justifyContent: 'center', marginLeft: 20 }}>
-              <Link to="game1" style={{ color: 'inherit', textDecoration: 'none' }}>
-                <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                  <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
-                    <label>Game 1</label>
-                    <div><RocketIcon width="35" height="35" /></div>
-                  </Flex>
-                </Button>
-              </Link>
-              <Link to="game2" style={{ color: 'inherit', textDecoration: 'none' }}>
-                <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                  <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
-                    <label>Game 2</label>
-                    <div><RocketIcon width="35" height="35" /></div>
-                  </Flex>
-                </Button>
-              </Link>
-              <Link to="game3" style={{ color: 'inherit', textDecoration: 'none' }}>
-                <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                  <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
-                    <label>Game 3</label>
-                    <div><RocketIcon width="35" height="35" /></div>
-                  </Flex>
-                </Button>
-              </Link>
-            </Box>
-            <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginLeft: 20, marginTop: 30 , marginBottom: 10 }}>&gt; Readme</Heading>
+            <Flex direction='row' gap='3' style={{padding:'20px 10px', alignItems: 'flex-start'}}>
+            <Flex direction='column' gap='3' style={{ flex: 1 }}>
+              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Get Started</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+                <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Tutorial</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                </Box>
+              </Box>
+              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Level 1</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+                <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 1</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 2</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 3</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                </Box>
+              </Box>
+              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Level 2</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+                <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 1</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 2</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 3</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                </Box>
+              </Box>
+              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Level 3</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+                <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 1</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 2</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 3</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                </Box>
+              </Box>
+
+
+            {/* NOTE THAT THE 3 LEVELS ARE NOT YET INDEPENDENT AT ALL!!!!!! */}
+
+
+            </Flex>
+            <Box style={{ flex: 1, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
+            <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Readme</Heading>
             <Box style={{ marginLeft: 20 }}>
-              <Readme />
+                <Readme />
             </Box>
+            </Box>
+            </Flex>
           </div>
           } />
-          <Route path="/game1" element={
+          <Route path="/tutorial" element={
             <BuildView
             currentGameNumber={1} 
             nOfInputs={4}
@@ -669,7 +753,42 @@ function App() {
             MontyPythonSwitch={MontyPythonSwitch}
           />
           } />
-          <Route path="/game2" element={
+          <Route path="/challenge1" element={
+            <BuildView
+            currentGameNumber={1} 
+            nOfInputs={4}
+            nOfOutputs={3}
+            cytoElements={cytoElements1}
+            cytoStyle={cytoStyle1}
+            generateFloatingButtons={generateFloatingButtons}
+            cytoLayers={cytoLayers1}
+            setCytoLayers={setCytoLayers1}
+            updateCytoLayers={updateCytoLayers}
+            loadLastCytoLayers={loadLastCytoLayers}
+            FloatingButton={FloatingButton}
+            addLayer={addLayer}
+            removeLayer={removeLayer}
+            iterationsSlider={iterationsSlider1}
+            iterations={iterations1}
+            setIterations={setIterations1}
+            learningRateSlider={learningRateSlider1}
+            learningRate={learningRate1}
+            setLearningRate={setLearningRate2}
+            isTraining={isTraining1}
+            setIsTraining={setIsTraining1}
+            apiData={apiData1}
+            setApiData={setApiData1}
+            postRequest={postRequest}
+            accuracy={accuracy1}
+            setAccuracy={setAccuracy1}
+            accuracyColor={accuracyColor}
+            handleSubmit={handleSubmit}
+            isResponding={isResponding1}
+            setIsResponding={setIsResponding1}
+            MontyPythonSwitch={MontyPythonSwitch}
+          />
+          } />
+          <Route path="/challenge2" element={
             <BuildView
             currentGameNumber={2} 
             nOfInputs={2}
@@ -704,7 +823,7 @@ function App() {
             MontyPythonSwitch={MontyPythonSwitch}
           />
           } />
-          <Route path="/game3" element={
+          <Route path="/challenge3" element={
             <BuildView
             currentGameNumber={3} 
             nOfInputs={10}
