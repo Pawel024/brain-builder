@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './App.css';
-import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator, Button } from '@radix-ui/themes';
+import { Theme, Flex, Box, Heading, Grid, IconButton, Button } from '@radix-ui/themes';
 import * as Slider from '@radix-ui/react-slider';
-import * as Form from '@radix-ui/react-form';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import CytoscapeComponent from 'react-cytoscapejs';
-import { PlusIcon, MinusIcon, PlayIcon, InfoCircledIcon, ChevronLeftIcon, ChevronRightIcon, RocketIcon, HomeIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, RocketIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
-import Building from './Building';
+import BuildView from './buildView';
+import chroma from 'chroma-js';
+import Readme from './readme';
+import { use } from 'cytoscape';
+
+
+const colorScale = chroma.scale(['#006383', '#348399', '#59a5b0', '#82c6c7', '#dddddd', '#efa19a', '#e36a61', '#c03b33', '#8a2111']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
 
 
 // ------- STYLED COMPONENTS -------
@@ -55,14 +59,15 @@ function useGenerateCytoElements(list = []) {
       for (let k = 0; k < memoizedList[i+1]; k++) {
         const target = memoizedList.slice(0, i+1).reduce((acc, curr) => acc + curr, 0) + k;
         if (target <= cElements.length) {
-          cElements.push({ data: { source, target } });
+          const weight = Math.random() * 2 - 1;  
+          cElements.push({ data: { source, target, weight } });
         }
       }
     }
   });
 
   return cElements;
-}
+  }
 
 
 // function to generate cytoscape style
@@ -80,8 +85,8 @@ function useGenerateCytoStyle(list = []) {
     {
       selector: 'edge',
       style: {
-        'width': 1,
-        'line-color': 'var(--slate-a10)',
+        'line-color': ele => colorScale(ele.data('weight')).toString(),
+        'width': ele => Math.abs(ele.data('weight'))*2,
         'curve-style': 'bezier'
       }
     }
@@ -97,10 +102,10 @@ function NotFound() {
     <div>
       <h1>404</h1>
       <p>Page not found</p>
+      <img src={require('./monty-python.jpeg')} alt="Monty Python" />
     </div>
   );
 }
-
 
 
 // ------- APP FUNCTION -------
@@ -128,33 +133,40 @@ function App() {
     };
   }, []);
 
-  console.log(window.location.origin);
+  const [apiData1, setApiData1] = useState(null);
+  const [isTraining1, setIsTraining1] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
+  const [isResponding1, setIsResponding1] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
+  const [accuracy1, setAccuracy1] = useState(null);
 
-  // ------- API EXPONENTIAL BACKOFF LISTENER -------
-  const [apiData, setApiData] = useState(null);
-  const [isTraining, setIsTraining] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
-  const [isResponding, setIsResponding] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
-  const [accuracy, setAccuracy] = useState(null);
+  const [apiData2, setApiData2] = useState(null);
+  const [isTraining2, setIsTraining2] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
+  const [isResponding2, setIsResponding2] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
+  const [accuracy2, setAccuracy2] = useState(null);
+
+  const [apiData3, setApiData3] = useState(null);
+  const [isTraining3, setIsTraining3] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
+  const [isResponding3, setIsResponding3] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
+  const [accuracy3, setAccuracy3] = useState(null);
 
   // Define the API endpoint
   const apiEndpoint = window.location.origin + "/api/backend";
 
   // Define the functions to fetch API data
-  const fetchTrainingData = () => {
+  const fetchTrainingData = (setApiData, setAccuracy) => {
     axios.get(apiEndpoint)
       .then((response) => {
         setApiData(response.data[0]);
-        setAccuracy(parseFloat(JSON.parse(apiData["error_list"])[1]))
+        setAccuracy(parseFloat(JSON.parse(apiData1["error_list"])[1]))
         console.log(response.data[0]);
       })
       .catch((error) => {
         console.log(`Error fetching API data: ${error}`);
       });
-    setIsTraining(2);
+    setIsTraining1(2);
     console.log("Training finished")
   };
 
-  const fetchQueryResponse = () => {
+  const fetchQueryResponse = (setApiData, setIsResponding) => {
     axios.get(apiEndpoint)
       .then((response) => {
         setApiData(response.data[0]);
@@ -171,34 +183,84 @@ function App() {
 
   // ------- CYTOSCAPE EDITING -------
 
-  const [cytoLayers, setCytoLayers] = useState([]);
+  const [cytoLayers1, setCytoLayers1] = useState([]);
+  useEffect(() => {
+    localStorage.setItem('cytoLayers1', JSON.stringify(cytoLayers1));
+  }, [cytoLayers1]);
+
+  const [cytoLayers2, setCytoLayers2] = useState([]);
+  useEffect(() => {
+    localStorage.setItem('cytoLayers2', JSON.stringify(cytoLayers2));
+  }, [cytoLayers2]);
+
+  const [cytoLayers3, setCytoLayers3] = useState([]);
+  useEffect(() => {
+    localStorage.setItem('cytoLayers3', JSON.stringify(cytoLayers3));
+  }, [cytoLayers3]);
+
+  
+  const loadLastCytoLayers = (setCytoLayers, apiData, setApiData, propertyName) => {
+    // Check localStorage for a saved setting
+    const savedSetting = localStorage.getItem(propertyName);
+    let goToStep2 = false;
+  
+    if (savedSetting && savedSetting !== '[]') {
+        try {
+            // If a saved setting is found, try to parse it from JSON
+            const cytoLayersSetting = JSON.parse(savedSetting);
+            // try to set the cytoLayers to the saved setting, if there is an error, set it to default
+            setCytoLayers(cytoLayersSetting);
+        }
+        catch (error) {
+            console.log(error);
+            goToStep2 = true;
+        }
+    }
+    else {goToStep2 = true;};
+
+    if (goToStep2) {
+        axios.get(window.location.origin + "/api/backend/?limit=1")
+        .then((response) => {
+            try {
+                setApiData(response.data[0]);
+                setCytoLayers(JSON.parse(apiData["network_setup"]));
+            }
+            catch (error) {
+                setCytoLayers([4, 7, 7, 3]);
+                console.log(error);
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
+  };
+  
+  /*
+  useEffect(() => {
+    loadLastCytoLayers(setCytoLayers1, apiData1, setApiData1, 'cytoLayers1');
+  }, [apiData1]);
+  
+  useEffect(() => {
+    loadLastCytoLayers(setCytoLayers2, apiData2, setApiData2, 'cytoLayers2');
+  }, [apiData2]);
 
   useEffect(() => {
-    let data;
-    axios.get(window.location.origin + "/api/backend/?limit=1")
-      .then((response) => {
-        // check if there is anything in the data
-        if (response.data.length === 0) {
-          data = [4, 10, 10, 10, 3]
-        }
-        else {
-          data = response.data[0];
-        }
-        console.log(data);
-        setApiData(data);
-        setCytoLayers(JSON.parse(data["network_setup"]));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+    loadLastCytoLayers(setCytoLayers3, apiData3, setApiData3, 'cytoLayers3');
+  }, [apiData3]);
+  */
 
-  // make a list of cytoscape elements that can be updated
-  const cytoElements = useGenerateCytoElements(cytoLayers);
-  const cytoStyle = useGenerateCytoStyle(cytoLayers);
+  const cytoElements1 = useGenerateCytoElements(cytoLayers1);
+  const cytoStyle1 = useGenerateCytoStyle(cytoLayers1);
+
+  const cytoElements2 = useGenerateCytoElements(cytoLayers2);
+  const cytoStyle2 = useGenerateCytoStyle(cytoLayers2);
+
+  const cytoElements3 = useGenerateCytoElements(cytoLayers3);
+  const cytoStyle3 = useGenerateCytoStyle(cytoLayers3);
 
   // function to add a layer
-  const addLayer = useCallback((column) => {
+  const addLayer = useCallback((setCytoLayers) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
       if (newLayers.length < 10) {newLayers.push(1)};
@@ -207,7 +269,7 @@ function App() {
   }, []);
 
   // function to remove a layer
-  const removeLayer = useCallback((column) => {
+  const removeLayer = useCallback((setCytoLayers) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
       if (newLayers.length > 2) {newLayers.pop()}
@@ -216,28 +278,28 @@ function App() {
   }, []);
 
   // function to add a node to a layer
-  const addNode = useCallback((column) => {
+  const addNode = useCallback((column, setCytoLayers, currentGameNumber) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
       newLayers[column] < 16 ? newLayers[column] += 1 : newLayers[column] = 16;
-      document.getElementById("input" + column).value = newLayers[column];
+      document.getElementById(currentGameNumber + "-input" + column).value = newLayers[column];
       return newLayers;
     });
   }, []);
 
   // function to remove a node from a layer
-  const removeNode = useCallback((column) => {
+  const removeNode = useCallback((column, setCytoLayers, currentGameNumber) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
       newLayers[column] > 1 ? newLayers[column] -= 1 : newLayers[column] = 1;
-      document.getElementById("input" + column).value = newLayers[column];
+      document.getElementById(currentGameNumber + "-input" + column).value = newLayers[column];
       return newLayers;
     });
   }, []);
 
   // function to set a custom number of nodes for a layer
-  const setNodes = useCallback((column) => {
-    var nodeInput = Number(document.getElementById("input" + column).value)
+  const setNodes = useCallback((column, setCytoLayers, currentGameNumber) => {
+    var nodeInput = Number(document.getElementById(currentGameNumber + "-input" + column).value)
     if (nodeInput && Number.isInteger(nodeInput)) {
       if (nodeInput < 1) {
         nodeInput = 1;
@@ -250,20 +312,20 @@ function App() {
         return newLayers;
       });
     } else {
-      nodeInput = cytoLayers[column];
+      nodeInput = cytoLayers1[column];
     }
-    document.getElementById("input" + column).value = nodeInput;
-  }, [cytoLayers]);
+    document.getElementById(currentGameNumber + "-input" + column).value = nodeInput;
+  }, [cytoLayers1]);
 
 
 
   // ------- POST REQUEST -------
-  const postRequest = (e) => {
+  const postRequest = (e, setApiData, setAccuracy, setIsTraining, learningRate, iterations) => {
     e.preventDefault();
     const trainingData = {
       learning_rate: learningRate,
       epochs: iterations,
-      network_setup: JSON.stringify(cytoLayers),
+      network_setup: JSON.stringify(cytoLayers1),
       nn_input: JSON.stringify([]),
       action: 1,
       error_list: JSON.stringify([]),
@@ -272,7 +334,7 @@ function App() {
     setIsTraining(1);
     axios.put(window.location.origin + "/api/backend/1", trainingData).then((response) => {
       console.log(response.status);
-      fetchTrainingData();
+      fetchTrainingData(setApiData, setAccuracy);
     });
   };
 
@@ -280,7 +342,7 @@ function App() {
   // ------- FLOATING BUTTONS -------
 
   // function to generate floating buttons
-  function generateFloatingButtons(top, left, dist, layers, isItPlus, nLayers) {
+  function generateFloatingButtons(top, left, dist, layers, isItPlus, nLayers, setCytoLayers, currentGameNumber) {
     const buttons = [];
     const icon = isItPlus ? <PlusIcon /> : <MinusIcon />;
     for (let i = 0; i < nLayers; i++) {
@@ -289,8 +351,8 @@ function App() {
         <div>
           <FloatingButton
             variant="outline"
-            disabled={(isItPlus && cytoLayers[i] >= 16) | (!isItPlus && cytoLayers[i] < 2)}
-            onClick = {isItPlus ? () => addNode(i) : () => removeNode(i)}
+            disabled={(isItPlus && cytoLayers1[i] >= 16) | (!isItPlus && cytoLayers1[i] < 2)}
+            onClick = {isItPlus ? () => addNode(i, setCytoLayers, currentGameNumber) : () => removeNode(i, setCytoLayers, currentGameNumber)}
             style={{...style}}
             key={i}
           >
@@ -299,7 +361,7 @@ function App() {
           {isItPlus &&
           <form>
             <input
-            id={"input" + i}
+            id={currentGameNumber + "-input" + i}
             type="text"
             defaultValue={layers[i]}
             style={{
@@ -314,11 +376,11 @@ function App() {
               color: 'var(--cyan-12)',
               fontWeight: 'bold'
             }}
-            onBlur={() => setNodes(i)}
+            onBlur={() => setNodes(i, setCytoLayers, currentGameNumber)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault();
-                setNodes(i);
+                setNodes(i, setCytoLayers, currentGameNumber);
               }
             }}
             />
@@ -332,26 +394,25 @@ function App() {
   }
 
   // ------- FORMS -------
-  const [formValues, setFormValues] = useState([]);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event, setIsResponding, setApiData) => {
     event.preventDefault();
     setIsResponding(1);
     axios.get(window.location.origin + "/api/backend/?limit=1")
       .then((response) => {
-        const studentData = response.data[0];
+        const networkData = response.data[0];
         const formData = new FormData(event.target);
         const values = Array.from(formData.values()).map((value) => Number(value));
         console.log("values");
         console.log(values);
-        studentData.nn_input = JSON.stringify(values);
-        studentData.action = 2;
-        console.log("updated student data");
-        console.log(studentData);
-        axios.put(window.location.origin + "/api/backend/1", studentData)
+        networkData.nn_input = JSON.stringify(values);
+        networkData.action = 2;
+        console.log("updated network data");
+        console.log(networkData);
+        axios.put(window.location.origin + "/api/backend/1", networkData)
           .then((response) => {
             console.log(response.status);
-            fetchQueryResponse();
+            fetchQueryResponse(setApiData, setIsResponding);
           })
           .catch((error) => {
             console.log(error);
@@ -370,7 +431,7 @@ function App() {
 
   const MontyPythonSwitch = () => {
     return (
-      <Switch.Root className="SwitchRoot" id="airplane-mode" checked={isMontyPythonLover} onClick={() => setIsMontyPythonLover(!isMontyPythonLover)}>
+      <Switch.Root className="SwitchRoot" id="monty-python-switch" checked={isMontyPythonLover} onClick={() => setIsMontyPythonLover(!isMontyPythonLover)}>
         <Switch.Thumb className="SwitchThumb" />
       </Switch.Root>
     )
@@ -381,16 +442,22 @@ function App() {
   // ------- SLIDERS -------
 
   // initiate iterations and learning rate as variables with a useState hook
-  const [iterations, setIterations] = useState(200);
-  const [learningRate, setLearningRate] = useState(0.01);
+  const [iterations1, setIterations1] = useState(200);
+  const [learningRate1, setLearningRate1] = useState(0.01);
 
-  // create a slider for iterations
-  const iterationsSlider = useMemo(() => {
+  const [iterations2, setIterations2] = useState(200);
+  const [learningRate2, setLearningRate2] = useState(0.01);
+
+  const [iterations3, setIterations3] = useState(200);
+  const [learningRate3, setLearningRate3] = useState(0.01);
+
+  // create a slider for iterations for each game
+  const iterationsSlider1 = useMemo(() => {
     return (
       <Slider.Root
         className="SliderRoot"
-        defaultValue={[iterations]}
-        onValueChange={(value) => setIterations(value[0]*2)}
+        defaultValue={[iterations1]}
+        onValueChange={(value) => setIterations1(value[0]*2)}
         max={100}
         step={0.5}
         style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
@@ -401,15 +468,52 @@ function App() {
         <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
       </Slider.Root>
     );
-  }, [iterations, setIterations]);
+  }, [iterations1, setIterations1]);
+
+  const iterationsSlider2 = useMemo(() => {
+    return (
+      <Slider.Root
+        className="SliderRoot"
+        defaultValue={[iterations2]}
+        onValueChange={(value) => setIterations2(value[0]*2)}
+        max={100}
+        step={0.5}
+        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
+      >
+        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
+          <Slider.Range className="SliderRange" />
+        </Slider.Track>
+        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
+      </Slider.Root>
+    );
+  }, [iterations2, setIterations2]);
+
+  const iterationsSlider3 = useMemo(() => {
+    return (
+      <Slider.Root
+        className="SliderRoot"
+        defaultValue={[iterations3]}
+        onValueChange={(value) => setIterations3(value[0]*2)}
+        max={100}
+        step={0.5}
+        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
+      >
+        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
+          <Slider.Range className="SliderRange" />
+        </Slider.Track>
+        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
+      </Slider.Root>
+    );
+  }, [iterations3, setIterations3]);
+
 
   // create a slider for learning rate
-  const learningRateSlider = useMemo(() => {
+  const learningRateSlider1 = useMemo(() => {
     return (
-      <Slider.Root id="learningRateSlider"
+      <Slider.Root id="learningRateSlider1"
         className="SliderRoot"
         defaultValue={[30]}
-        onValueChange={(value) => setLearningRate((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
+        onValueChange={(value) => setLearningRate1((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
         max={70}
         step={10}
         style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
@@ -420,16 +524,52 @@ function App() {
         <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
       </Slider.Root>
     );
-  }, [setLearningRate]);
+  }, []);
+
+  const learningRateSlider2 = useMemo(() => {
+    return (
+      <Slider.Root id="learningRateSlider2"
+        className="SliderRoot"
+        defaultValue={[30]}
+        onValueChange={(value) => setLearningRate2((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
+        max={70}
+        step={10}
+        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
+      >
+        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
+          <Slider.Range className="SliderRange" />
+        </Slider.Track>
+        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
+      </Slider.Root>
+    );
+  }, []);
+
+  const learningRateSlider3 = useMemo(() => {
+    return (
+      <Slider.Root id="learningRateSlider3"
+        className="SliderRoot"
+        defaultValue={[30]}
+        onValueChange={(value) => setLearningRate3((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
+        max={70}
+        step={10}
+        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
+      >
+        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
+          <Slider.Range className="SliderRange" />
+        </Slider.Track>
+        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
+      </Slider.Root>
+    );
+  }, []);
 
 
-  const updateCytoLayers = (setCytoLayersMethod, n_of_inputs, n_of_outputs) => {
-    setCytoLayersMethod(prevCytoLayers => {
+  const updateCytoLayers = (setCytoLayers, nOfInputs, nOfOutputs) => {
+    setCytoLayers(prevCytoLayers => {
       const newCytoLayers = prevCytoLayers.map((layer, index) => {
         if (index === 0) {
-          return n_of_inputs;
+          return nOfInputs;
         } else if (index === prevCytoLayers.length - 1) {
-          return n_of_outputs;
+          return nOfOutputs;
         } else {
           return layer;
         }
@@ -449,121 +589,272 @@ function App() {
           <Route path="/" element={
           <div>
             <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
-              <Grid columns='3' mt='1'>
-                <Box align='start' ml='3' >
-                  <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none' }}>
-                    <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30' />
-                  </Link>
-                </Box>
-                <Link to="https://brain-builder-f6e4dc8afc4d.herokuapp.com/" style={{ textDecoration: 'none' }}>
-                  <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
+            <Grid columns='3' mt='1'>
+                <Box/>
+                <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
+                <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
                 </Link>
-                <Box></Box>
-              </Grid>
+                <Box align='end' mr='3' >
+                    <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
+                    <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
+                    </Link>
+                </Box>
+            </Grid>
             </Box>
-            <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '20px', alignItems: 'start', justifyContent: 'center', height: '100vh', padding: '20px' }}>
-              <Link to="game1" style={{ color: 'inherit', textDecoration: 'none' }}>
-                <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                  <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
-                    <label>Game 1</label>
-                    <div><RocketIcon width="35" height="35" /></div>
-                  </Flex>
-                </Button>
-              </Link>
-              <Link to="game2" style={{ color: 'inherit', textDecoration: 'none' }}>
-                <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                  <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
-                    <label>Game 2</label>
-                    <div><RocketIcon width="35" height="35" /></div>
-                  </Flex>
-                </Button>
-              </Link>
-              <Link to="game3" style={{ color: 'inherit', textDecoration: 'none' }}>
-                <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                  <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
-                    <label>Game 3</label>
-                    <div><RocketIcon width="35" height="35" /></div>
-                  </Flex>
-                </Button>
-              </Link>
+            <Flex direction='row' gap='3' style={{padding:'20px 10px', alignItems: 'flex-start'}}>
+            <Flex direction='column' gap='3' style={{ flex: 1 }}>
+              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Get Started</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+                <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Tutorial</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                </Box>
+              </Box>
+              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Level 1</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+                <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 1</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 2</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 3</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                </Box>
+              </Box>
+              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Level 2</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+                <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 1</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 2</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 3</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                </Box>
+              </Box>
+              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Level 3</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+                <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 1</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 2</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 3</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
+                </Box>
+              </Box>
+
+
+            {/* NOTE THAT THE 3 LEVELS ARE NOT YET INDEPENDENT AT ALL!!!!!! */}
+
+
+            </Flex>
+            <Box style={{ flex: 1, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
+            <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Readme</Heading>
+            <Box style={{ marginLeft: 20 }}>
+                <Readme />
             </Box>
+            </Box>
+            </Flex>
           </div>
           } />
-          <Route path="/game1" element={
-            <Building 
-            n_of_inputs={4}
-            n_of_outputs={3}
-            cytoElements={cytoElements}
-            cytoStyle={cytoStyle}
+          <Route path="/tutorial" element={
+            <BuildView
+            currentGameNumber={1} 
+            nOfInputs={4}
+            nOfOutputs={3}
+            cytoElements={cytoElements1}
+            cytoStyle={cytoStyle1}
             generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers}
-            setCytoLayers={setCytoLayers}
+            cytoLayers={cytoLayers1}
+            setCytoLayers={setCytoLayers1}
             updateCytoLayers={updateCytoLayers}
+            loadLastCytoLayers={loadLastCytoLayers}
             FloatingButton={FloatingButton}
             addLayer={addLayer}
             removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider}
-            iterations={iterations}
-            learningRateSlider={learningRateSlider}
-            learningRate={learningRate}
-            isTraining={isTraining}
-            apiData={apiData}
+            iterationsSlider={iterationsSlider1}
+            iterations={iterations1}
+            setIterations={setIterations1}
+            learningRateSlider={learningRateSlider1}
+            learningRate={learningRate1}
+            setLearningRate={setLearningRate2}
+            isTraining={isTraining1}
+            setIsTraining={setIsTraining1}
+            apiData={apiData1}
+            setApiData={setApiData1}
             postRequest={postRequest}
+            accuracy={accuracy1}
+            setAccuracy={setAccuracy1}
             accuracyColor={accuracyColor}
             handleSubmit={handleSubmit}
-            isResponding={isResponding}
+            isResponding={isResponding1}
+            setIsResponding={setIsResponding1}
             MontyPythonSwitch={MontyPythonSwitch}
           />
           } />
-          <Route path="/game2" element={
-            <Building 
-            n_of_inputs={2}
-            n_of_outputs={5}
-            cytoElements={cytoElements}
-            cytoStyle={cytoStyle}
+          <Route path="/challenge1" element={
+            <BuildView
+            currentGameNumber={1} 
+            nOfInputs={4}
+            nOfOutputs={3}
+            cytoElements={cytoElements1}
+            cytoStyle={cytoStyle1}
             generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers}
-            setCytoLayers={setCytoLayers}
+            cytoLayers={cytoLayers1}
+            setCytoLayers={setCytoLayers1}
             updateCytoLayers={updateCytoLayers}
+            loadLastCytoLayers={loadLastCytoLayers}
             FloatingButton={FloatingButton}
             addLayer={addLayer}
             removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider}
-            iterations={iterations}
-            learningRateSlider={learningRateSlider}
-            learningRate={learningRate}
-            isTraining={isTraining}
-            apiData={apiData}
+            iterationsSlider={iterationsSlider1}
+            iterations={iterations1}
+            setIterations={setIterations1}
+            learningRateSlider={learningRateSlider1}
+            learningRate={learningRate1}
+            setLearningRate={setLearningRate2}
+            isTraining={isTraining1}
+            setIsTraining={setIsTraining1}
+            apiData={apiData1}
+            setApiData={setApiData1}
             postRequest={postRequest}
+            accuracy={accuracy1}
+            setAccuracy={setAccuracy1}
             accuracyColor={accuracyColor}
             handleSubmit={handleSubmit}
-            isResponding={isResponding}
+            isResponding={isResponding1}
+            setIsResponding={setIsResponding1}
             MontyPythonSwitch={MontyPythonSwitch}
           />
           } />
-          <Route path="/game3" element={
-            <Building 
-            n_of_inputs={10}
-            n_of_outputs={1}
-            cytoElements={cytoElements}
-            cytoStyle={cytoStyle}
+          <Route path="/challenge2" element={
+            <BuildView
+            currentGameNumber={2} 
+            nOfInputs={2}
+            nOfOutputs={5}
+            cytoElements={cytoElements2}
+            cytoStyle={cytoStyle2}
             generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers}
-            setCytoLayers={setCytoLayers}
+            cytoLayers={cytoLayers2}
+            setCytoLayers={setCytoLayers2}
             updateCytoLayers={updateCytoLayers}
+            loadLastCytoLayers={loadLastCytoLayers}
             FloatingButton={FloatingButton}
             addLayer={addLayer}
             removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider}
-            iterations={iterations}
-            learningRateSlider={learningRateSlider}
-            learningRate={learningRate}
-            isTraining={isTraining}
-            apiData={apiData}
+            iterationsSlider={iterationsSlider2}
+            iterations={iterations2}
+            setIterations={setIterations2}
+            learningRateSlider={learningRateSlider2}
+            learningRate={learningRate2}
+            setLearningRate={setLearningRate2}
+            isTraining={isTraining2}
+            setIsTraining={setIsTraining2}
+            apiData={apiData2}
+            setApiData={setApiData2}
             postRequest={postRequest}
+            accuracy={accuracy2}
+            setAccuracy={setAccuracy2}
             accuracyColor={accuracyColor}
             handleSubmit={handleSubmit}
-            isResponding={isResponding}
+            isResponding={isResponding2}
+            setIsResponding={setIsResponding2}
+            MontyPythonSwitch={MontyPythonSwitch}
+          />
+          } />
+          <Route path="/challenge3" element={
+            <BuildView
+            currentGameNumber={3} 
+            nOfInputs={10}
+            nOfOutputs={1}
+            cytoElements={cytoElements3}
+            cytoStyle={cytoStyle3}
+            generateFloatingButtons={generateFloatingButtons}
+            cytoLayers={cytoLayers3}
+            setCytoLayers={setCytoLayers3}
+            updateCytoLayers={updateCytoLayers}
+            loadLastCytoLayers={loadLastCytoLayers}
+            FloatingButton={FloatingButton}
+            addLayer={addLayer}
+            removeLayer={removeLayer}
+            iterationsSlider={iterationsSlider3}
+            setIterations={setIterations3}
+            iterations={iterations3}
+            learningRateSlider={learningRateSlider3}
+            learningRate={learningRate3}
+            setLearningRate={setLearningRate3}
+            isTraining={isTraining3}
+            setIsTraining={setIsTraining3}
+            apiData={apiData3}
+            setApiData={setApiData3}
+            postRequest={postRequest}
+            accuracy={accuracy3}
+            setAccuracy={setAccuracy3}
+            accuracyColor={accuracyColor}
+            handleSubmit={handleSubmit}
+            isResponding={isResponding3}
+            setIsResponding={setIsResponding3}
             MontyPythonSwitch={MontyPythonSwitch}
           />
           } />

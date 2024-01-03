@@ -1,5 +1,3 @@
-// will use updatethis.props.cytoLayers
-
 import React from 'react'
 import './App.css';
 import { Flex, Box, Tabs, Heading, Grid, IconButton, Separator } from '@radix-ui/themes';
@@ -13,7 +11,8 @@ import { PlayIcon, ChevronLeftIcon, ChevronRightIcon, HomeIcon } from '@radix-ui
 class Building extends React.Component {
 
   componentDidMount() {
-    this.props.updateCytoLayers(this.props.setCytoLayers, this.props.n_of_inputs, this.props.n_of_outputs);
+    this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.currentGameNumber);
+    this.props.updateCytoLayers(this.props.setCytoLayers, this.props.nOfInputs, this.props.nOfOutputs);
   }
 
   // Common functionality for all games can go here
@@ -23,19 +22,19 @@ class Building extends React.Component {
       <div>
       <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
         <Grid columns='3' mt='1'>
-          <Box align='start' ml='3' >
-            <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none' }}>
-              <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30' />
+        <Box ml='3' style={{display:"flex"}}>  
+            <Link to="/">
+              <IconButton aria-label="navigate to home" width='auto' height='21' style={{ marginLeft: 'auto', color: 'inherit', textDecoration: 'none' }}>
+                <HomeIcon color="white" width='auto' height='18' style={{ marginTop: 2 }} />
+              </IconButton>
             </Link>
           </Box>
-          <Link to="https://brain-builder-f6e4dc8afc4d.herokuapp.com/" style={{ textDecoration: 'none' }}>
+          <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
             <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
           </Link>
-          <Box style={{display:"flex"}}>  
-            <Link to="/">
-              <IconButton aria-label="navigate to home" style={{ marginLeft: 'auto', color: 'inherit', textDecoration: 'none' }}>
-                <HomeIcon color="white" />
-              </IconButton>
+          <Box align='end' mr='3' >
+            <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
+              <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
             </Link>
           </Box>
         </Grid>
@@ -57,13 +56,12 @@ class Building extends React.Component {
             <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
               <CytoscapeComponent elements={this.props.cytoElements} stylesheet={this.props.cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
               
-              {console.log(this.props.cytoLayers.length)}
-              {this.props.generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, this.props.cytoLayers, true, this.props.cytoLayers.length)}                    
-              {this.props.generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, this.props.cytoLayers, false, this.props.cytoLayers.length)}
+              {this.props.generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, this.props.cytoLayers, true, this.props.cytoLayers.length, this.props.setCytoLayers, this.props.currentGameNumber)}                    
+              {this.props.generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, this.props.cytoLayers, false, this.props.cytoLayers.length, this.props.setCytoLayers, this.props.currentGameNumber)}
 
               <this.props.FloatingButton
                 variant="outline"
-                onClick = {this.props.addLayer}
+                onClick = {() => this.props.addLayer(this.props.setCytoLayers)}
                 size="0"
                 style={{top: window.innerHeight*0.285, 
                         left: window.innerWidth*0.74, 
@@ -81,7 +79,7 @@ class Building extends React.Component {
 
               <this.props.FloatingButton
                 variant="outline"
-                onClick = {this.props.removeLayer}
+                onClick = {() => this.props.removeLayer(this.props.setCytoLayers)}
                 size="0"
                 style= {{ top: window.innerHeight*0.285, 
                           left: window.innerWidth*0.71,
@@ -127,7 +125,7 @@ class Building extends React.Component {
             </div>
           </Box>
 
-          <IconButton onClick={this.props.postRequest} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+          <IconButton onClick={(event) => this.props.postRequest(event, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining)} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
             <Flex direction="horizontal" gap="2" style={{alignItems: "center"}}>
               <PlayIcon width="18" height="18" />Start training!
             </Flex>
@@ -138,7 +136,7 @@ class Building extends React.Component {
         <Tabs.Content value="stuff">
           <Flex direction="column" gap="2">
           
-          <Form.Root className="FormRoot" onSubmit={this.props.handleSubmit}>
+          <Form.Root className="FormRoot" onSubmit={(event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData)}>
             <Form.Field className="FormField" name="s-m_axis">
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
                 <Form.Label className="FormLabel">Semi-Major Axis [km]</Form.Label>
