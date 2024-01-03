@@ -149,7 +149,7 @@ function App() {
   const [accuracy3, setAccuracy3] = useState(null);
 
   // Define the API endpoint
-  const apiEndpoint = window.location.origin + "/api/backend";
+  const apiEndpoint = window.location.origin + "/api/backend/?limit=1";
 
   // Define the functions to fetch API data
   const fetchTrainingData = (setApiData, setAccuracy) => {
