@@ -222,6 +222,8 @@ function App() {
         .then((response) => {
             try {
                 setApiData(response.data[0]);
+                console.log("apiData:")
+                console.log(apiData)
                 setCytoLayers(JSON.parse(apiData["network_setup"]));
             }
             catch (error) {
