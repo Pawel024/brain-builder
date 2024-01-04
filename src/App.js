@@ -741,7 +741,7 @@ function App() {
             setIterations={setIterations1}
             learningRateSlider={learningRateSlider1}
             learningRate={learningRate1}
-            setLearningRate={setLearningRate2}
+            setLearningRate={setLearningRate1}
             isTraining={isTraining1}
             setIsTraining={setIsTraining1}
             apiData={apiData1}
@@ -776,7 +776,7 @@ function App() {
             setIterations={setIterations1}
             learningRateSlider={learningRateSlider1}
             learningRate={learningRate1}
-            setLearningRate={setLearningRate2}
+            setLearningRate={setLearningRate1}
             isTraining={isTraining1}
             setIsTraining={setIsTraining1}
             apiData={apiData1}
