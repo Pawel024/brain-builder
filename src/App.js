@@ -155,7 +155,7 @@ function App() {
     axios.get(apiEndpoint)
       .then((response) => {
         setApiData(response.data[0]);
-        setAccuracy(parseFloat(JSON.parse(apiData["error_list"])[1]))
+        setAccuracy(parseFloat(JSON.parse(response.data[0]["error_list"])[1]))
         console.log(response.data[0]);
       })
       .catch((error) => {
@@ -223,8 +223,8 @@ function App() {
             try {
                 setApiData(response.data[0]);
                 console.log("apiData:")
-                console.log(apiData)
-                setCytoLayers(JSON.parse(apiData["network_setup"]));
+                console.log(response.data[0])
+                setCytoLayers(JSON.parse(response.data[0]["network_setup"]));
             }
             catch (error) {
                 setCytoLayers([4, 7, 7, 3]);
