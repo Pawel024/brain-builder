@@ -12,7 +12,6 @@ import axios from 'axios';
 import BuildView from './buildView';
 import chroma from 'chroma-js';
 import Readme from './readme';
-import { use } from 'cytoscape';
 
 
 const colorScale = chroma.scale(['#006383', '#348399', '#59a5b0', '#82c6c7', '#dddddd', '#efa19a', '#e36a61', '#c03b33', '#8a2111']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
@@ -152,17 +151,17 @@ function App() {
   const apiEndpoint = window.location.origin + "/api/backend/?limit=1";
 
   // Define the functions to fetch API data
-  const fetchTrainingData = (setApiData, setAccuracy) => {
+  const fetchTrainingData = (apiData, setApiData, setAccuracy, setIsTraining) => {
     axios.get(apiEndpoint)
       .then((response) => {
         setApiData(response.data[0]);
-        setAccuracy(parseFloat(JSON.parse(apiData1["error_list"])[1]))
+        setAccuracy(parseFloat(JSON.parse(apiData["error_list"])[1]))
         console.log(response.data[0]);
       })
       .catch((error) => {
         console.log(`Error fetching API data: ${error}`);
       });
-    setIsTraining1(2);
+    setIsTraining(2);
     console.log("Training finished")
   };
 
@@ -320,12 +319,12 @@ function App() {
 
 
   // ------- POST REQUEST -------
-  const postRequest = (e, setApiData, setAccuracy, setIsTraining, learningRate, iterations) => {
+  const postRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations) => {
     e.preventDefault();
     const trainingData = {
       learning_rate: learningRate,
       epochs: iterations,
-      network_setup: JSON.stringify(cytoLayers1),
+      network_setup: JSON.stringify(cytoLayers),
       nn_input: JSON.stringify([]),
       action: 1,
       error_list: JSON.stringify([]),
@@ -334,7 +333,7 @@ function App() {
     setIsTraining(1);
     axios.put(window.location.origin + "/api/backend/1", trainingData).then((response) => {
       console.log(response.status);
-      fetchTrainingData(setApiData, setAccuracy);
+      fetchTrainingData(apiData, setApiData, setAccuracy, setIsTraining);
     });
   };
 
@@ -342,7 +341,7 @@ function App() {
   // ------- FLOATING BUTTONS -------
 
   // function to generate floating buttons
-  function generateFloatingButtons(top, left, dist, layers, isItPlus, nLayers, setCytoLayers, currentGameNumber) {
+  function generateFloatingButtons(top, left, dist, isItPlus, nLayers, cytoLayers, setCytoLayers, currentGameNumber) {
     const buttons = [];
     const icon = isItPlus ? <PlusIcon /> : <MinusIcon />;
     for (let i = 0; i < nLayers; i++) {
@@ -351,7 +350,7 @@ function App() {
         <div>
           <FloatingButton
             variant="outline"
-            disabled={(isItPlus && cytoLayers1[i] >= 16) | (!isItPlus && cytoLayers1[i] < 2)}
+            disabled={(isItPlus && cytoLayers[i] >= 16) | (!isItPlus && cytoLayers1[i] < 2)}
             onClick = {isItPlus ? () => addNode(i, setCytoLayers, currentGameNumber) : () => removeNode(i, setCytoLayers, currentGameNumber)}
             style={{...style}}
             key={i}
@@ -363,7 +362,7 @@ function App() {
             <input
             id={currentGameNumber + "-input" + i}
             type="text"
-            defaultValue={layers[i]}
+            defaultValue={cytoLayers[i]}
             style={{
               border: 'none',
               width: 0.02 * (window.innerWidth * 0.97),
@@ -601,14 +600,14 @@ function App() {
                 </Box>
             </Grid>
             </Box>
-            <Flex direction='row' gap='3' style={{padding:'20px 10px', alignItems: 'flex-start'}}>
+            <Flex direction='row' gap='3' style={{padding:'10px 10px', alignItems: 'flex-start'}}>
             <Flex direction='column' gap='3' style={{ flex: 1 }}>
-              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Get Started</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Get Started</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
                         <label>Tutorial</label>
                         <div><RocketIcon width="35" height="35" /></div>
                     </Flex>
@@ -616,12 +615,12 @@ function App() {
                 </Link>
                 </Box>
               </Box>
-              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Level 1</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Level 1</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 1</label>
                         <div><RocketIcon width="35" height="35" /></div>
                     </Flex>
@@ -629,7 +628,7 @@ function App() {
                 </Link>
                 <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 2</label>
                         <div><RocketIcon width="35" height="35" /></div>
                     </Flex>
@@ -637,7 +636,7 @@ function App() {
                 </Link>
                 <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 3</label>
                         <div><RocketIcon width="35" height="35" /></div>
                     </Flex>
@@ -645,12 +644,12 @@ function App() {
                 </Link>
                 </Box>
               </Box>
-              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Level 2</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Level 2</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 1</label>
                         <div><RocketIcon width="35" height="35" /></div>
                     </Flex>
@@ -658,7 +657,7 @@ function App() {
                 </Link>
                 <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 2</label>
                         <div><RocketIcon width="35" height="35" /></div>
                     </Flex>
@@ -666,7 +665,7 @@ function App() {
                 </Link>
                 <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 3</label>
                         <div><RocketIcon width="35" height="35" /></div>
                     </Flex>
@@ -674,12 +673,12 @@ function App() {
                 </Link>
                 </Box>
               </Box>
-              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Level 3</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Level 3</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 1</label>
                         <div><RocketIcon width="35" height="35" /></div>
                     </Flex>
@@ -687,7 +686,7 @@ function App() {
                 </Link>
                 <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 2</label>
                         <div><RocketIcon width="35" height="35" /></div>
                     </Flex>
@@ -695,7 +694,7 @@ function App() {
                 </Link>
                 <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{flexDirection: "column", alignItems: "center"}}>
+                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 3</label>
                         <div><RocketIcon width="35" height="35" /></div>
                     </Flex>
@@ -709,9 +708,9 @@ function App() {
 
 
             </Flex>
-            <Box style={{ flex: 1, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 20px' }}>
-            <Heading as='h2' size='5' style={{ color: 'var(--gray-12)', marginBottom:5 }}>&gt; Readme</Heading>
-            <Box style={{ marginLeft: 20 }}>
+            <Box style={{ flex: 1, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+            <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Readme</Heading>
+            <Box>
                 <Readme />
             </Box>
             </Box>
