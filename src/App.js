@@ -161,7 +161,7 @@ function App() {
       .catch((error) => {
         console.log(`Error fetching API data: ${error}`);
       });
-    setIsTraining(2);
+    setIsTraining1(2);
     console.log("Training finished")
   };
 
@@ -328,7 +328,7 @@ function App() {
     const trainingData = {
       learning_rate: learningRate,
       epochs: iterations,
-      network_setup: JSON.stringify(cytoLayers),
+      network_setup: JSON.stringify(cytoLayers1),
       nn_input: JSON.stringify([]),
       action: 1,
       error_list: JSON.stringify([]),
@@ -639,7 +639,7 @@ function App() {
                     </Button>
                 </Link>
                 <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}
                     <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 3</label>
                         <div><RocketIcon width="35" height="35" /></div>
@@ -661,6 +661,7 @@ function App() {
                 </Link>
                 <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+
                     <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 2</label>
                         <div><RocketIcon width="35" height="35" /></div>
