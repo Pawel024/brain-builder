@@ -222,8 +222,8 @@ function App() {
         .then((response) => {
             try {
                 setApiData(response.data[0]);
-                console.log("apiData:")
-                console.log(response.data[0])
+                console.log("apiData:");
+                console.log(response.data[0]);
                 setCytoLayers(JSON.parse(response.data[0]["network_setup"]));
             }
             catch (error) {
@@ -323,6 +323,8 @@ function App() {
   // ------- POST REQUEST -------
   const postRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations) => {
     e.preventDefault();
+    console.log("learningRate:");
+    console.log(learningRate);
     const trainingData = {
       learning_rate: learningRate,
       epochs: iterations,
