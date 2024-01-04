@@ -639,7 +639,7 @@ function App() {
                     </Button>
                 </Link>
                 <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
                     <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 3</label>
                         <div><RocketIcon width="35" height="35" /></div>
