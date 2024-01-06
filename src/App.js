@@ -10,6 +10,7 @@ import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
 import BuildView from './buildView';
+import Tutorial from './tutorial';
 import chroma from 'chroma-js';
 import Readme from './readme';
 
@@ -97,11 +98,13 @@ function useGenerateCytoStyle(list = []) {
 // ------- 404 PAGE -------
 
 function NotFound() {
+  const isMontyPythonLover = true; // Replace with your condition
+
   return (
     <div>
       <h1>404</h1>
       <p>Page not found</p>
-      <img src={require('./monty-python.jpeg')} alt="Monty Python" />
+      {isMontyPythonLover && <img src={require('./monty-python.jpeg')} alt="Monty Python" />}
     </div>
   );
 }
@@ -723,8 +726,7 @@ function App() {
           </div>
           } />
           <Route path="/tutorial" element={
-            <BuildView
-            currentGameNumber={1} 
+            <Tutorial 
             nOfInputs={4}
             nOfOutputs={3}
             cytoElements={cytoElements1}

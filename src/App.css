@@ -291,3 +291,7 @@ button {
 .readme h6 {
   font-size: inherit;
 }
+
+.react-joyride__beacon {
+  visibility: hidden;
+}

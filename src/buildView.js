@@ -7,15 +7,58 @@ import tu_delft_pic from "./tud_black_new.png";
 import { Link } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { PlayIcon, ChevronLeftIcon, ChevronRightIcon, HomeIcon } from '@radix-ui/react-icons';
+import Joyride from 'react-joyride';
+import { useNavigate } from 'react-router-dom';
 
+function BuildingWrapper(props) {
+  const navigate = useNavigate();
+
+  return <Building {...props} navigate={navigate} />;
+}
 class Building extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      runTutorial: false,
+      steps: [
+        {
+          target: '.iterationsSlider',
+          content: 'This is the slider to adjust the number of epochs.',
+        },
+        {
+          target: '.learningRateSlider',
+          content: 'This is the slider to adjust the learning rate.',
+        },
+        // Add more steps as needed
+      ],
+    };
+  }
 
   componentDidMount() {
     this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.currentGameNumber);
     this.props.updateCytoLayers(this.props.setCytoLayers, this.props.nOfInputs, this.props.nOfOutputs);
+    if (this.props.currentGameNumber === 0) {
+      this.setState({ runTutorial: true }, () => {
+        // Delay the click on the beacon until after the Joyride component has been rendered
+        setTimeout(() => {
+          const beacon = document.querySelector('.react-joyride__beacon');
+  
+          if (beacon) {
+            beacon.click();
+          }
+        }, 0);
+      });
+    }
   }
 
-  // Common functionality for all games can go here
+  handleJoyrideCallback = (data) => {
+    const { action, status } = data;
+
+    if (action === 'skip' || status === 'finished') {
+      this.props.navigate('/');
+    }
+  }
+
   render() {
 
       return(
@@ -103,13 +146,17 @@ class Building extends React.Component {
           <Separator orientation='vertical' style = {{ position:"absolute", top: Math.round(0.03 * (window.innerHeight-140)), left: Math.round(0.8 * (window.innerWidth * 0.97)), height: 0.96 * (window.innerHeight-140) }}/>
 
           <Box style={{ position:"absolute", top: 0.14 * (window.innerHeight-140), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
-            {this.props.iterationsSlider}
-            <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', borderRadius: 'var(--radius-3)' }}>{this.props.iterations}</div>
+            <div className="iterationsSlider">
+              {this.props.iterationsSlider}
+            </div>
+            <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Epochs: {this.props.iterations}</div>
           </Box>
 
           <Box style={{ position:"absolute", top: Math.round(0.30 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
-            {this.props.learningRateSlider}
-            <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', borderRadius: 'var(--radius-3)'}}>{this.props.learningRate}</div>
+            <div className="learningRateSlider">
+              {this.props.learningRateSlider}
+            </div>
+            <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Learning rate: {this.props.learningRate}</div>
           </Box>
           
           <Box style={{ position:"absolute", top: Math.round(0.50 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
@@ -233,12 +280,25 @@ class Building extends React.Component {
         </Tabs.Content>
         </Box>
       </Tabs.Root>
+
+      <Joyride
+        steps={this.state.steps}
+        run={this.state.runTutorial}
+        continuous={true}
+        disableOverlayClose={true}
+        disableCloseOnEsc={true}
+        disableScrolling={true}
+        callback={this.handleJoyrideCallback}
+      />
     </div>
   )}
 }
 
-export default Building;
+export default BuildingWrapper;
 
+/*
+tooltipComponent={(props) => <CustomTooltip {...props} steps={this.state.steps} />}
+*/
 
 /*
 class Game1 extends Building {
