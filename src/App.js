@@ -15,7 +15,7 @@ import chroma from 'chroma-js';
 import Readme from './readme';
 
 
-const colorScale = chroma.scale(['#006383', '#348399', '#59a5b0', '#82c6c7', '#dddddd', '#efa19a', '#e36a61', '#c03b33', '#8a2111']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
+const colorScale = chroma.scale(['#49329b', '#5e5cc2', '#8386d8', '#afb0e1', '#dddddd', '#e3a692', '#d37254', '#b64124', '#8f0500']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
 
 
 // ------- STYLED COMPONENTS -------

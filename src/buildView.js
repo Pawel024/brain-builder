@@ -289,6 +289,7 @@ class Building extends React.Component {
         disableCloseOnEsc={true}
         disableScrolling={true}
         callback={this.handleJoyrideCallback}
+        locale={{ last: 'Finish' }}
       />
     </div>
   )}
