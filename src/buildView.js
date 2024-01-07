@@ -104,8 +104,9 @@ class Building extends React.Component {
 
               <this.props.FloatingButton
                 variant="outline"
-                onClick = {() => this.props.addLayer(this.props.setCytoLayers)}
+                onClick = {() => this.props.addLayer(this.props.setCytoLayers, this.props.nOfOutputs)}
                 size="0"
+                disabled={this.props.cytoLayers.length>this.props.maxLayers-1}
                 style={{top: window.innerHeight*0.285, 
                         left: window.innerWidth*0.74, 
                         position: 'absolute',
@@ -113,7 +114,8 @@ class Building extends React.Component {
                         borderRadius: 'var(--radius-5)',
                         width: 35,
                         height: 60,
-                        boxShadow: '0 2px 8px var(--slate-a11)'}}
+                        boxShadow: '0 2px 8px var(--slate-a11)'
+                }}
               >
                 {<ChevronRightIcon 
                 style={{height: 30, width: 30}}
@@ -124,6 +126,7 @@ class Building extends React.Component {
                 variant="outline"
                 onClick = {() => this.props.removeLayer(this.props.setCytoLayers)}
                 size="0"
+                disabled={this.props.cytoLayers.length<3}
                 style= {{ top: window.innerHeight*0.285, 
                           left: window.innerWidth*0.71,
                           position: 'absolute',

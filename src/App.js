@@ -264,10 +264,10 @@ function App() {
   const cytoStyle3 = useGenerateCytoStyle(cytoLayers3);
 
   // function to add a layer
-  const addLayer = useCallback((setCytoLayers) => {
+  const addLayer = useCallback((setCytoLayers, nOfOutputs) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      if (newLayers.length < 10) {newLayers.push(1)};
+      if (newLayers.length < 10) {newLayers.push(nOfOutputs)};
       return newLayers;
     });
   }, []);
@@ -276,7 +276,7 @@ function App() {
   const removeLayer = useCallback((setCytoLayers) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      if (newLayers.length > 2) {newLayers.pop()}
+      if (newLayers.length > 2) {newLayers.splice(-2, 1)}
       return newLayers;
     });
   }, []);
@@ -353,7 +353,7 @@ function App() {
   function generateFloatingButtons(top, left, dist, isItPlus, nLayers, cytoLayers, setCytoLayers, currentGameNumber) {
     const buttons = [];
     const icon = isItPlus ? <PlusIcon /> : <MinusIcon />;
-    for (let i = 0; i < nLayers; i++) {
+    for (let i = 1; i < nLayers-1; i++) {
       const style = { top: top, left: left + i * dist };
       const button = (
         <div>
@@ -731,6 +731,7 @@ function App() {
             <Tutorial 
             nOfInputs={4}
             nOfOutputs={3}
+            maxLayers={10}
             cytoElements={cytoElements1}
             cytoStyle={cytoStyle1}
             generateFloatingButtons={generateFloatingButtons}
@@ -766,6 +767,7 @@ function App() {
             currentGameNumber={1} 
             nOfInputs={4}
             nOfOutputs={3}
+            maxLayers={10}
             cytoElements={cytoElements1}
             cytoStyle={cytoStyle1}
             generateFloatingButtons={generateFloatingButtons}
@@ -801,6 +803,7 @@ function App() {
             currentGameNumber={2} 
             nOfInputs={2}
             nOfOutputs={5}
+            maxLayers={10}
             cytoElements={cytoElements2}
             cytoStyle={cytoStyle2}
             generateFloatingButtons={generateFloatingButtons}
@@ -836,6 +839,7 @@ function App() {
             currentGameNumber={3} 
             nOfInputs={10}
             nOfOutputs={1}
+            maxLayers={10}
             cytoElements={cytoElements3}
             cytoStyle={cytoStyle3}
             generateFloatingButtons={generateFloatingButtons}
