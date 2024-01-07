@@ -22,6 +22,10 @@ class Building extends React.Component {
       runTutorial: false,
       steps: [
         {
+          target: '.cytoscape',
+          content: 'This is the neural network you will be building. You can add and remove layers with the buttons on the right. You can also use the + and - buttons below the network to add or remove nodes. Note: the number of nodes in the first and last layers are fixed! They correspond to the size of the input and output vectors respectively.',
+        },
+        {
           target: '.iterationsSlider',
           content: 'This is the slider to adjust the number of epochs.',
         },
@@ -97,7 +101,7 @@ class Building extends React.Component {
         <Tabs.Content value="building">
           <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
             <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
-              <CytoscapeComponent elements={this.props.cytoElements} stylesheet={this.props.cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
+              <CytoscapeComponent className="cytoscape" elements={this.props.cytoElements} stylesheet={this.props.cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
               
               {this.props.generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, true, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.currentGameNumber)}                    
               {this.props.generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, false, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.currentGameNumber)}

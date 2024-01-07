@@ -53,13 +53,18 @@ function useGenerateCytoElements(list = []) {
   });
 
   // Generate lines between nodes
-  memoizedList.forEach((nodesPerLayer, i) => {
+  memoizedList.forEach((nodesPerLayer, i, apiData) => {
     for (let j = 0; j < nodesPerLayer; j++) {
       const source = memoizedList.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
       for (let k = 0; k < memoizedList[i+1]; k++) {
         const target = memoizedList.slice(0, i+1).reduce((acc, curr) => acc + curr, 0) + k;
         if (target <= cElements.length) {
-          const weight = Math.random() * 2 - 1;  
+          const weight = 5;
+          try {
+            const weight = apiData["network_weights"][i][j][k];
+          } catch (error) {
+            console.log(error);
+          }
           cElements.push({ data: { source, target, weight } });
         }
       }
