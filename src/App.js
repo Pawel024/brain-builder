@@ -83,10 +83,10 @@ function useGenerateCytoElements(list = [], apiData) {
         if (target <= cElements.length) {
           const weight = 5;
           if (apiData) {
-            console.log(this.props.apiData["network_weights"])
-            console.log(JSON.parse(this.props.apiData["network_weights"])[i])
-            console.log(JSON.parse(this.props.apiData["network_weights"])[i][j][k])
-            weight = parseFloat(JSON.parse(this.props.apiData["network_weights"])[i][j][k]);
+            console.log(apiData["network_weights"])
+            console.log(JSON.parse(apiData["network_weights"])[i])
+            console.log(JSON.parse(apiData["network_weights"])[i][j][k])
+            weight = parseFloat(JSON.parse(apiData["network_weights"])[i][j][k]);
           }
           cElements.push({ data: { source, target, weight } });
         }

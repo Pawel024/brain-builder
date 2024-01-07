@@ -106,8 +106,9 @@ class Building extends React.Component {
         <Box px="4" pt="3" pb="0">
         <Tabs.Content value="building">
           <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
+            <div className='cytoscape'style={{top: 5, left: 3, position: 'absolute', width: window.innerWidth*0.78, height: window.innerHeight-125}}></div>
             <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
-              <CytoscapeComponent className="cytoscape" elements={this.props.cytoElements} stylesheet={this.props.cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
+              <CytoscapeComponent elements={this.props.cytoElements} stylesheet={this.props.cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
               
               <img src={color_scale_pic} alt='Color scale from purple for negative to red for positive' width='20' height='auto' style={{ position: 'absolute', top: 15, left: 15 }}/>
 
@@ -140,7 +141,7 @@ class Building extends React.Component {
                 size="0"
                 disabled={this.props.cytoLayers.length<3}
                 style= {{ top: window.innerHeight*0.285, 
-                          left: window.innerWidth*0.71,
+                          left: window.innerWidth*0.70,
                           position: 'absolute',
                           zIndex: 9999,
                           borderRadius: 'var(--radius-5)',
