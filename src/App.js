@@ -331,7 +331,7 @@ function App() {
     const trainingData = {
       learning_rate: learningRate,
       epochs: iterations,
-      network_setup: JSON.stringify(cytoLayers1),
+      network_setup: JSON.stringify(cytoLayers),
       network_weights: JSON.stringify([]),
       network_biases: JSON.stringify([]),
       nn_input: JSON.stringify([]),
