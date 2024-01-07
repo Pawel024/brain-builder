@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import BuildView from './buildView';
 import './App.css';
 
-function Tutorial({ nOfInputs, nOfOutputs, cytoElements, cytoStyle, generateFloatingButtons, cytoLayers, setCytoLayers, updateCytoLayers, loadLastCytoLayers, FloatingButton, addLayer, removeLayer, iterationsSlider, iterations, setIterations, learningRateSlider, learningRate, setLearningRate, isTraining, setIsTraining, apiData, setApiData, postRequest, accuracy, setAccuracy, accuracyColor, handleSubmit, isResponding, setIsResponding, MontyPythonSwitch }) {
+function Tutorial({ nOfInputs, nOfOutputs, maxLayers, taskDescription, cytoElements, cytoStyle, generateFloatingButtons, cytoLayers, setCytoLayers, updateCytoLayers, loadLastCytoLayers, FloatingButton, addLayer, removeLayer, iterationsSlider, iterations, setIterations, learningRateSlider, learningRate, setLearningRate, isTraining, setIsTraining, apiData, setApiData, postRequest, accuracy, setAccuracy, accuracyColor, handleSubmit, isResponding, setIsResponding, MontyPythonSwitch }) {
   return (
         <BuildView
             currentGameNumber={0} 
             nOfInputs={nOfInputs}
             nOfOutputs={nOfOutputs}
+            maxLayers={maxLayers}
+            taskDescription={taskDescription}
             cytoElements={cytoElements}
             cytoStyle={cytoStyle}
             generateFloatingButtons={generateFloatingButtons}

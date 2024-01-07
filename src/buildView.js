@@ -182,7 +182,9 @@ class Building extends React.Component {
               ) : (this.props.isTraining===1 ? (
                 <pre>Training...</pre>
               ) : (
-                <div></div>
+                <div>
+                  {this.props.taskDescription}
+                </div>
               )
               )}
             </div>
