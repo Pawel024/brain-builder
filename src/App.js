@@ -61,10 +61,8 @@ function useGenerateCytoElements(list = [], apiData) {
         if (target <= cElements.length) {
           const weight = 5;
           try {
-            const weight = apiData["network_weights"][i][j][k];
-          } catch (error) {
-            console.log(error);
-          }
+            weight = parseFloat(JSON.parse(this.props.apiData["network_weights"])[i][j][k]);
+          } catch (error) {}
           cElements.push({ data: { source, target, weight } });
         }
       }
