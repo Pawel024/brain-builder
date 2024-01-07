@@ -30,6 +30,28 @@ const FloatingButton = styled(IconButton, {
 });
 
 
+// ------- CSRF TOKEN -------
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
+
 
 // ------- CYTOSCAPE FUNCTIONS -------
 
@@ -61,6 +83,9 @@ function useGenerateCytoElements(list = [], apiData) {
         if (target <= cElements.length) {
           const weight = 5;
           try {
+            console.log(this.props.apiData["network_weights"])
+            console.log(JSON.parse(this.props.apiData["network_weights"])[i])
+            console.log(JSON.parse(this.props.apiData["network_weights"])[i][j][k])
             weight = parseFloat(JSON.parse(this.props.apiData["network_weights"])[i][j][k]);
           } catch (error) {}
           cElements.push({ data: { source, target, weight } });
