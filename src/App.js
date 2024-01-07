@@ -88,14 +88,15 @@ function useGenerateCytoStyle(list = []) {
     {
       selector: 'edge',
       style: {
-        'line-color': ele => colorScale(ele.data('weight')).toString(),
-        'width': ele => Math.abs(ele.data('weight'))*2,
+        'line-color': ele => ele.data('weight') !== 5 ? colorScale(ele.data('weight')).toString() : '#666',
+        'width': ele => ele.data('weight') !== 5 ? Math.abs(ele.data('weight'))*2 : 1,
         'curve-style': 'bezier'
       }
     }
   ];
   return cStyle;
 }
+
 
 
 // ------- 404 PAGE -------
