@@ -23,6 +23,11 @@ class Building extends React.Component {
       runTutorial: false,
       steps: [
         {
+          target: '.buildBody',
+          content: 'Welcome to the Building View! This is where you can build and test your own neural networks. The next sections will contain challenges for you to solve with these tools, so make sure you pay attention! You can always come back to this tutorial if you need to refresh your memory.',
+          placement: 'center',
+        },
+        {
           target: '.cytoscape',
           content: 'This is the neural network you will be building. You can add and remove layers with the buttons on the right. You can also use the + and - buttons below the network to add or remove nodes. Note: the number of nodes in the first and last layers are fixed! They correspond to the size of the input and output vectors respectively.',
         },
@@ -67,7 +72,7 @@ class Building extends React.Component {
   render() {
 
       return(
-      <div>
+      <div className='buildBody'>
       <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
         <Grid columns='3' mt='1'>
         <Box ml='3' style={{display:"flex"}}>  

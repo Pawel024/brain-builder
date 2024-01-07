@@ -82,12 +82,12 @@ function useGenerateCytoElements(list = [], apiData) {
         const target = memoizedList.slice(0, i+1).reduce((acc, curr) => acc + curr, 0) + k;
         if (target <= cElements.length) {
           const weight = 5;
-          try {
+          if (apiData) {
             console.log(this.props.apiData["network_weights"])
             console.log(JSON.parse(this.props.apiData["network_weights"])[i])
             console.log(JSON.parse(this.props.apiData["network_weights"])[i][j][k])
             weight = parseFloat(JSON.parse(this.props.apiData["network_weights"])[i][j][k]);
-          } catch (error) {}
+          }
           cElements.push({ data: { source, target, weight } });
         }
       }
@@ -481,13 +481,13 @@ function App() {
   // ------- SLIDERS -------
 
   // initiate iterations and learning rate as variables with a useState hook
-  const [iterations1, setIterations1] = useState(100);
+  const [iterations1, setIterations1] = useState(200);
   const [learningRate1, setLearningRate1] = useState(0.01);
 
-  const [iterations2, setIterations2] = useState(100);
+  const [iterations2, setIterations2] = useState(200);
   const [learningRate2, setLearningRate2] = useState(0.01);
 
-  const [iterations3, setIterations3] = useState(100);
+  const [iterations3, setIterations3] = useState(200);
   const [learningRate3, setLearningRate3] = useState(0.01);
 
   // create a slider for iterations for each game
