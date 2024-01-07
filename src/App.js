@@ -75,19 +75,41 @@ function useGenerateCytoElements(list = [], apiData) {
   });
 
   // Generate lines between nodes
+  let weights;
+  let max;
+  let min;
+  let absMax;
+  if (apiData) {
+    weights = JSON.parse(apiData["network_weights"]);
+    max = weights.reduce((max, part) => Math.max(max, part.reduce((subMax, arr) => Math.max(subMax, ...arr.map(Number)), 0)), 0);
+    min = weights.reduce((min, part) => Math.min(min, part.reduce((subMin, arr) => Math.min(subMin, ...arr.map(Number)), Infinity)), Infinity);
+    absMax = Math.max(Math.abs(max), Math.abs(min));
+  }
+
+  let cumulativeSums = memoizedList.reduce((acc, curr, i) => {
+    acc[i] = (acc[i-1] || 0) + curr;
+    return acc;
+  }, []);
+
   memoizedList.forEach((nodesPerLayer, i) => {
     for (let j = 0; j < nodesPerLayer; j++) {
-      const source = memoizedList.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
+      let source;
+      if (i > 0) {
+        source = cumulativeSums[i-1] + j;
+      } else {
+        source = j;
+      }
       for (let k = 0; k < memoizedList[i+1]; k++) {
-        const target = memoizedList.slice(0, i+1).reduce((acc, curr) => acc + curr, 0) + k;
+        const target = cumulativeSums[i] + k;
         if (target <= cElements.length) {
           let weight = 5;
-          if (apiData) { try {
-            weight = parseFloat(JSON.parse(apiData["network_weights"])[i][j][k]);
-          }
-          catch (error) {
-            console.log(error);
-          }
+          if (apiData) { 
+            try {
+              weight = parseFloat(weights[i][j][k])/absMax;
+            }
+            catch (error) {
+              console.log(error);
+            }
           }
           cElements.push({ data: { source, target, weight } });
         }
@@ -96,8 +118,7 @@ function useGenerateCytoElements(list = [], apiData) {
   });
 
   return cElements;
-  }
-
+}
 
 // function to generate cytoscape style
 function useGenerateCytoStyle(list = []) {
