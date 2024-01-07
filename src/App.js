@@ -105,7 +105,7 @@ function useGenerateCytoElements(list = [], apiData) {
           let weight = 5;
           if (apiData) { 
             try {
-              weight = parseFloat(weights[i][j][k])/absMax;
+              weight = parseFloat(weights[j][i][k])/absMax;
             }
             catch (error) {
               console.log(error);
