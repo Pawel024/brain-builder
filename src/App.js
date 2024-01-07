@@ -168,8 +168,10 @@ function App() {
       .catch((error) => {
         console.log(`Error fetching API data: ${error}`);
       });
-    setIsTraining1(2);
-    console.log("Training finished")
+    setTimeout(() => {
+      setIsTraining(2);
+      console.log("Training finished")
+    }, 1000);
   };
 
   const fetchQueryResponse = (setApiData, setIsResponding) => {
