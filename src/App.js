@@ -31,7 +31,7 @@ const FloatingButton = styled(IconButton, {
 
 
 // ------- CSRF TOKEN -------
-
+/*
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {
@@ -51,7 +51,7 @@ function getCookie(name) {
 const csrftoken = getCookie('csrftoken');
 
 axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
-
+*/
 
 // ------- CYTOSCAPE FUNCTIONS -------
 
