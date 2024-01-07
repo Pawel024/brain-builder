@@ -377,18 +377,19 @@ function App() {
 
 
   // ------- POST REQUEST -------
-  const postRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations) => {
+  const postRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, tag) => {
     e.preventDefault();
     console.log("learningRate:");
     console.log(learningRate);
     const trainingData = {
+      action: 1,
+      tag: tag,
       learning_rate: learningRate,
       epochs: iterations,
       network_setup: JSON.stringify(cytoLayers),
       network_weights: JSON.stringify([]),
       network_biases: JSON.stringify([]),
       nn_input: JSON.stringify([]),
-      action: 1,
       error_list: JSON.stringify([]),
     };
     setAccuracy(null);
