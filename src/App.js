@@ -103,7 +103,7 @@ function NotFound() {
   return (
     <div>
       <h1>404</h1>
-      <p>Page not found \n hehehe</p>
+      <p>Page not found : ( </p>
       {isMontyPythonLover && <img src={require('./monty-python.jpeg')} alt="Monty Python" />}
     </div>
   );
