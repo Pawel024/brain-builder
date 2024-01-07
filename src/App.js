@@ -481,13 +481,13 @@ function App() {
   // ------- SLIDERS -------
 
   // initiate iterations and learning rate as variables with a useState hook
-  const [iterations1, setIterations1] = useState(200);
+  const [iterations1, setIterations1] = useState(100);
   const [learningRate1, setLearningRate1] = useState(0.01);
 
-  const [iterations2, setIterations2] = useState(200);
+  const [iterations2, setIterations2] = useState(100);
   const [learningRate2, setLearningRate2] = useState(0.01);
 
-  const [iterations3, setIterations3] = useState(200);
+  const [iterations3, setIterations3] = useState(100);
   const [learningRate3, setLearningRate3] = useState(0.01);
 
   // create a slider for iterations for each game
