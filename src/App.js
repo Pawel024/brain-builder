@@ -79,11 +79,20 @@ function useGenerateCytoElements(list = [], apiData) {
   let max;
   let min;
   let absMax;
-  if (apiData) {
-    weights = JSON.parse(apiData["network_weights"]);
+  if (apiData && apiData["network_weights"]) {
+    try {
+      weights = JSON.parse(apiData["network_weights"]);
+    } catch (error) {
+      console.error("Error parsing JSON:", error);
+    }
+    try {
     max = weights.reduce((max, part) => Math.max(max, part.reduce((subMax, arr) => Math.max(subMax, ...arr.map(Number)), 0)), 0);
     min = weights.reduce((min, part) => Math.min(min, part.reduce((subMin, arr) => Math.min(subMin, ...arr.map(Number)), Infinity)), Infinity);
     absMax = Math.max(Math.abs(max), Math.abs(min));
+    }
+    catch (error) {
+      console.error("Error processing max and min weights:", error);
+    }
   }
 
   let cumulativeSums = memoizedList.reduce((acc, curr, i) => {
@@ -103,7 +112,7 @@ function useGenerateCytoElements(list = [], apiData) {
         const target = cumulativeSums[i] + k;
         if (target <= cElements.length) {
           let weight = 5;
-          if (apiData) { 
+          if (apiData && apiData["network_weights"]) { 
             try {
               weight = parseFloat(weights[i][k][j])/absMax;
             }
