@@ -81,7 +81,7 @@ function useGenerateCytoElements(list = [], apiData) {
       for (let k = 0; k < memoizedList[i+1]; k++) {
         const target = memoizedList.slice(0, i+1).reduce((acc, curr) => acc + curr, 0) + k;
         if (target <= cElements.length) {
-          const weight = 5;
+          let weight = 5;
           if (apiData) {
             console.log(apiData["network_weights"])
             console.log(JSON.parse(apiData["network_weights"])[i])
