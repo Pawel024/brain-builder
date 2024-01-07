@@ -34,7 +34,7 @@ const FloatingButton = styled(IconButton, {
 // ------- CYTOSCAPE FUNCTIONS -------
 
 // function to generate cytoscape elements
-function useGenerateCytoElements(list = []) {
+function useGenerateCytoElements(list = [], apiData) {
   const memoizedList = useMemo(() => list, [list]);
   const cElements = [];
 
@@ -53,7 +53,7 @@ function useGenerateCytoElements(list = []) {
   });
 
   // Generate lines between nodes
-  memoizedList.forEach((nodesPerLayer, i, apiData) => {
+  memoizedList.forEach((nodesPerLayer, i) => {
     for (let j = 0; j < nodesPerLayer; j++) {
       const source = memoizedList.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
       for (let k = 0; k < memoizedList[i+1]; k++) {
@@ -259,13 +259,13 @@ function App() {
   }, [apiData3]);
   */
 
-  const cytoElements1 = useGenerateCytoElements(cytoLayers1);
+  const cytoElements1 = useGenerateCytoElements(cytoLayers1, apiData1);
   const cytoStyle1 = useGenerateCytoStyle(cytoLayers1);
 
-  const cytoElements2 = useGenerateCytoElements(cytoLayers2);
+  const cytoElements2 = useGenerateCytoElements(cytoLayers2, apiData2);
   const cytoStyle2 = useGenerateCytoStyle(cytoLayers2);
 
-  const cytoElements3 = useGenerateCytoElements(cytoLayers3);
+  const cytoElements3 = useGenerateCytoElements(cytoLayers3, apiData3);
   const cytoStyle3 = useGenerateCytoStyle(cytoLayers3);
 
   // function to add a layer
