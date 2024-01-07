@@ -56,7 +56,7 @@ axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
 // ------- CYTOSCAPE FUNCTIONS -------
 
 // function to generate cytoscape elements
-function useGenerateCytoElements(list = [], apiData) {
+function useGenerateCytoElements(list = [], apiData, isTraining) {
   const memoizedList = useMemo(() => list, [list]);
   const cElements = [];
 
@@ -112,7 +112,7 @@ function useGenerateCytoElements(list = [], apiData) {
         const target = cumulativeSums[i] + k;
         if (target <= cElements.length) {
           let weight = 5;
-          if (apiData && apiData["network_weights"]) { 
+          if (apiData && apiData["network_weights" && isTraining === 2]) { 
             try {
               weight = parseFloat(weights[i][k][j])/absMax;
             }
@@ -250,16 +250,19 @@ function App() {
   const [cytoLayers1, setCytoLayers1] = useState([]);
   useEffect(() => {
     localStorage.setItem('cytoLayers1', JSON.stringify(cytoLayers1));
+    setIsTraining1(0);
   }, [cytoLayers1]);
 
   const [cytoLayers2, setCytoLayers2] = useState([]);
   useEffect(() => {
     localStorage.setItem('cytoLayers2', JSON.stringify(cytoLayers2));
+    setIsTraining2(0);
   }, [cytoLayers2]);
 
   const [cytoLayers3, setCytoLayers3] = useState([]);
   useEffect(() => {
     localStorage.setItem('cytoLayers3', JSON.stringify(cytoLayers3));
+    setIsTraining3(0);
   }, [cytoLayers3]);
 
   
@@ -316,13 +319,13 @@ function App() {
   }, [apiData3]);
   */
 
-  const cytoElements1 = useGenerateCytoElements(cytoLayers1, apiData1);
+  const cytoElements1 = useGenerateCytoElements(cytoLayers1, apiData1, isTraining1);
   const cytoStyle1 = useGenerateCytoStyle(cytoLayers1);
 
-  const cytoElements2 = useGenerateCytoElements(cytoLayers2, apiData2);
+  const cytoElements2 = useGenerateCytoElements(cytoLayers2, apiData2, isTraining2);
   const cytoStyle2 = useGenerateCytoStyle(cytoLayers2);
 
-  const cytoElements3 = useGenerateCytoElements(cytoLayers3, apiData3);
+  const cytoElements3 = useGenerateCytoElements(cytoLayers3, apiData3, isTraining3);
   const cytoStyle3 = useGenerateCytoStyle(cytoLayers3);
 
   // function to add a layer
@@ -676,10 +679,18 @@ function App() {
               <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Get Started</Heading>
                 <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', alignItems: 'start', justifyContent: 'center'}}>
+                <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                        <label>Introduction</label>
+                        <div><RocketIcon width="35" height="35" /></div>
+                    </Flex>
+                    </Button>
+                </Link>
                 <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
                     <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
-                        <label>Tutorial</label>
+                        <label>Building View</label>
                         <div><RocketIcon width="35" height="35" /></div>
                     </Flex>
                     </Button>
