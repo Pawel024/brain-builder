@@ -76,7 +76,7 @@ def construct_classifier(input_list, csv_file_path):
     nn = BuildNetwork(structure)
     # print("Status check: ", nn.forward(torch.rand((28, 28)).view((1, 28*28))))
     # optimizer has to be defined outside the network module, idk why
-    optimizer = torch.optim.Adam(nn.parameters(), lr=learning_rate)
+    optimizer = torch.optim.SGD(nn.parameters(), lr=learning_rate)
     errors = nn.train_network(epochs, training_set, test_set, optimizer)
 
     # for testing
@@ -94,12 +94,14 @@ def construct_classifier(input_list, csv_file_path):
     output_structure = []
     for i in range(len(structure)):
         output_structure += [int(structure[i][0])]
+    
+    weights, biases = get_parameters(nn)
 
     # save the network to a pickle file
     with open('nn.txt', 'wb') as output:
         pickle.dump(nn, output, pickle.HIGHEST_PROTOCOL)
 
-    return output_structure, errors
+    return output_structure, errors, weights, biases
 
 
 def get_parameters(nn):
