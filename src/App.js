@@ -332,6 +332,8 @@ function App() {
       learning_rate: learningRate,
       epochs: iterations,
       network_setup: JSON.stringify(cytoLayers1),
+      network_weights: JSON.stringify([]),
+      network_biases: JSON.stringify([]),
       nn_input: JSON.stringify([]),
       action: 1,
       error_list: JSON.stringify([]),
