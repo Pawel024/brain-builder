@@ -106,7 +106,7 @@ class Building extends React.Component {
         <Box px="4" pt="3" pb="0">
         <Tabs.Content value="building">
           <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
-            <div className='cytoscape'style={{top: 5, left: 3, position: 'absolute', width: window.innerWidth*0.78, height: window.innerHeight-125}}></div>
+            <div className='cytoscape'style={{top: 5, left: 3, position: 'absolute', width: window.innerWidth*0.78, height: window.innerHeight-130}}></div>
             <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
               <CytoscapeComponent elements={this.props.cytoElements} stylesheet={this.props.cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
               

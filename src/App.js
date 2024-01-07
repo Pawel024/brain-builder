@@ -82,11 +82,12 @@ function useGenerateCytoElements(list = [], apiData) {
         const target = memoizedList.slice(0, i+1).reduce((acc, curr) => acc + curr, 0) + k;
         if (target <= cElements.length) {
           let weight = 5;
-          if (apiData) {
-            console.log(apiData["network_weights"])
-            console.log(JSON.parse(apiData["network_weights"])[i])
-            console.log(JSON.parse(apiData["network_weights"])[i][j][k])
+          if (apiData) { try {
             weight = parseFloat(JSON.parse(apiData["network_weights"])[i][j][k]);
+          }
+          catch (error) {
+            console.log(error);
+          }
           }
           cElements.push({ data: { source, target, weight } });
         }
