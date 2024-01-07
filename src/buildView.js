@@ -4,6 +4,7 @@ import { Flex, Box, Tabs, Heading, Grid, IconButton, Separator } from '@radix-ui
 import * as Form from '@radix-ui/react-form';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
+import color_scale_pic from "./color_scale_2.png";
 import { Link } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { PlayIcon, ChevronLeftIcon, ChevronRightIcon, HomeIcon } from '@radix-ui/react-icons';
@@ -21,6 +22,15 @@ class Building extends React.Component {
     this.state = {
       runTutorial: false,
       steps: [
+        {
+          target: '.buildBody',
+          content: 'Welcome to the Building View! This is where you can build and test your own neural networks. The next sections will contain challenges for you to solve with these tools, so make sure you pay attention! You can always come back to this tutorial if you need to refresh your memory.',
+          placement: 'center',
+        },
+        {
+          target: '.cytoscape',
+          content: 'This is the neural network you will be building. You can add and remove layers with the buttons on the right. You can also use the + and - buttons below the network to add or remove nodes. Note: the number of nodes in the first and last layers are fixed! They correspond to the size of the input and output vectors respectively.',
+        },
         {
           target: '.iterationsSlider',
           content: 'This is the slider to adjust the number of epochs.',
@@ -62,7 +72,7 @@ class Building extends React.Component {
   render() {
 
       return(
-      <div>
+      <div className='buildBody'>
       <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
         <Grid columns='3' mt='1'>
         <Box ml='3' style={{display:"flex"}}>  
@@ -96,16 +106,20 @@ class Building extends React.Component {
         <Box px="4" pt="3" pb="0">
         <Tabs.Content value="building">
           <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
+            <div className='cytoscape'style={{top: 5, left: 3, position: 'absolute', width: window.innerWidth*0.78, height: window.innerHeight-130}}></div>
             <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
               <CytoscapeComponent elements={this.props.cytoElements} stylesheet={this.props.cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
               
+              <img src={color_scale_pic} alt='Color scale from purple for negative to red for positive' width='20' height='auto' style={{ position: 'absolute', top: 15, left: 15 }}/>
+
               {this.props.generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, true, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.currentGameNumber)}                    
               {this.props.generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, false, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.currentGameNumber)}
 
               <this.props.FloatingButton
                 variant="outline"
-                onClick = {() => this.props.addLayer(this.props.setCytoLayers)}
+                onClick = {() => this.props.addLayer(this.props.setCytoLayers, this.props.nOfOutputs)}
                 size="0"
+                disabled={this.props.cytoLayers.length>this.props.maxLayers-1}
                 style={{top: window.innerHeight*0.285, 
                         left: window.innerWidth*0.74, 
                         position: 'absolute',
@@ -113,7 +127,8 @@ class Building extends React.Component {
                         borderRadius: 'var(--radius-5)',
                         width: 35,
                         height: 60,
-                        boxShadow: '0 2px 8px var(--slate-a11)'}}
+                        boxShadow: '0 2px 8px var(--slate-a11)'
+                }}
               >
                 {<ChevronRightIcon 
                 style={{height: 30, width: 30}}
@@ -124,8 +139,9 @@ class Building extends React.Component {
                 variant="outline"
                 onClick = {() => this.props.removeLayer(this.props.setCytoLayers)}
                 size="0"
+                disabled={this.props.cytoLayers.length<3}
                 style= {{ top: window.innerHeight*0.285, 
-                          left: window.innerWidth*0.71,
+                          left: window.innerWidth*0.70,
                           position: 'absolute',
                           zIndex: 9999,
                           borderRadius: 'var(--radius-5)',
@@ -166,7 +182,9 @@ class Building extends React.Component {
               ) : (this.props.isTraining===1 ? (
                 <pre>Training...</pre>
               ) : (
-                <div></div>
+                <div>
+                  {this.props.taskDescription}
+                </div>
               )
               )}
             </div>

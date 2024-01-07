@@ -30,11 +30,33 @@ const FloatingButton = styled(IconButton, {
 });
 
 
+// ------- CSRF TOKEN -------
+/*
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
+*/
 
 // ------- CYTOSCAPE FUNCTIONS -------
 
 // function to generate cytoscape elements
-function useGenerateCytoElements(list = []) {
+function useGenerateCytoElements(list = [], apiData) {
   const memoizedList = useMemo(() => list, [list]);
   const cElements = [];
 
@@ -53,13 +75,42 @@ function useGenerateCytoElements(list = []) {
   });
 
   // Generate lines between nodes
+  let weights;
+  let max;
+  let min;
+  let absMax;
+  if (apiData) {
+    weights = JSON.parse(apiData["network_weights"]);
+    max = weights.reduce((max, part) => Math.max(max, part.reduce((subMax, arr) => Math.max(subMax, ...arr.map(Number)), 0)), 0);
+    min = weights.reduce((min, part) => Math.min(min, part.reduce((subMin, arr) => Math.min(subMin, ...arr.map(Number)), Infinity)), Infinity);
+    absMax = Math.max(Math.abs(max), Math.abs(min));
+  }
+
+  let cumulativeSums = memoizedList.reduce((acc, curr, i) => {
+    acc[i] = (acc[i-1] || 0) + curr;
+    return acc;
+  }, []);
+
   memoizedList.forEach((nodesPerLayer, i) => {
     for (let j = 0; j < nodesPerLayer; j++) {
-      const source = memoizedList.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
+      let source;
+      if (i > 0) {
+        source = cumulativeSums[i-1] + j;
+      } else {
+        source = j;
+      }
       for (let k = 0; k < memoizedList[i+1]; k++) {
-        const target = memoizedList.slice(0, i+1).reduce((acc, curr) => acc + curr, 0) + k;
+        const target = cumulativeSums[i] + k;
         if (target <= cElements.length) {
-          const weight = Math.random() * 2 - 1;  
+          let weight = 5;
+          if (apiData) { 
+            try {
+              weight = parseFloat(weights[i][k][j])/absMax;
+            }
+            catch (error) {
+              console.log(error);
+            }
+          }
           cElements.push({ data: { source, target, weight } });
         }
       }
@@ -67,8 +118,7 @@ function useGenerateCytoElements(list = []) {
   });
 
   return cElements;
-  }
-
+}
 
 // function to generate cytoscape style
 function useGenerateCytoStyle(list = []) {
@@ -85,14 +135,15 @@ function useGenerateCytoStyle(list = []) {
     {
       selector: 'edge',
       style: {
-        'line-color': ele => colorScale(ele.data('weight')).toString(),
-        'width': ele => Math.abs(ele.data('weight'))*2,
+        'line-color': ele => ele.data('weight') !== 5 ? colorScale(ele.data('weight')).toString() : '#666',
+        'width': ele => ele.data('weight') !== 5 ? Math.abs(ele.data('weight'))*2 : 1,
         'curve-style': 'bezier'
       }
     }
   ];
   return cStyle;
 }
+
 
 
 // ------- 404 PAGE -------
@@ -103,7 +154,7 @@ function NotFound() {
   return (
     <div>
       <h1>404</h1>
-      <p>Page not found</p>
+      <p>Page not found : ( </p>
       {isMontyPythonLover && <img src={require('./monty-python.jpeg')} alt="Monty Python" />}
     </div>
   );
@@ -164,8 +215,10 @@ function App() {
       .catch((error) => {
         console.log(`Error fetching API data: ${error}`);
       });
-    setIsTraining1(2);
-    console.log("Training finished")
+    setTimeout(() => {
+      setIsTraining(2);
+      console.log("Training finished")
+    }, 1000);
   };
 
   const fetchQueryResponse = (setApiData, setIsResponding) => {
@@ -254,20 +307,20 @@ function App() {
   }, [apiData3]);
   */
 
-  const cytoElements1 = useGenerateCytoElements(cytoLayers1);
+  const cytoElements1 = useGenerateCytoElements(cytoLayers1, apiData1);
   const cytoStyle1 = useGenerateCytoStyle(cytoLayers1);
 
-  const cytoElements2 = useGenerateCytoElements(cytoLayers2);
+  const cytoElements2 = useGenerateCytoElements(cytoLayers2, apiData2);
   const cytoStyle2 = useGenerateCytoStyle(cytoLayers2);
 
-  const cytoElements3 = useGenerateCytoElements(cytoLayers3);
+  const cytoElements3 = useGenerateCytoElements(cytoLayers3, apiData3);
   const cytoStyle3 = useGenerateCytoStyle(cytoLayers3);
 
   // function to add a layer
-  const addLayer = useCallback((setCytoLayers) => {
+  const addLayer = useCallback((setCytoLayers, nOfOutputs) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      if (newLayers.length < 10) {newLayers.push(1)};
+      if (newLayers.length < 10) {newLayers.push(nOfOutputs)};
       return newLayers;
     });
   }, []);
@@ -276,7 +329,7 @@ function App() {
   const removeLayer = useCallback((setCytoLayers) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      if (newLayers.length > 2) {newLayers.pop()}
+      if (newLayers.length > 2) {newLayers.splice(-2, 1)}
       return newLayers;
     });
   }, []);
@@ -331,7 +384,9 @@ function App() {
     const trainingData = {
       learning_rate: learningRate,
       epochs: iterations,
-      network_setup: JSON.stringify(cytoLayers1),
+      network_setup: JSON.stringify(cytoLayers),
+      network_weights: JSON.stringify([]),
+      network_biases: JSON.stringify([]),
       nn_input: JSON.stringify([]),
       action: 1,
       error_list: JSON.stringify([]),
@@ -351,7 +406,7 @@ function App() {
   function generateFloatingButtons(top, left, dist, isItPlus, nLayers, cytoLayers, setCytoLayers, currentGameNumber) {
     const buttons = [];
     const icon = isItPlus ? <PlusIcon /> : <MinusIcon />;
-    for (let i = 0; i < nLayers; i++) {
+    for (let i = 1; i < nLayers-1; i++) {
       const style = { top: top, left: left + i * dist };
       const button = (
         <div>
@@ -729,6 +784,8 @@ function App() {
             <Tutorial 
             nOfInputs={4}
             nOfOutputs={3}
+            maxLayers={10}
+            taskDescription={"This would normally be a task description, but we are in a tutorial, so instead you can read a few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
             cytoElements={cytoElements1}
             cytoStyle={cytoStyle1}
             generateFloatingButtons={generateFloatingButtons}
@@ -764,6 +821,8 @@ function App() {
             currentGameNumber={1} 
             nOfInputs={4}
             nOfOutputs={3}
+            maxLayers={10}
+            taskDescription={""}
             cytoElements={cytoElements1}
             cytoStyle={cytoStyle1}
             generateFloatingButtons={generateFloatingButtons}
@@ -799,6 +858,8 @@ function App() {
             currentGameNumber={2} 
             nOfInputs={2}
             nOfOutputs={5}
+            maxLayers={10}
+            taskDescription={""}
             cytoElements={cytoElements2}
             cytoStyle={cytoStyle2}
             generateFloatingButtons={generateFloatingButtons}
@@ -834,6 +895,8 @@ function App() {
             currentGameNumber={3} 
             nOfInputs={10}
             nOfOutputs={1}
+            maxLayers={10}
+            taskDescription={""}
             cytoElements={cytoElements3}
             cytoStyle={cytoStyle3}
             generateFloatingButtons={generateFloatingButtons}
