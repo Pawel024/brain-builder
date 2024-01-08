@@ -100,7 +100,7 @@ class Building extends React.Component {
         <Tabs.List size="2">
           <Tabs.Trigger value="building" >Build</Tabs.Trigger>
           <Tabs.Trigger value="stuff">Test</Tabs.Trigger>
-          <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
+          {/*<Tabs.Trigger value="settings">Settings</Tabs.Trigger>*/}
         </Tabs.List>
 
         <Box px="4" pt="3" pb="0">
@@ -284,7 +284,7 @@ class Building extends React.Component {
 
 
 
-        <Tabs.Content value="settings">
+        {/*<Tabs.Content value="settings">
           <Box style={{ display: 'flex', height: '100vh' }}>
           <form>
             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -295,9 +295,9 @@ class Building extends React.Component {
             </div>
           </form>
           </Box>
-        </Tabs.Content>
+        </Tabs.Content>*/}
         </Box>
-      </Tabs.Root>
+        </Tabs.Root>
 
       <Joyride
         steps={this.state.steps}
