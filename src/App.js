@@ -112,7 +112,7 @@ function useGenerateCytoElements(list = [], apiData, isTraining) {
         const target = cumulativeSums[i] + k;
         if (target <= cElements.length) {
           let weight = 5;
-          if (apiData && apiData["network_weights" && isTraining === 2]) { 
+          if (apiData && apiData["network_weights"] && isTraining === 2) { 
             try {
               weight = parseFloat(weights[i][k][j])/absMax;
             }
@@ -690,7 +690,7 @@ function App() {
                 <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
                     <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
-                        <label>Building View</label>
+                        <label>Tutorial</label>
                         <div><RocketIcon width="35" height="35" /></div>
                     </Flex>
                     </Button>
