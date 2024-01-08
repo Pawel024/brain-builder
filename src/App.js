@@ -181,6 +181,7 @@ function App() {
     return {innerWidth, innerHeight};
   }
   
+  // eslint-disable-next-line no-unused-vars
   const [windowSize, setWindowSize] = useState(getWindowSize());
 
   // update window size when window is resized
