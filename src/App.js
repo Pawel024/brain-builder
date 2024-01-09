@@ -806,7 +806,7 @@ function App() {
             nOfInputs={4}
             nOfOutputs={3}
             maxLayers={10}
-            taskDescription={"This would normally be a task description, but we are in a tutorial, so instead you can read a few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
+            taskDescription={"This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
             cytoElements={cytoElements1}
             cytoStyle={cytoStyle1}
             generateFloatingButtons={generateFloatingButtons}
@@ -843,7 +843,7 @@ function App() {
             nOfInputs={4}
             nOfOutputs={3}
             maxLayers={10}
-            taskDescription={""}
+            taskDescription={"DRAFT: This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
             cytoElements={cytoElements1}
             cytoStyle={cytoStyle1}
             generateFloatingButtons={generateFloatingButtons}
@@ -880,7 +880,7 @@ function App() {
             nOfInputs={2}
             nOfOutputs={5}
             maxLayers={10}
-            taskDescription={""}
+            taskDescription={"DRAFT: This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
             cytoElements={cytoElements2}
             cytoStyle={cytoStyle2}
             generateFloatingButtons={generateFloatingButtons}
@@ -917,7 +917,7 @@ function App() {
             nOfInputs={10}
             nOfOutputs={1}
             maxLayers={10}
-            taskDescription={""}
+            taskDescription={"DRAFT: This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
             cytoElements={cytoElements3}
             cytoStyle={cytoStyle3}
             generateFloatingButtons={generateFloatingButtons}
