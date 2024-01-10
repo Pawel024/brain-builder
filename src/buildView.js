@@ -62,6 +62,34 @@ class Building extends React.Component {
     }
   }
 
+  chartRef = React.createRef();
+
+  componentDidUpdate() {
+    if (this.props.isTraining === 2 && this.chartRef.current) {
+      const ctx = this.chartRef.current.getContext('2d');
+
+      new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: JSON.parse(this.props.apiData["error_list"])[0].map((_, i) => i + 1), // Generate labels based on error array length
+              datasets: [{
+                  label: 'Errors',
+                  data: JSON.parse(this.props.apiData["error_list"])[0],
+                  borderColor: 'rgba(75, 192, 192, 1)',
+                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              }]
+          },
+          options: {
+              scales: {
+                  y: {
+                      beginAtZero: true
+                  }
+              }
+          }
+      });
+    }
+  }
+
   handleJoyrideCallback = (data) => {
     const { action, status } = data;
 
@@ -73,27 +101,6 @@ class Building extends React.Component {
   
 
   render() {
-    const ctx = document.getElementById('myChart').getContext('2d');
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: JSON.parse(this.props.apiData["error_list"])[0].map((_, i) => i + 1), // Generate labels based on error array length
-            datasets: [{
-                label: 'Errors',
-                data: JSON.parse(this.props.apiData["error_list"])[0],
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
 
     return(
     <div className='buildBody'>
@@ -221,7 +228,7 @@ class Building extends React.Component {
             </Flex>
           </IconButton>
 
-          <canvas id="myChart"></canvas>
+          {this.props.isTraining === 2 && <canvas ref={this.chartRef} id="myChart"></canvas>}
 
         </Tabs.Content>
       
