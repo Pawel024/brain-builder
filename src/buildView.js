@@ -1,6 +1,6 @@
 import React from 'react'
 import './App.css';
-import { Flex, Box, Tabs, Heading, Grid, IconButton, Separator } from '@radix-ui/themes';
+import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator } from '@radix-ui/themes';
 import * as Form from '@radix-ui/react-form';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
@@ -10,6 +10,7 @@ import CytoscapeComponent from 'react-cytoscapejs';
 import { PlayIcon, ChevronLeftIcon, ChevronRightIcon, HomeIcon } from '@radix-ui/react-icons';
 import Joyride from 'react-joyride';
 import { useNavigate } from 'react-router-dom';
+import { Chart } from 'chart.js';
 
 function BuildingWrapper(props) {
   const navigate = useNavigate();
@@ -69,10 +70,34 @@ class Building extends React.Component {
     }
   }
 
-  render() {
+  
 
-      return(
-      <div className='buildBody'>
+  render() {
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: JSON.parse(this.props.apiData["error_list"])[0].map((_, i) => i + 1), // Generate labels based on error array length
+            datasets: [{
+                label: 'Errors',
+                data: JSON.parse(this.props.apiData["error_list"])[0],
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    return(
+    <div className='buildBody'>
+      <Theme accentColor="cyan" grayColor="slate" panelBackground="solid" radius="large" appearance='light'>
       <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
         <Grid columns='3' mt='1'>
         <Box ml='3' style={{display:"flex"}}>  
@@ -196,6 +221,8 @@ class Building extends React.Component {
             </Flex>
           </IconButton>
 
+          <canvas id="myChart"></canvas>
+
         </Tabs.Content>
       
         <Tabs.Content value="stuff">
@@ -309,6 +336,7 @@ class Building extends React.Component {
         callback={this.handleJoyrideCallback}
         locale={{ last: 'Finish' }}
       />
+      </Theme>
     </div>
   )}
 }
