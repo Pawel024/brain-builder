@@ -10,13 +10,15 @@ import CytoscapeComponent from 'react-cytoscapejs';
 import { PlayIcon, ChevronLeftIcon, ChevronRightIcon, HomeIcon } from '@radix-ui/react-icons';
 import Joyride from 'react-joyride';
 import { useNavigate } from 'react-router-dom';
-import { Chart } from 'chart.js';
+import { Chart, LinearScale } from 'chart.js';
 
 function BuildingWrapper(props) {
   const navigate = useNavigate();
 
   return <Building {...props} navigate={navigate} />;
 }
+
+Chart.register(LinearScale);
 class Building extends React.Component {
   constructor(props) {
     super(props);
