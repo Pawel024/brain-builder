@@ -95,7 +95,7 @@ class Building extends React.Component {
       
       
 
-      <Tabs.Root defaultValue="building">
+      <Tabs.Root defaultValue="building" style={{ fontFamily:'monospace' }}>
 
         <Tabs.List size="2">
           <Tabs.Trigger value="building" >Build</Tabs.Trigger>
@@ -191,7 +191,7 @@ class Building extends React.Component {
           </Box>
 
           <IconButton onClick={(event) => this.props.postRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations)} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-            <Flex direction="horizontal" gap="2" style={{alignItems: "center"}}>
+            <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
               <PlayIcon width="18" height="18" />Start training!
             </Flex>
           </IconButton>
@@ -269,7 +269,7 @@ class Building extends React.Component {
             </Form.Submit>
           </Form.Root>
           
-          <div id="query-response">
+          <div id="query-response" style={{ fontFamily:'monospace' }}>
               {this.props.isResponding===2 ? (
                 <div>Output: {this.props.apiData["nn_input"]}</div>
               ) : (this.props.isResponding===1 ? (
