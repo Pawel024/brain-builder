@@ -84,12 +84,19 @@ class Building extends React.Component {
   }
 
   chartRef = React.createRef();
+  chartInstance = null;
 
   componentDidUpdate() {
     if (this.props.isTraining === 2 && this.chartRef.current) {
       const ctx = this.chartRef.current.getContext('2d');
 
-      new Chart(ctx, {
+      // Destroy the old chart if it exists
+      if (this.chartInstance) {
+        this.chartInstance.destroy();
+      }
+
+      // Create a new chart and save a reference to it
+      this.chartInstance = new Chart(ctx, {
           type: 'line',
           data: {
               labels: JSON.parse(this.props.apiData["error_list"])[0].map((_, i) => i + 1), // Generate labels based on error array length
