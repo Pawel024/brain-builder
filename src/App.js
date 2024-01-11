@@ -13,6 +13,7 @@ import BuildView from './buildView';
 import Tutorial from './tutorial';
 import chroma from 'chroma-js';
 import Readme from './readme';
+import Introduction from './introduction';
 
 
 const colorScale = chroma.scale(['#49329b', '#5e5cc2', '#8386d8', '#afb0e1', '#dddddd', '#e3a692', '#d37254', '#b64124', '#8f0500']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
@@ -800,6 +801,9 @@ function App() {
             </Box>
             </Flex>
           </div>
+          } />
+          <Route path="/introduction" element={
+            <Introduction/>
           } />
           <Route path="/tutorial" element={
             <Tutorial 
