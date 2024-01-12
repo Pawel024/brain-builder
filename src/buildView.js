@@ -254,7 +254,10 @@ class Building extends React.Component {
           <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
             <div id="/api-data">
               {this.props.isTraining===2 ? (
-                <div style={{ color: this.props.accuracyColor, fontFamily:'monospace' }}><b>Accuracy: {(parseFloat(JSON.parse(this.props.apiData["error_list"])[1])*100).toFixed(2)}%</b></div>
+                <Flex direction='column' >
+                  <div style={{ color: this.props.accuracyColor, fontFamily:'monospace' }}><b>Accuracy: {(parseFloat(JSON.parse(this.props.apiData["error_list"])[1])*100).toFixed(2)}%</b></div>
+                  <canvas ref={this.chartRef} id="myChart"></canvas>
+                </Flex>
               ) : (this.props.isTraining===1 ? (
                 <div style={{ fontFamily:'monospace' }}><b>Training...</b></div>
               ) : (
@@ -271,8 +274,6 @@ class Building extends React.Component {
               <PlayIcon width="18" height="18" />Start training!
             </Flex>
           </IconButton>
-
-          {this.props.isTraining === 2 && <canvas ref={this.chartRef} id="myChart"></canvas>}
 
         </Tabs.Content>
       
