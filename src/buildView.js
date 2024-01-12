@@ -42,6 +42,7 @@ class Building extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      printedDescription: '',
       runTutorial: false,
       steps: [
         {
@@ -66,6 +67,13 @@ class Building extends React.Component {
     };
   }
 
+  typeWriter = (txt, speed=15, i=0) => {
+    if (i < txt.length) {
+      this.setState({ printedDescription: this.state.printedDescription + txt.charAt(i)})
+      setTimeout(() => this.typeWriter(txt, speed, i + 1), speed);
+    }
+  };
+
   componentDidMount() {
     this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.currentGameNumber);
     this.props.updateCytoLayers(this.props.setCytoLayers, this.props.nOfInputs, this.props.nOfOutputs);
@@ -81,6 +89,7 @@ class Building extends React.Component {
         }, 0);
       });
     }
+    this.typeWriter(this.props.taskDescription);
   }
 
   chartRef = React.createRef();
@@ -155,15 +164,22 @@ class Building extends React.Component {
       
       
 
-      <Tabs.Root defaultValue="building" style={{ fontFamily:'monospace' }}>
+      <Tabs.Root defaultValue="task" style={{ fontFamily:'monospace' }}>
 
         <Tabs.List size="2">
+          <Tabs.Trigger value="task" >Your Task</Tabs.Trigger>
           <Tabs.Trigger value="building" >Build</Tabs.Trigger>
           <Tabs.Trigger value="stuff">Test</Tabs.Trigger>
           {/*<Tabs.Trigger value="settings">Settings</Tabs.Trigger>*/}
         </Tabs.List>
 
         <Box px="4" pt="3" pb="0">
+        <Tabs.Content value="task">
+          <Box style={{ padding: '20px 300px', fontFamily:'monospace' }}>
+          <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Task Description </Heading>
+          <div style={{ textAlign:'justify' }}>{this.state.printedDescription}</div>
+          </Box>
+        </Tabs.Content>
         <Tabs.Content value="building">
           <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
             <div className='cytoscape'style={{top: 5, left: 3, position: 'absolute', width: window.innerWidth*0.77, height: window.innerHeight-130}}></div>
