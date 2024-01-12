@@ -256,7 +256,7 @@ class Building extends React.Component {
               {this.props.isTraining===2 ? (
                 <Flex direction='column' >
                   <div style={{ color: this.props.accuracyColor, fontFamily:'monospace' }}><b>Accuracy: {(parseFloat(JSON.parse(this.props.apiData["error_list"])[1])*100).toFixed(2)}%</b></div>
-                  <canvas ref={this.chartRef} id="myChart"></canvas>
+                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: '100vh' }}></canvas>
                 </Flex>
               ) : (this.props.isTraining===1 ? (
                 <div style={{ fontFamily:'monospace' }}><b>Training...</b></div>
@@ -269,7 +269,7 @@ class Building extends React.Component {
             </div>
           </Box>
 
-          <IconButton onClick={(event) => this.props.postRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations)} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+          <IconButton onClick={(event) => this.props.postRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations)} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.16 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
             <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
               <PlayIcon width="18" height="18" />Start training!
             </Flex>
