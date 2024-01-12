@@ -679,109 +679,109 @@ function App() {
             <Flex direction='row' gap='3' style={{padding:'10px 10px', alignItems: 'flex-start'}}>
             <Flex direction='column' gap='3' style={{ flex: 1 }}>
               <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Get Started</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', alignItems: 'start', justifyContent: 'center'}}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt; Get Started</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <Button variant="outline" size="1" style={{ width: 120, height: 80, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Introduction</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                     </Button>
                 </Link>
                 <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <Button variant="outline" size="1" style={{ width: 120, height: 80, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Tutorial</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                     </Button>
                 </Link>
                 </Box>
               </Box>
               <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Level 1</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', alignItems: 'start', justifyContent: 'center'}}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt; Level 1</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <Button variant="outline" size="1" style={{ width: 120, height: 80, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 1</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                     </Button>
                 </Link>
                 <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <Button variant="outline" size="1" style={{ width: 120, height: 80, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}> 
                         <label>Challenge 2</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                     </Button>
                 </Link>
                 <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <Button variant="outline" size="1" style={{ width: 120, height: 80, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 3</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                     </Button>
                 </Link>
                 </Box>
               </Box>
               <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Level 2</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', alignItems: 'start', justifyContent: 'center'}}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt; Level 2</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <Button variant="outline" size="1" style={{ width: 120, height: 80, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 1</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                     </Button>
                 </Link>
                 <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Button variant="outline" size="1" style={{ width: 120, height: 80, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
 
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 2</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                     </Button>
                 </Link>
                 <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <Button variant="outline" size="1" style={{ width: 120, height: 80, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 3</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                     </Button>
                 </Link>
                 </Box>
               </Box>
               <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Level 3</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', alignItems: 'start', justifyContent: 'center'}}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt; Level 3</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <Button variant="outline" size="1" style={{ width: 120, height: 80, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 1</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                     </Button>
                 </Link>
                 <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <Button variant="outline" size="1" style={{ width: 120, height: 80, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 2</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                     </Button>
                 </Link>
                 <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <Button variant="outline" size="1" style={{ width: 120, height: 80, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 3</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                     </Button>
                 </Link>
