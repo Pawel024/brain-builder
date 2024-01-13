@@ -102,8 +102,8 @@ class Building extends React.Component {
   chartRef = React.createRef();
   chartInstance = null;
 
-  componentDidUpdate() {
-    if (this.props.isTraining === 2 && this.chartRef.current) {
+  componentDidUpdate(prevProps) {
+    if (this.props.isTraining !== prevProps.isTraining && this.props.isTraining === 2 && this.chartRef.current) {
       const ctx = this.chartRef.current.getContext('2d');
 
       // Destroy the old chart if it exists
