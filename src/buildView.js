@@ -112,7 +112,7 @@ class Building extends React.Component {
               datasets: [{
                   label: 'Errors',
                   data: JSON.parse(this.props.apiData["error_list"])[0],
-                  borderColor: 'var(--cyan-10)',
+                  borderColor: 'rgba(7, 151, 185, 1)',
                   backgroundColor: 'rgba(7, 151, 185, 0.2)',
               }]
           },
