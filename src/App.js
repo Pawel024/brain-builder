@@ -13,6 +13,7 @@ import BuildView from './buildView';
 import Tutorial from './tutorial';
 import chroma from 'chroma-js';
 import Readme from './readme';
+import Introduction from './introduction';
 
 
 const colorScale = chroma.scale(['#49329b', '#5e5cc2', '#8386d8', '#afb0e1', '#dddddd', '#e3a692', '#d37254', '#b64124', '#8f0500']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
@@ -29,6 +30,13 @@ const FloatingButton = styled(IconButton, {
   boxShadow: '0 2px 8px var(--slate-a11)'
 });
 
+const ChallengeButton = styled(Button, {
+  width: 120,
+  height: 80,
+  fontSize: 'var(--font-size-2)',
+  fontWeight: '500',
+  boxShadow: '0 1px 3px var(--slate-a11)'
+});
 
 // ------- CSRF TOKEN -------
 /*
@@ -181,6 +189,7 @@ function App() {
     return {innerWidth, innerHeight};
   }
   
+  // eslint-disable-next-line no-unused-vars
   const [windowSize, setWindowSize] = useState(getWindowSize());
 
   // update window size when window is resized
@@ -445,7 +454,7 @@ function App() {
               top: window.innerHeight - 258,
               left: left + i * dist + 16.5,
               transform: 'translateX(-50%)',
-              fontSize: '14px',
+              fontSize: 'var(--font-size-2)',
               color: 'var(--cyan-12)',
               fontWeight: 'bold'
             }}
@@ -677,111 +686,110 @@ function App() {
             <Flex direction='row' gap='3' style={{padding:'10px 10px', alignItems: 'flex-start'}}>
             <Flex direction='column' gap='3' style={{ flex: 1 }}>
               <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Get Started</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', alignItems: 'start', justifyContent: 'center'}}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Get Started</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Introduction</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
-                    </Button>
+                    </ChallengeButton>
                 </Link>
                 <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Tutorial</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
-                    </Button>
+                    </ChallengeButton>
                 </Link>
                 </Box>
               </Box>
               <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Level 1</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', alignItems: 'start', justifyContent: 'center'}}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 1</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 1</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
-                    </Button>
+                    </ChallengeButton>
                 </Link>
                 <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}> 
                         <label>Challenge 2</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
-                    </Button>
+                    </ChallengeButton>
                 </Link>
                 <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 3</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
-                    </Button>
+                    </ChallengeButton>
                 </Link>
                 </Box>
               </Box>
               <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Level 2</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', alignItems: 'start', justifyContent: 'center'}}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 2</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 1</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
-                    </Button>
+                    </ChallengeButton>
                 </Link>
                 <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 2</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
-                    </Button>
+                    </ChallengeButton>
                 </Link>
                 <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 3</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
-                    </Button>
+                    </ChallengeButton>
                 </Link>
                 </Box>
               </Box>
               <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Level 3</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', alignItems: 'start', justifyContent: 'center'}}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 3</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 1</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
-                    </Button>
+                    </ChallengeButton>
                 </Link>
                 <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 2</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
-                    </Button>
+                    </ChallengeButton>
                 </Link>
                 <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Button variant="outline" size="1" style={{ width: 100, height: 100, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-                    <Flex gap="2" style={{ color:'var(--cyan-11)', flexDirection: "column", alignItems: "center"}}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 3</label>
-                        <div><RocketIcon width="35" height="35" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
-                    </Button>
+                    </ChallengeButton>
                 </Link>
                 </Box>
               </Box>
@@ -792,7 +800,7 @@ function App() {
 
             </Flex>
             <Box style={{ flex: 1, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-            <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Readme</Heading>
+            <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Readme</Heading>
             <Box>
                 <Readme />
             </Box>
@@ -800,12 +808,15 @@ function App() {
             </Flex>
           </div>
           } />
+          <Route path="/introduction" element={
+            <Introduction/>
+          } />
           <Route path="/tutorial" element={
             <Tutorial 
             nOfInputs={4}
             nOfOutputs={3}
             maxLayers={10}
-            taskDescription={"This would normally be a task description, but we are in a tutorial, so instead you can read a few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
+            taskDescription={"This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
             cytoElements={cytoElements1}
             cytoStyle={cytoStyle1}
             generateFloatingButtons={generateFloatingButtons}
@@ -842,7 +853,7 @@ function App() {
             nOfInputs={4}
             nOfOutputs={3}
             maxLayers={10}
-            taskDescription={""}
+            taskDescription={"DRAFT: This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
             cytoElements={cytoElements1}
             cytoStyle={cytoStyle1}
             generateFloatingButtons={generateFloatingButtons}
@@ -879,7 +890,7 @@ function App() {
             nOfInputs={2}
             nOfOutputs={5}
             maxLayers={10}
-            taskDescription={""}
+            taskDescription={"DRAFT: This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
             cytoElements={cytoElements2}
             cytoStyle={cytoStyle2}
             generateFloatingButtons={generateFloatingButtons}
@@ -916,7 +927,7 @@ function App() {
             nOfInputs={10}
             nOfOutputs={1}
             maxLayers={10}
-            taskDescription={""}
+            taskDescription={"DRAFT: This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
             cytoElements={cytoElements3}
             cytoStyle={cytoStyle3}
             generateFloatingButtons={generateFloatingButtons}

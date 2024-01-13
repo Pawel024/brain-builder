@@ -1,6 +1,6 @@
 import React from 'react'
 import './App.css';
-import { Flex, Box, Tabs, Heading, Grid, IconButton, Separator } from '@radix-ui/themes';
+import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator } from '@radix-ui/themes';
 import * as Form from '@radix-ui/react-form';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
@@ -10,16 +10,39 @@ import CytoscapeComponent from 'react-cytoscapejs';
 import { PlayIcon, ChevronLeftIcon, ChevronRightIcon, HomeIcon } from '@radix-ui/react-icons';
 import Joyride from 'react-joyride';
 import { useNavigate } from 'react-router-dom';
+import { 
+  Chart, 
+  CategoryScale, 
+  LinearScale, 
+  LineController, 
+  PointElement, 
+  LineElement, 
+  Title, 
+  Tooltip, 
+  Legend 
+} from 'chart.js';
 
 function BuildingWrapper(props) {
   const navigate = useNavigate();
 
   return <Building {...props} navigate={navigate} />;
 }
+
+Chart.register(
+  CategoryScale, 
+  LinearScale, 
+  LineController, 
+  PointElement, 
+  LineElement, 
+  Title, 
+  Tooltip, 
+  Legend
+);
 class Building extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      printedDescription: '',
       runTutorial: false,
       steps: [
         {
@@ -44,6 +67,13 @@ class Building extends React.Component {
     };
   }
 
+  typeWriter = (txt, speed=15, i=0) => {
+    if (i < txt.length) {
+      this.setState({ printedDescription: this.state.printedDescription + txt.charAt(i)})
+      setTimeout(() => this.typeWriter(txt, speed, i + 1), speed);
+    }
+  };
+
   componentDidMount() {
     this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.currentGameNumber);
     this.props.updateCytoLayers(this.props.setCytoLayers, this.props.nOfInputs, this.props.nOfOutputs);
@@ -59,6 +89,42 @@ class Building extends React.Component {
         }, 0);
       });
     }
+    this.typeWriter(this.props.taskDescription);
+  }
+
+  chartRef = React.createRef();
+  chartInstance = null;
+
+  componentDidUpdate() {
+    if (this.props.isTraining === 2 && this.chartRef.current) {
+      const ctx = this.chartRef.current.getContext('2d');
+
+      // Destroy the old chart if it exists
+      if (this.chartInstance) {
+        this.chartInstance.destroy();
+      }
+
+      // Create a new chart and save a reference to it
+      this.chartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: JSON.parse(this.props.apiData["error_list"])[0].map((_, i) => i + 1), // Generate labels based on error array length
+              datasets: [{
+                  label: 'Errors',
+                  data: JSON.parse(this.props.apiData["error_list"])[0],
+                  borderColor: 'rgba(7, 151, 185, 1)',
+                  backgroundColor: 'rgba(7, 151, 185, 0.2)',
+              }]
+          },
+          options: {
+              scales: {
+                  y: {
+                      beginAtZero: true
+                  }
+              }
+          }
+      });
+    }
   }
 
   handleJoyrideCallback = (data) => {
@@ -69,10 +135,13 @@ class Building extends React.Component {
     }
   }
 
+  
+
   render() {
 
-      return(
-      <div className='buildBody'>
+    return(
+    <div className='buildBody'>
+      <Theme accentColor="cyan" grayColor="slate" panelBackground="solid" radius="large" appearance='light'>
       <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
         <Grid columns='3' mt='1'>
         <Box ml='3' style={{display:"flex"}}>  
@@ -95,18 +164,25 @@ class Building extends React.Component {
       
       
 
-      <Tabs.Root defaultValue="building">
+      <Tabs.Root defaultValue="task" style={{ fontFamily:'monospace' }}>
 
         <Tabs.List size="2">
+          <Tabs.Trigger value="task" >Your Task</Tabs.Trigger>
           <Tabs.Trigger value="building" >Build</Tabs.Trigger>
           <Tabs.Trigger value="stuff">Test</Tabs.Trigger>
-          <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
+          {/*<Tabs.Trigger value="settings">Settings</Tabs.Trigger>*/}
         </Tabs.List>
 
         <Box px="4" pt="3" pb="0">
+        <Tabs.Content value="task">
+          <Box style={{ padding: '20px 300px', fontFamily:'monospace' }}>
+          <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Task Description </Heading>
+          <div style={{ textAlign:'justify' }}>{this.state.printedDescription}</div>
+          </Box>
+        </Tabs.Content>
         <Tabs.Content value="building">
           <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
-            <div className='cytoscape'style={{top: 5, left: 3, position: 'absolute', width: window.innerWidth*0.78, height: window.innerHeight-130}}></div>
+            <div className='cytoscape'style={{top: 5, left: 3, position: 'absolute', width: window.innerWidth*0.77, height: window.innerHeight-130}}></div>
             <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
               <CytoscapeComponent elements={this.props.cytoElements} stylesheet={this.props.cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
               
@@ -161,28 +237,31 @@ class Building extends React.Component {
           
           <Separator orientation='vertical' style = {{ position:"absolute", top: Math.round(0.03 * (window.innerHeight-140)), left: Math.round(0.8 * (window.innerWidth * 0.97)), height: 0.96 * (window.innerHeight-140) }}/>
 
-          <Box style={{ position:"absolute", top: 0.14 * (window.innerHeight-140), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
+          <Box style={{ position:"absolute", top: 0.14 * (window.innerHeight-140), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontFamily:'monospace'  }}>
             <div className="iterationsSlider">
               {this.props.iterationsSlider}
             </div>
-            <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Epochs: {this.props.iterations}</div>
+            <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Epochs: {this.props.iterations}</div>
           </Box>
 
-          <Box style={{ position:"absolute", top: Math.round(0.30 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
+          <Box style={{ position:"absolute", top: Math.round(0.26 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontFamily:'monospace'  }}>
             <div className="learningRateSlider">
               {this.props.learningRateSlider}
             </div>
-            <div style={{ position:"absolute", zIndex: 9999, top: -35, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Learning rate: {this.props.learningRate}</div>
+            <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Learning rate: {this.props.learningRate}</div>
           </Box>
           
-          <Box style={{ position:"absolute", top: Math.round(0.50 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh' }}>
-            <div id="/api-data" style={{ color: this.props.accuracyColor }}>
+          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
+            <div id="/api-data">
               {this.props.isTraining===2 ? (
-                <pre>Accuracy: {(parseFloat(JSON.parse(this.props.apiData["error_list"])[1])*100).toFixed(2)}%</pre>
+                <Flex direction='column' >
+                  <div style={{ color: this.props.accuracyColor, fontFamily:'monospace' }}><b>Accuracy: {(parseFloat(JSON.parse(this.props.apiData["error_list"])[1])*100).toFixed(2)}%</b></div>
+                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:20 }}></canvas>
+                </Flex>
               ) : (this.props.isTraining===1 ? (
-                <pre>Training...</pre>
+                <div style={{ fontFamily:'monospace' }}><b>Training...</b></div>
               ) : (
-                <div>
+                <div style={{ textAlign:'justify', width: Math.round(0.16 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
                   {this.props.taskDescription}
                 </div>
               )
@@ -190,8 +269,8 @@ class Building extends React.Component {
             </div>
           </Box>
 
-          <IconButton onClick={(event) => this.props.postRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations)} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: 150, height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-            <Flex direction="horizontal" gap="2" style={{alignItems: "center"}}>
+          <IconButton onClick={(event) => this.props.postRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations)} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.16 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+            <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
               <PlayIcon width="18" height="18" />Start training!
             </Flex>
           </IconButton>
@@ -201,7 +280,7 @@ class Building extends React.Component {
         <Tabs.Content value="stuff">
           <Flex direction="column" gap="2">
           
-          <Form.Root className="FormRoot" onSubmit={(event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData)}>
+          <Form.Root className="FormRoot" onSubmit={(event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData)} style={{ fontFamily:'monospace' }}>
             <Form.Field className="FormField" name="s-m_axis">
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
                 <Form.Label className="FormLabel">Semi-Major Axis [km]</Form.Label>
@@ -269,11 +348,11 @@ class Building extends React.Component {
             </Form.Submit>
           </Form.Root>
           
-          <div id="query-response">
+          <div id="query-response" style={{ fontFamily:'monospace' }}>
               {this.props.isResponding===2 ? (
-                <pre>Output: {this.props.apiData["nn_input"]}</pre>
+                <div>Output: {this.props.apiData["nn_input"]}</div>
               ) : (this.props.isResponding===1 ? (
-                <pre>Getting your reply...</pre>
+                <div>Getting your reply...</div>
               ) : (
                 <div></div>
               )
@@ -284,7 +363,7 @@ class Building extends React.Component {
 
 
 
-        <Tabs.Content value="settings">
+        {/*<Tabs.Content value="settings">
           <Box style={{ display: 'flex', height: '100vh' }}>
           <form>
             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -295,9 +374,9 @@ class Building extends React.Component {
             </div>
           </form>
           </Box>
-        </Tabs.Content>
+        </Tabs.Content>*/}
         </Box>
-      </Tabs.Root>
+        </Tabs.Root>
 
       <Joyride
         steps={this.state.steps}
@@ -309,6 +388,7 @@ class Building extends React.Component {
         callback={this.handleJoyrideCallback}
         locale={{ last: 'Finish' }}
       />
+      </Theme>
     </div>
   )}
 }
