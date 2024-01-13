@@ -112,8 +112,8 @@ class Building extends React.Component {
               datasets: [{
                   label: 'Errors',
                   data: JSON.parse(this.props.apiData["error_list"])[0],
-                  borderColor: 'rgba(75, 192, 192, 1)',
-                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                  borderColor: 'var(--cyan-10)',
+                  backgroundColor: 'rgba(7, 151, 185, 0.2)',
               }]
           },
           options: {
@@ -176,7 +176,7 @@ class Building extends React.Component {
         <Box px="4" pt="3" pb="0">
         <Tabs.Content value="task">
           <Box style={{ padding: '20px 300px', fontFamily:'monospace' }}>
-          <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt; Task Description </Heading>
+          <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Task Description </Heading>
           <div style={{ textAlign:'justify' }}>{this.state.printedDescription}</div>
           </Box>
         </Tabs.Content>
@@ -256,7 +256,7 @@ class Building extends React.Component {
               {this.props.isTraining===2 ? (
                 <Flex direction='column' >
                   <div style={{ color: this.props.accuracyColor, fontFamily:'monospace' }}><b>Accuracy: {(parseFloat(JSON.parse(this.props.apiData["error_list"])[1])*100).toFixed(2)}%</b></div>
-                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: Math.round(0.3 * (window.innerHeight-140)) }}></canvas>
+                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:20 }}></canvas>
                 </Flex>
               ) : (this.props.isTraining===1 ? (
                 <div style={{ fontFamily:'monospace' }}><b>Training...</b></div>
