@@ -74,6 +74,11 @@ class Building extends React.Component {
     }
   };
 
+  async getTaskDescription(taskId) {
+    const response = await fetch(process.env.PUBLIC_URL + "/task-" + taskId + ".txt"); // get the text file with the task description
+    return await response.text();
+  }
+
   componentDidMount() {
     this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.currentGameNumber);
     this.props.updateCytoLayers(this.props.setCytoLayers, this.props.nOfInputs, this.props.nOfOutputs);
@@ -89,7 +94,9 @@ class Building extends React.Component {
         }, 0);
       });
     }
-    this.typeWriter(this.props.taskDescription);
+    this.getTaskDescription(this.props.taskId).then(text => {
+      this.typeWriter(text);
+    });
   }
 
   chartRef = React.createRef();

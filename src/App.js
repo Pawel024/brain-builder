@@ -853,7 +853,7 @@ function App() {
             nOfInputs={4}
             nOfOutputs={3}
             maxLayers={10}
-            taskDescription={"DRAFT: This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
+            taskId={11}
             cytoElements={cytoElements1}
             cytoStyle={cytoStyle1}
             generateFloatingButtons={generateFloatingButtons}
@@ -890,7 +890,7 @@ function App() {
             nOfInputs={2}
             nOfOutputs={5}
             maxLayers={10}
-            taskDescription={"DRAFT: This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
+            taskId={12}
             cytoElements={cytoElements2}
             cytoStyle={cytoStyle2}
             generateFloatingButtons={generateFloatingButtons}
@@ -927,7 +927,7 @@ function App() {
             nOfInputs={10}
             nOfOutputs={1}
             maxLayers={10}
-            taskDescription={"DRAFT: This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
+            taskId={13}
             cytoElements={cytoElements3}
             cytoStyle={cytoStyle3}
             generateFloatingButtons={generateFloatingButtons}
