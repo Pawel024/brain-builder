@@ -45,14 +45,14 @@ def convert_input(lst):
     structure = [[nodes[0]]]
     for x in nodes[1:]:
         structure += [[x, 'Linear', 'Sigmoid', True]]  # all nodes are linear and include a sigmoid activation and bias
-    learning_rate, epochs = other
-    return structure, learning_rate, epochs
+    learning_rate, epochs, normalization = other
+    return structure, learning_rate, epochs, normalization
 
 
 def construct_classifier(input_list, csv_file_path):
     global dataset, n_inputs, n_classes
     # convert the input list to usable values
-    structure, learning_rate, epochs = convert_input(input_list)
+    structure, learning_rate, epochs, normalization = convert_input(input_list)
 
     # load the dataset from Excel -> use custom dataset class
     dataset = DataFromExcel(csv_file_path=csv_file_path)

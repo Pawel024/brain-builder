@@ -6,7 +6,7 @@ def process(data):
     data = dict(data)
 
     if data['action'] == 1:  # create and train a network
-        input_list = ((float(data['learning_rate']), int(data['epochs'])), json.loads(data['network_setup']))
+        input_list = ((float(data['learning_rate']), int(data['epochs']), bool(data['normalization'])), json.loads(data['network_setup']))
         csv_file_path = os.path.join(os.path.dirname(__file__), 'Clas2a.csv')
         structure, errors, w, b = construct_classifier(input_list, csv_file_path)
         data['network_setup'] = json.dumps(structure)  # list of integers representing nodes per layer, eg [4, 8, 8, 8, 2]

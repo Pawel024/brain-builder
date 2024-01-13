@@ -6,6 +6,7 @@ class Row(models.Model):
     timestamp = models.DateTimeField(auto_now=True)
     learning_rate = models.FloatField(max_length=20)
     epochs = models.IntegerField()
+    normalization = models.BooleanField()
     network_setup = models.CharField(max_length=200)
     network_weights = models.CharField(max_length=1000000)
     network_biases = models.CharField(max_length=100000)
