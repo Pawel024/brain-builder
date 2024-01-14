@@ -219,12 +219,11 @@ function App() {
   const [isResponding13, setIsResponding13] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
   const [accurata13, setAccurata13] = useState(null);
 
-  // Define the API endpoint
-  const apiEndpoint = window.location.origin + "/api/backend/?limit=1";
-
   // Define the functions to fetch API data
-  const fetchTrainingData = (apiData, setApiData, setAccuracy, setIsTraining) => {
-    axios.get(apiEndpoint)
+  const fetchTrainingData = (apiData, setApiData, setAccuracy, setIsTraining, taskId) => {
+    let userId = localStorage.getItem('userId');
+
+    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`)
       .then((response) => {
         setApiData(response.data[0]);
         setAccuracy(parseFloat(JSON.parse(response.data[0]["error_list"])[1]))
@@ -239,8 +238,10 @@ function App() {
     }, 1000);
   };
 
-  const fetchQueryResponse = (setApiData, setIsResponding) => {
-    axios.get(apiEndpoint)
+  const fetchQueryResponse = (setApiData, setIsResponding, taskId) => {
+    let userId = localStorage.getItem('userId');
+
+    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`)
       .then((response) => {
         setApiData(response.data[0]);
         console.log(response.data[0]);
@@ -275,7 +276,7 @@ function App() {
   }, [cytoLayers13]);
 
   
-  const loadLastCytoLayers = (setCytoLayers, apiData, setApiData, propertyName) => {
+  const loadLastCytoLayers = (setCytoLayers, apiData, setApiData, propertyName, taskId) => {
     // Check localStorage for a saved setting
     const savedSetting = localStorage.getItem(propertyName);
     let goToStep2 = false;
@@ -294,23 +295,25 @@ function App() {
     }
     else {goToStep2 = true;};
 
+    let userId = localStorage.getItem('userId');
+
     if (goToStep2) {
-        axios.get(window.location.origin + "/api/backend/?limit=1")
-        .then((response) => {
-            try {
-                setApiData(response.data[0]);
-                console.log("apiData:");
-                console.log(response.data[0]);
-                setCytoLayers(JSON.parse(response.data[0]["network_setup"]));
-            }
-            catch (error) {
-                setCytoLayers([4, 7, 7, 3]);
-                console.log(error);
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-        });
+      axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`)
+      .then((response) => {
+          try {
+              setApiData(response.data[0]);
+              console.log("apiData:");
+              console.log(response.data[0]);
+              setCytoLayers(JSON.parse(response.data[0]["network_setup"]));
+          }
+          catch (error) {
+              setCytoLayers([4, 7, 7, 3]);
+              console.log(error);
+          }
+      })
+      .catch((error) => {
+          console.log(error);
+      });
     }
   };
   
@@ -398,11 +401,12 @@ function App() {
 
 
   // ------- POST REQUEST -------
-  const postRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations) => {
+  const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId) => {
     e.preventDefault();
-    console.log("learningRate:");
-    console.log(learningRate);
+    let userId = localStorage.getItem('userId');
     const trainingData = {
+      user_id: userId,
+      task_id: taskId,
       learning_rate: learningRate,
       epochs: iterations,
       network_setup: JSON.stringify(cytoLayers),
@@ -414,10 +418,28 @@ function App() {
     };
     setAccuracy(null);
     setIsTraining(1);
-    axios.put(window.location.origin + "/api/backend/1", trainingData).then((response) => {
-      console.log(response.status);
-      fetchTrainingData(apiData, setApiData, setAccuracy, setIsTraining);
-    });
+    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`).then((response) => {
+      if (response.data.length > 0) {
+          // If the record exists, update it
+          let pk = response.data[0].id;
+          axios.put(window.location.origin + `/api/backend/${pk}`, trainingData).then((response) => {
+              console.log(response.status);
+              fetchTrainingData(apiData, setApiData, setAccuracy, setIsTraining, taskId);
+          }, (error) => {
+              console.log(error);
+          });
+      } else {
+          // If the record doesn't exist, create it
+          axios.post(window.location.origin + "/api/backend/", trainingData).then((response) => {
+              console.log(response.status);
+              fetchTrainingData(apiData, setApiData, setAccuracy, setIsTraining, taskId);
+          }, (error) => {
+              console.log(error);
+          });
+      }
+  }, (error) => {
+      console.log(error);
+  });
   };
 
 
@@ -477,10 +499,13 @@ function App() {
 
   // ------- FORMS -------
 
-  const handleSubmit = (event, setIsResponding, setApiData) => {
+  const handleSubmit = (event, setIsResponding, setApiData, taskId) => {
     event.preventDefault();
     setIsResponding(1);
-    axios.get(window.location.origin + "/api/backend/?limit=1")
+
+    let userId = localStorage.getItem('userId');
+
+    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`)
       .then((response) => {
         const networkData = response.data[0];
         const formData = new FormData(event.target);
@@ -491,10 +516,10 @@ function App() {
         networkData.action = 2;
         console.log("updated network data");
         console.log(networkData);
-        axios.put(window.location.origin + "/api/backend/1", networkData)
+        axios.put(window.location.origin + `/api/backend/${networkData.pk}`, networkData)
           .then((response) => {
             console.log(response.status);
-            fetchQueryResponse(setApiData, setIsResponding);
+            fetchQueryResponse(setApiData, setIsResponding, taskId);
           })
           .catch((error) => {
             console.log(error);
@@ -838,7 +863,7 @@ function App() {
             setIsTraining={setIsTraining11}
             apiData={apiData11}
             setApiData={setApiData11}
-            postRequest={postRequest}
+            putRequest={putRequest}
             accuracy={accuracy11}
             setAccuracy={setAccuracy11}
             accuracyColor={accuracyColor}
@@ -874,7 +899,7 @@ function App() {
             setIsTraining={setIsTraining11}
             apiData={apiData11}
             setApiData={setApiData11}
-            postRequest={postRequest}
+            putRequest={putRequest}
             accuracy={accuracy11}
             setAccuracy={setAccuracy11}
             accuracyColor={accuracyColor}
@@ -910,7 +935,7 @@ function App() {
             setIsTraining={setIsTraining12}
             apiData={apiData12}
             setApiData={setApiData12}
-            postRequest={postRequest}
+            putRequest={putRequest}
             accuracy={accuracy12}
             setAccuracy={setAccuracy12}
             accuracyColor={accuracyColor}
@@ -946,7 +971,7 @@ function App() {
             setIsTraining={setIsTraining13}
             apiData={apiData13}
             setApiData={setApiData13}
-            postRequest={postRequest}
+            putRequest={putRequest}
             accuracy={accurata13}
             setAccuracy={setAccurata13}
             accuracyColor={accuracyColor}

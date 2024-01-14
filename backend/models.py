@@ -1,6 +1,8 @@
 from django.db import models
 
 class Row(models.Model):
+    user_id = models.CharField(max_length=36)
+    task_id = models.IntegerField()
     learning_rate = models.FloatField(max_length=20)
     epochs = models.IntegerField()
     network_setup = models.CharField(max_length=200)
