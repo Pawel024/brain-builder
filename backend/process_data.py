@@ -25,8 +25,8 @@ import pandas as pd
 def process(req, root_link, pk=None):
     req = dict(req)
     task_id, user_id = req['task_id'], req['user_id']
+    assert False, root_link
     response = requests.post(root_link + 'api/progress/', json={'progress': 1, 'plots': json.dumps([]), 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
-    assert False, response
 
     # load the games dataframe from the API
     #  this dataframe contains all the game-specific info the backend uses
