@@ -23,10 +23,9 @@ import pandas as pd
 
 
 def process(req, root_link, pk=None):
-    assert pk is not None, "no pk"
     req = dict(req)
     task_id, user_id = req['task_id'], req['user_id']
-    response = requests.put(root_link + 'api/progress/' + str(pk) + '/', json={'progress': 1, 'plots': json.dumps([]), 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
+    response = requests.post(root_link + 'api/progress/', json={'progress': 1, 'plots': json.dumps([]), 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
     assert False, response
 
     # load the games dataframe from the API
