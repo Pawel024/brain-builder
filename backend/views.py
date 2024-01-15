@@ -11,7 +11,7 @@ from django.shortcuts import render
 import uuid
 
 def index(request):
-    user_id = request.session.get('user_id')
+    user_id = request.GET.get('user_id')
 
     if user_id is None:
         # This is a new user, create a new user_id and store it in the session
