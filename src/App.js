@@ -447,7 +447,7 @@ function App() {
     }).then((response) => {
       if (response.data.length > 0) {
           // If the record exists, update it
-          let pk = response.data[0].id;
+          let pk = response.data[0].pk;
           axios.put(window.location.origin + `/api/backend/${pk}`, trainingData, {
             headers: {
               'X-CSRFToken': csrftoken
