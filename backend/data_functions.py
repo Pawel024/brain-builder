@@ -204,7 +204,7 @@ class DataFromExcel(Dataset):
         plt.savefig(img, format='png')
         img.seek(0)
         img = b64encode(img.getvalue()).decode('utf-8')
-        requests.put(root_link + 'api/progress/' + pk + '/', json={'progress': -1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
+        requests.put(root_link + 'api/progress/' + pk + '/', json={'progress': 10, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
         plt.clf()
 
     # This function is based on a CSE2510 Notebook and plots the decision boundary of a classifier
@@ -469,11 +469,6 @@ class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_c
                     self.targets[:, i] = ((self.targets[:, i] - self.target_minima[i]) /
                                           (self.target_maxima[i] - self.target_minima[i]))
 
-        # clear the plots directory
-        self.plt_dir = 'plots'
-        files = os.listdir(self.plt_dir)
-        for file in files:
-            os.remove(self.plt_dir + '/' + file)
         self.plot_data()  # uncomment if you want plots of the data; they will be saved in plt_dir
 
     def __len__(self):
