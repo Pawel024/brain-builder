@@ -78,7 +78,17 @@ class Building extends React.Component {
   getTaskDescription = (taskId) => {
     axios.get(window.location.origin + '/api/tasks/?task_id=' + taskId)
     .then(response => {
-      return response.data.description;
+      try {
+      console.log(response.data[0].description);
+      } catch (error) {
+        console.log('Task description error:', error);
+      }
+      try {
+        console.log(response.data.description);
+      } catch (error) {
+        console.log('Task description error:', error);
+      }
+      return response.data[0].description;
     })
     .catch(error => {
       console.error('Task description error:', error);
@@ -101,7 +111,8 @@ class Building extends React.Component {
       });
     }
 
-    this.typeWriter(this.getTaskDescription(this.props.taskId));
+    console.log(this.getTaskDescription(this.props.taskId))
+
   }
 
   chartRef = React.createRef();
