@@ -2,7 +2,6 @@ from django.db import models
 
 class Row(models.Model):
     action = models.IntegerField()
-    tag = models.IntegerField()
     timestamp = models.DateTimeField(auto_now=True)
     user_id = models.CharField(max_length=100)
     task_id = models.IntegerField()
@@ -22,6 +21,12 @@ class Row(models.Model):
 class TaskDescription(models.Model):
     task_id = models.IntegerField(unique=True)
     description = models.TextField()
+    n_inputs = models.IntegerField()
+    n_outputs = models.IntegerField()
+    max_epochs = models.IntegerField()
+    max_layers = models.IntegerField()
+    max_nodes = models.IntegerField()
+    normalization = models.BooleanField()
 
     def __str__(self):
         return self.description

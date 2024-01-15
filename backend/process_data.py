@@ -12,8 +12,8 @@ When this happens, the data is sent to the process function, which reads out the
 # Idea: make the normalization an integer value so it's easier to expand
 
 import json
-import .building  # UNCOMMENT THIS
-# import building  # COMMENT THIS
+# import .building  # UNCOMMENT THIS
+from . import building  # COMMENT THIS
 import os
 import pickle
 
@@ -23,7 +23,7 @@ def process(request):
 
     if request['action'] == 1:  # create and train a network
         input_list = ((float(request['learning_rate']), int(request['epochs']), bool(request['normalization'])), json.loads(request['network_setup']))
-        tag = int(request['tag'])
+        tag = int(request['task_id'])
         structure, errors, w, b = building.build_nn(input_list, tag)
         request['network_setup'] = json.dumps(structure)  # list of integers representing nodes per layer, eg [4, 8, 8, 8, 2]
         request['network_weights'] = json.dumps(w)  # list of lists of floats representing the weights
@@ -46,7 +46,7 @@ def process(request):
                 output_value = "Wrong Network"
             else:
                 input_vector = json.loads(request['nn_input'])
-                tag = int(request['tag'])
+                tag = int(request['task_id'])
                 building.dataset = data
                 output_value = building.predict(input_vector, nn, tag, normalization=bool(request['normalization']), name=False)
         else:

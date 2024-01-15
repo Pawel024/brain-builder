@@ -8,7 +8,6 @@ There are 3 ways to obtain a dataset:
 2. load a dataset from an Excel file (e.g. 'Clas1', 'Clas2a', 'Reg1')
 3. use a custom dataset class (e.g. 'sin' or 'circle')
 """
-import json
 
 # Improvements:
 # TODO: add more games to games.csv
@@ -17,7 +16,7 @@ import json
 # Idea: add a 'custom' option to load a custom dataset from a csv (and potentially expand this to images?)
 # Idea: look into reinforcement learning
 
-import .data_functions as df  # UNCOMMENT THIS
+from . import data_functions as df  # UNCOMMENT THIS
 #import data_functions as df  # COMMENT THIS
 import os
 from sklearn import datasets
@@ -35,7 +34,7 @@ data = None
 # Note: for now still a work in progress, might give errors.
 
 # load the games dataframe from the csv
-games = pd.read_csv(os.path.join(os.path.dirname(__file__), 'games.csv'), index_col=0)
+games = pd.read_csv(os.path.join(os.path.dirname(__file__), 'Games.csv'), index_col=0)
 
 
 # this is how you access data in the dataframe

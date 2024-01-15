@@ -11,10 +11,10 @@ and calls the levels module for information on the games, and the modular_networ
 
 from sklearn.model_selection import train_test_split
 from .modular_network import *  # UNCOMMENT THIS
-import .levels  # UNCOMMENT THIS
+#import .levels  # UNCOMMENT THIS
 #from modular_network import *  # COMMENT THIS
 #from data_functions import *  # COMMENT THIS
-#import levels  # COMMENT THIS
+from . import levels  # COMMENT THIS
 import pickle
 
 # an example input
