@@ -279,7 +279,10 @@ function App() {
   useEffect(() => {
     axios.get('/api/all_tasks/')
       .then(response => {
-        const taskIds = response.data.map(entry => entry.task_id);
+        let taskIds = response.data.map(entry => entry.task_id);
+        taskIds = taskIds.filter(taskId => taskId !== 0); // filter out taskId 0
+        taskIds.sort((a, b) => a - b); // sort the taskIds
+        
         setTaskIds(taskIds);
         setCytoLayers(taskIds.map(() => []));
         setIsTraining(taskIds.map(() => false));
