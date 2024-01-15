@@ -75,16 +75,6 @@ class Building extends React.Component {
     }
   };
 
-  getTaskDescription = (taskId) => {
-    axios.get(window.location.origin + '/api/tasks/?task_id=' + taskId)
-    .then(response => {
-      return response.data[0].description;
-    })
-    .catch(error => {
-      console.error('Task description error:', error);
-    });
-  }
-
   componentDidMount() {
     this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.taskId, this.props.taskId, this.props.index);
     this.props.updateCytoLayers(this.props.setCytoLayers, this.props.nOfInputs, this.props.nOfOutputs, this.props.index);
@@ -101,8 +91,13 @@ class Building extends React.Component {
       });
     }
 
-    this.typeWriter(this.getTaskDescription(this.props.taskId))
-
+    axios.get(window.location.origin + '/api/tasks/?task_id=' + this.props.taskId)
+    .then(response => {
+      this.typeWriter(response.data[0].description);
+    })
+    .catch(error => {
+      console.error('Task description error:', error);
+    });
   }
 
   chartRef = React.createRef();
