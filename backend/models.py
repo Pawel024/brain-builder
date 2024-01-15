@@ -21,6 +21,7 @@ class Row(models.Model):
 class TaskDescription(models.Model):
     task_id = models.IntegerField(unique=True)
     description = models.TextField()
+    dataset = models.TextField()
     n_inputs = models.IntegerField()
     n_outputs = models.IntegerField()
     max_epochs = models.IntegerField()
