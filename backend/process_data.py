@@ -22,9 +22,10 @@ import requests
 import pandas as pd
 
 
-def process(req, root_link):
+def process(req, root_link, pk=None):
     req = dict(req)
-    requests.put(root_link + 'api/progress/' + str(req['pk']) + '/', json={'progress': 1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
+    task_id, user_id = req['task_id'], req['user_id']
+    requests.put(root_link + 'api/progress/' + str(pk) + '/', json={'progress': 1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
 
     # load the games dataframe from the API
     #  this dataframe contains all the game-specific info the backend uses
@@ -32,9 +33,9 @@ def process(req, root_link):
     levels.games = response.json()
     levels.games = pd.DataFrame(levels.games)
     df.root_link, mn.root_link = root_link, root_link
-    df.task_id, mn.task_id = req['task_id'], req['task_id']
-    df.user_id, mn.user_id = req['user_id'], req['user_id']
-    df.pk, mn.pk = req['pk'], req['pk']
+    df.task_id, mn.task_id = task_id, task_id
+    df.user_id, mn.user_id = user_id, user_id
+    df.pk, mn.pk = pk, pk
 
 
     if req['action'] == 1:  # create and train a network

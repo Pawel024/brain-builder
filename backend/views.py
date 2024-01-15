@@ -75,7 +75,7 @@ def query_detail(request, pk):
         absolute_uri = request.build_absolute_uri('/')
         parsed_uri = urlparse(absolute_uri)
         root_url = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
-        processed_data = process(request.data, root_url)
+        processed_data = process(request.data, root_url, pk)
         processed_data['user_id'] = request.data.get('user_id')
         processed_data['task_id'] = request.data.get('task_id')
         serializer = RowSerializer(query, data=processed_data,context={'request': request})
