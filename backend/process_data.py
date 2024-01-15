@@ -23,7 +23,9 @@ import pandas as pd
 
 
 def process(req, root_link):
+    print("Processing data...")
     req = dict(req)
+    print("req: ", req)
 
     # load the games dataframe from the API
     #  this dataframe contains all the game-specific info the backend uses
@@ -34,9 +36,11 @@ def process(req, root_link):
     df.task_id, mn.task_id = req['task_id'], req['task_id']
     df.user_id, mn.user_id = req['user_id'], req['user_id']
     df.pk, mn.pk = req['pk'], req['pk']
+    print("Games loaded")
 
 
     if req['action'] == 1:  # create and train a network
+        print("Action 1")
         input_list = ((float(req['learning_rate']), int(req['epochs']), bool(req['normalization'])), json.loads(req['network_setup']))
         tag = int(req['task_id'])
         structure, errors, w, b = building.build_nn(input_list, tag)
@@ -47,7 +51,7 @@ def process(req, root_link):
         # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
 
     elif req['action'] == 2:  # classify a given input
-
+        print("Action 2")
         if 'nn.txt' in os.listdir() and 'data.txt' in os.listdir():
             # load neural network from json using nn_path
             with open('nn.txt', 'rb') as inpu:
