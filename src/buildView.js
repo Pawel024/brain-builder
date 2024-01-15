@@ -96,8 +96,8 @@ class Building extends React.Component {
   }
 
   componentDidMount() {
-    this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.taskId, this.props.taskId);
-    this.props.updateCytoLayers(this.props.setCytoLayers, this.props.nOfInputs, this.props.nOfOutputs);
+    this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.taskId, this.props.taskId, this.props.index);
+    this.props.updateCytoLayers(this.props.setCytoLayers, this.props.nOfInputs, this.props.nOfOutputs, this.props.index);
     if (this.props.taskId === 0) {
       this.setState({ runTutorial: true }, () => {
         // Delay the click on the beacon until after the Joyride component has been rendered
@@ -144,7 +144,7 @@ class Building extends React.Component {
             options: {
                 scales: {
                     y: {
-                        beginAtZero: true8
+                        beginAtZero: true
                     }
                 },
                 animation: {
@@ -217,12 +217,12 @@ class Building extends React.Component {
               
               <img src={color_scale_pic} alt='Color scale from purple for negative to red for positive' width='20' height='auto' style={{ position: 'absolute', top: 15, left: 15 }}/>
 
-              {this.props.generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, true, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId)}                    
-              {this.props.generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, false, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId)}
+              {this.props.generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, true, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}                    
+              {this.props.generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, false, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}
 
               <this.props.FloatingButton
                 variant="outline"
-                onClick = {() => this.props.addLayer(this.props.setCytoLayers, this.props.nOfOutputs)}
+                onClick = {() => this.props.addLayer(this.props.setCytoLayers, this.props.nOfOutputs, this.props.index)}
                 size="0"
                 disabled={this.props.cytoLayers.length>this.props.maxLayers-1}
                 style={{top: window.innerHeight*0.285, 
@@ -242,7 +242,7 @@ class Building extends React.Component {
 
               <this.props.FloatingButton
                 variant="outline"
-                onClick = {() => this.props.removeLayer(this.props.setCytoLayers)}
+                onClick = {() => this.props.removeLayer(this.props.setCytoLayers, this.props.index)}
                 size="0"
                 disabled={this.props.cytoLayers.length<3}
                 style= {{ top: window.innerHeight*0.285, 
@@ -301,7 +301,7 @@ class Building extends React.Component {
             </div>
           </Box>
 
-          <IconButton onClick={(event) => this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId)} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.16 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+          <IconButton onClick={(event) => this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index)} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.16 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
             <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
               <PlayIcon width="18" height="18" />Start training!
             </Flex>
@@ -312,7 +312,7 @@ class Building extends React.Component {
         <Tabs.Content value="stuff">
           <Flex direction="column" gap="2">
           
-          <Form.Root className="FormRoot" onSubmit={(event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData, this.props.taskId)} style={{ fontFamily:'monospace' }}>
+          <Form.Root className="FormRoot" onSubmit={(event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData, this.props.taskId, this.props.index)} style={{ fontFamily:'monospace' }}>
             <Form.Field className="FormField" name="s-m_axis">
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
                 <Form.Label className="FormLabel">Semi-Major Axis [km]</Form.Label>

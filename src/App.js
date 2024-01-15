@@ -70,20 +70,19 @@ function getCookie(name) {
 // ------- CYTOSCAPE FUNCTIONS -------
 
 // function to generate cytoscape elements
-function useGenerateCytoElements(list = [], apiData, isTraining) {
-  const memoizedList = useMemo(() => list, [list]);
+function generateCytoElements(list, apiData, isTraining) {
   const cElements = [];
 
   // Generate nodes
-  memoizedList.forEach((nodesPerLayer, i) => {
+  list.forEach((nodesPerLayer, i) => {
     for (let j = 0; j < nodesPerLayer; j++) {
-      const id = memoizedList.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
+      const id = list.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
       const label = `Node ${id}`;
       const hAvailable = window.innerHeight - 326;
       const wAvailable = 0.7 * (window.innerWidth * 0.97);
-      const xDistBetweenNodes = wAvailable/memoizedList.length;
-      const yDistBetweenNodes = hAvailable/Math.max(...memoizedList);
-      const position = { x: Math.round((0.78 * window.innerWidth * 0.97) + (i-memoizedList.length) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes - 65 + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
+      const xDistBetweenNodes = wAvailable/list.length;
+      const yDistBetweenNodes = hAvailable/Math.max(...list);
+      const position = { x: Math.round((0.78 * window.innerWidth * 0.97) + (i-list.length) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes - 65 + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
       cElements.push({ data: { id, label }, position });
     }
   });
@@ -109,12 +108,12 @@ function useGenerateCytoElements(list = [], apiData, isTraining) {
     }
   }
 
-  let cumulativeSums = memoizedList.reduce((acc, curr, i) => {
+  let cumulativeSums = list.reduce((acc, curr, i) => {
     acc[i] = (acc[i-1] || 0) + curr;
     return acc;
   }, []);
 
-  memoizedList.forEach((nodesPerLayer, i) => {
+  list.forEach((nodesPerLayer, i) => {
     for (let j = 0; j < nodesPerLayer; j++) {
       let source;
       if (i > 0) {
@@ -122,7 +121,7 @@ function useGenerateCytoElements(list = [], apiData, isTraining) {
       } else {
         source = j;
       }
-      for (let k = 0; k < memoizedList[i+1]; k++) {
+      for (let k = 0; k < list[i+1]; k++) {
         const target = cumulativeSums[i] + k;
         if (target <= cElements.length) {
           let weight = 5;
@@ -144,7 +143,7 @@ function useGenerateCytoElements(list = [], apiData, isTraining) {
 }
 
 // function to generate cytoscape style
-function useGenerateCytoStyle(list = []) {
+function generateCytoStyle(list = []) {
   const cStyle = [ // the base stylesheet for the graph
     {
       selector: 'node',
@@ -210,23 +209,8 @@ function App() {
     };
   }, []);
 
-  const [apiData11, setApiData11] = useState(null);
-  const [isTraining11, setIsTraining11] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
-  const [isResponding11, setIsResponding11] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
-  const [accuracy11, setAccuracy11] = useState(null);
-
-  const [apiData12, setApiData12] = useState(null);
-  const [isTraining12, setIsTraining12] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
-  const [isResponding12, setIsResponding12] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
-  const [accuracy12, setAccuracy12] = useState(null);
-
-  const [apiData13, setApiData13] = useState(null);
-  const [isTraining13, setIsTraining13] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
-  const [isResponding13, setIsResponding13] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
-  const [accurata13, setAccurata13] = useState(null);
-
   // Define the functions to fetch API data
-  const fetchTrainingData = (apiData, setApiData, setAccuracy, setIsTraining, taskId) => {
+  const fetchTrainingData = (apiData, setApiData, setAccuracy, setIsTraining, taskId, index) => {
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
 
@@ -236,20 +220,32 @@ function App() {
       }
     })
       .then((response) => {
-        setApiData(response.data[0]);
-        setAccuracy(parseFloat(JSON.parse(response.data[0]["error_list"])[1]))
+        setApiData(prevApiData => {
+          const newApiData = [...prevApiData];
+          newApiData[index] = response.data[0];
+          return newApiData;
+        });
+        setAccuracy(prevAccuracy => {
+          const newAccuracy = [...prevAccuracy];
+          newAccuracy[index] = parseFloat(JSON.parse(response.data[0]["error_list"])[1]);
+          return newAccuracy;
+        });
         console.log(response.data[0]);
       })
       .catch((error) => {
         console.log(`Error fetching API data: ${error}`);
       });
     setTimeout(() => {
-      setIsTraining(2);
+      setIsTraining(prevIsTraining => {
+        const newIsTraining = [...prevIsTraining];
+        newIsTraining[index] = 2;
+        return newIsTraining;
+      });
       console.log("Training finished")
     }, 1000);
   };
 
-  const fetchQueryResponse = (setApiData, setIsResponding, taskId) => {
+  const fetchQueryResponse = (setApiData, setIsResponding, taskId, index) => {
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
 
@@ -259,40 +255,47 @@ function App() {
       }
     })
       .then((response) => {
-        setApiData(response.data[0]);
+        setApiData(prevApiData => {
+          const newApiData = [...prevApiData];
+          newApiData[index] = response.data[0];
+          return newApiData;
+        });
         console.log(response.data[0]);
       })
       .catch((error) => {
         console.log(`Error fetching API data: ${error}`);
       });
-    setIsResponding(2);
+    setIsResponding(prevIsResponding => {
+        const newIsResponding = [...prevIsResponding];
+        newIsResponding[index] = 2;
+        return newIsResponding;
+      });
     console.log("Training finished")
   };
 
   let accuracyColor = 'var(--slate-11)';
 
   // ------- CYTOSCAPE EDITING -------
-
-  const [cytoLayers11, setCytoLayers11] = useState([]);
+  const taskIds = useMemo(() => [11, 12, 13], []);
+  const [cytoLayers, setCytoLayers] = useState(taskIds.map(() => []));
+  const [isTraining, setIsTraining] = useState(taskIds.map(() => false));
+  const [apiData, setApiData] = useState(taskIds.map(() => null));
+  const [accuracy, setAccuracy] = useState(taskIds.map(() => 0));
+  const [isResponding, setIsResponding] = useState(taskIds.map(() => false));
+  
   useEffect(() => {
-    localStorage.setItem('cytoLayers11', JSON.stringify(cytoLayers11));
-    setIsTraining11(0);
-  }, [cytoLayers11]);
-
-  const [cytoLayers12, setCytoLayers12] = useState([]);
-  useEffect(() => {
-    localStorage.setItem('cytoLayers12', JSON.stringify(cytoLayers12));
-    setIsTraining12(0);
-  }, [cytoLayers12]);
-
-  const [cytoLayers13, setCytoLayers13] = useState([]);
-  useEffect(() => {
-    localStorage.setItem('cytoLayers13', JSON.stringify(cytoLayers13));
-    setIsTraining13(0);
-  }, [cytoLayers13]);
+    cytoLayers.forEach((cytoLayer, index) => {
+      localStorage.setItem(`cytoLayers${taskIds[index]}`, JSON.stringify(cytoLayer));
+      setIsTraining(prevIsTraining => {
+        const newIsTraining = [...prevIsTraining];
+        newIsTraining[index] = 0;
+        return newIsTraining;
+      });
+    });
+  }, [cytoLayers, taskIds]);
 
   
-  const loadLastCytoLayers = (setCytoLayers, apiData, setApiData, propertyName, taskId) => {
+  const loadLastCytoLayers = (setCytoLayers, apiData, setApiData, propertyName, taskId, index) => {
     // Check localStorage for a saved setting
     const savedSetting = localStorage.getItem(propertyName);
     let goToStep2 = false;
@@ -302,7 +305,11 @@ function App() {
             // If a saved setting is found, try to parse it from JSON
             const cytoLayersSetting = JSON.parse(savedSetting);
             // try to set the cytoLayers to the saved setting, if there is an error, set it to default
-            setCytoLayers(cytoLayersSetting);
+            setCytoLayers(prevCytoLayers => {
+              const newCytoLayers = [...prevCytoLayers];
+              newCytoLayers[index] = cytoLayersSetting;
+              return newCytoLayers;
+            });
         }
         catch (error) {
             console.log(error);
@@ -322,85 +329,96 @@ function App() {
       })
       .then((response) => {
           try {
-              setApiData(response.data[0]);
-              console.log("apiData:");
-              console.log(response.data[0]);
-              setCytoLayers(JSON.parse(response.data[0]["network_setup"]));
+            setApiData(prevApiData => {
+              const newApiData = [...prevApiData];
+              newApiData[index] = response.data[0];
+              return newApiData;
+            });
+            console.log("apiData:");
+            console.log(response.data[0]);
+            if (typeof response.data[0] === 'undefined') {
+              throw new Error('response.data[0] is undefined');
+            }
+            setCytoLayers(prevCytoLayers => {
+              const newCytoLayers = [...prevCytoLayers];
+              newCytoLayers[index] = JSON.parse(response.data[0]["network_setup"]);
+              return newCytoLayers;
+            });
           }
           catch (error) {
-              setCytoLayers([4, 7, 7, 3]);
-              console.log(error);
+            console.log(error);
+            console.log("setting cytoLayers to default");
+            setCytoLayers(prevCytoLayers => {
+              const newCytoLayers = [...prevCytoLayers];
+              newCytoLayers[index] = [4, 7, 7, 3];
+              return newCytoLayers;
+            });
+            console.log("done doing that, this is what cytoLayers are now: ", cytoLayers);
           }
       })
       .catch((error) => {
-          console.log(error);
+        console.log(error);
       });
     }
   };
-  
-  /*
+
+  const [cytoElements, setCytoElements] = useState([]);
+  const [cytoStyle, setCytoStyle] = useState([]);
+
+  // Update the state when the dependencies change
   useEffect(() => {
-    loadLastCytoLayers(setCytoLayers11, apiData11, setApiData11, 'cytoLayers11');
-  }, [apiData11]);
-  
-  useEffect(() => {
-    loadLastCytoLayers(setCytoLayers12, apiData12, setApiData12, 'cytoLayers12');
-  }, [apiData12]);
+    setCytoElements(taskIds.map((taskId, index) => 
+      generateCytoElements(cytoLayers[index], apiData[index], isTraining[index])
+    ));
+    console.log("cytoLayers:", cytoLayers);
+  }, [taskIds, cytoLayers, apiData, isTraining]);
 
   useEffect(() => {
-    loadLastCytoLayers(setCytoLayers13, apiData13, setApiData13, 'cytoLayers13');
-  }, [apiData13]);
-  */
-
-  const cytoElements11 = useGenerateCytoElements(cytoLayers11, apiData11, isTraining11);
-  const cytoStyle11 = useGenerateCytoStyle(cytoLayers11);
-
-  const cytoElements12 = useGenerateCytoElements(cytoLayers12, apiData12, isTraining12);
-  const cytoStyle12 = useGenerateCytoStyle(cytoLayers12);
-
-  const cytoElements13 = useGenerateCytoElements(cytoLayers13, apiData13, isTraining13);
-  const cytoStyle13 = useGenerateCytoStyle(cytoLayers13);
+    setCytoStyle(taskIds.map((taskId, index) => 
+      generateCytoStyle(cytoLayers[index])
+    ));
+  }, [taskIds, cytoLayers]);
 
   // function to add a layer
-  const addLayer = useCallback((setCytoLayers, nOfOutputs) => {
+  const addLayer = useCallback((setCytoLayers, nOfOutputs, index) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      if (newLayers.length < 10) {newLayers.push(nOfOutputs)};
+      if (newLayers[index].length < 10) {newLayers[index].push(nOfOutputs)};
       return newLayers;
     });
   }, []);
 
   // function to remove a layer
-  const removeLayer = useCallback((setCytoLayers) => {
+  const removeLayer = useCallback((setCytoLayers, index) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      if (newLayers.length > 2) {newLayers.splice(-2, 1)}
+      if (newLayers[index].length > 2) {newLayers[index].splice(-2, 1)}
       return newLayers;
     });
   }, []);
 
   // function to add a node to a layer
-  const addNode = useCallback((column, setCytoLayers, taskId) => {
+  const addNode = useCallback((column, setCytoLayers, taskId, index) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      newLayers[column] < 16 ? newLayers[column] += 1 : newLayers[column] = 16;
-      document.getElementById(taskId + "-input" + column).value = newLayers[column];
+      newLayers[index][column] < 16 ? newLayers[index][column] += 1 : newLayers[index][column] = 16;
+      document.getElementById(taskId + "-input" + column).value = newLayers[index][column];
       return newLayers;
     });
   }, []);
 
   // function to remove a node from a layer
-  const removeNode = useCallback((column, setCytoLayers, taskId) => {
+  const removeNode = useCallback((column, setCytoLayers, taskId, index) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      newLayers[column] > 1 ? newLayers[column] -= 1 : newLayers[column] = 1;
-      document.getElementById(taskId + "-input" + column).value = newLayers[column];
+      newLayers[index][column] > 1 ? newLayers[index][column] -= 1 : newLayers[index][column] = 1;
+      document.getElementById(taskId + "-input" + column).value = newLayers[index][column];
       return newLayers;
     });
   }, []);
 
   // function to set a custom number of nodes for a layer
-  const setNodes = useCallback((column, setCytoLayers, taskId) => {
+  const setNodes = useCallback((column, cytoLayers, setCytoLayers, taskId, index) => {
     var nodeInput = Number(document.getElementById(taskId + "-input" + column).value)
     if (nodeInput && Number.isInteger(nodeInput)) {
       if (nodeInput < 1) {
@@ -410,19 +428,19 @@ function App() {
       }
       setCytoLayers(prevLayers => {
         const newLayers = [...prevLayers];
-        newLayers[column] = nodeInput;
+        newLayers[index][column] = nodeInput;
         return newLayers;
       });
     } else {
-      nodeInput = cytoLayers11[column];
+      nodeInput = cytoLayers[index][column];
     }
     document.getElementById(taskId + "-input" + column).value = nodeInput;
-  }, [cytoLayers11]);
+  }, []);
 
 
 
   // ------- POST REQUEST -------
-  const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId) => {
+  const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index) => {
     e.preventDefault();
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
@@ -495,8 +513,16 @@ function App() {
       nn_input: JSON.stringify([]),
       error_list: JSON.stringify([]),
     };
-    setAccuracy(null);
-    setIsTraining(1);
+    setAccuracy(prevAccuracy => {
+      const newAccuracy = [...prevAccuracy];
+      newAccuracy[index] = null;
+      return newAccuracy;
+    });
+    setIsTraining(prevIsTraining => {
+      const newIsTraining = [...prevIsTraining];
+      newIsTraining[index] = 1;
+      return newIsTraining;
+    });
     axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
       headers: {
         'X-CSRFToken': csrftoken
@@ -511,7 +537,7 @@ function App() {
             }
           }).then((response) => {
               console.log(response.status);
-              fetchTrainingData(apiData, setApiData, setAccuracy, setIsTraining, taskId);
+              fetchTrainingData(apiData, setApiData, setAccuracy, setIsTraining, taskId, index);
           }, (error) => {
               console.log(error);
           }).finally(() => {
@@ -526,7 +552,7 @@ function App() {
             }
           }).then((response) => {
               console.log(response.status);
-              fetchTrainingData(apiData, setApiData, setAccuracy, setIsTraining, taskId);
+              fetchTrainingData(apiData, setApiData, setAccuracy, setIsTraining, taskId, index);
           }, (error) => {
               console.log(error);
           });
@@ -540,7 +566,7 @@ function App() {
   // ------- FLOATING BUTTONS -------
 
   // function to generate floating buttons
-  function generateFloatingButtons(top, left, dist, isItPlus, nLayers, cytoLayers, setCytoLayers, taskId) {
+  function generateFloatingButtons(top, left, dist, isItPlus, nLayers, cytoLayers, setCytoLayers, taskId, index) {
     const buttons = [];
     const icon = isItPlus ? <PlusIcon /> : <MinusIcon />;
     for (let i = 1; i < nLayers-1; i++) {
@@ -549,8 +575,8 @@ function App() {
         <div>
           <FloatingButton
             variant="outline"
-            disabled={(isItPlus && cytoLayers[i] >= 16) | (!isItPlus && cytoLayers11[i] < 2)}
-            onClick = {isItPlus ? () => addNode(i, setCytoLayers, taskId) : () => removeNode(i, setCytoLayers, taskId)}
+            disabled={(isItPlus && cytoLayers[i] >= 16) | (!isItPlus && cytoLayers[i] < 2)}
+            onClick = {isItPlus ? () => addNode(i, setCytoLayers, taskId, index) : () => removeNode(i, setCytoLayers, taskId, index)}
             style={{...style}}
             key={i}
           >
@@ -574,11 +600,11 @@ function App() {
               color: 'var(--cyan-12)',
               fontWeight: 'bold'
             }}
-            onBlur={() => setNodes(i, setCytoLayers, taskId)}
+            onBlur={() => setNodes(i, setCytoLayers, taskId, index)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault();
-                setNodes(i, setCytoLayers, taskId);
+                setNodes(i, setCytoLayers, taskId, index);
               }
             }}
             />
@@ -593,50 +619,54 @@ function App() {
 
   // ------- FORMS -------
 
-  const handleSubmit = (event, setIsResponding, setApiData, taskId) => {
-    event.preventDefault();
-    setIsResponding(1);
+  const handleSubmit = (event, setIsResponding, setApiData, taskId, index) => {
+  event.preventDefault();
+  setIsResponding(prevIsResponding => {
+    const newIsResponding = [...prevIsResponding];
+    newIsResponding[index] = 1;
+    return newIsResponding;
+  });
 
-    var userId = getCookie('user_id');
-    var csrftoken = getCookie('csrftoken');
+  var userId = getCookie('user_id');
+  var csrftoken = getCookie('csrftoken');
 
-    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
-      headers: {
-        'X-CSRFToken': csrftoken
-      }
-    })
-      .then((response) => {
-        const networkData = response.data[0];
-        const formData = new FormData(event.target);
-        const values = Array.from(formData.values()).map((value) => Number(value));
-        console.log("values");
-        console.log(values);
-        networkData.nn_input = JSON.stringify(values);
-        networkData.action = 2;
-        console.log("updated network data");
-        console.log(networkData);
-        axios.put(window.location.origin + `/api/backend/${networkData.pk}`, networkData, {
-          headers: {
-            'X-CSRFToken': csrftoken
-          }
-        })
-          .then((response) => {
-            console.log(response.status);
-            fetchQueryResponse(setApiData, setIsResponding, taskId);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+  axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+    headers: {
+      'X-CSRFToken': csrftoken
+    }
+  })
+    .then((response) => {
+      const networkData = response.data[0];
+      const formData = new FormData(event.target);
+      const values = Array.from(formData.values()).map((value) => Number(value));
+      console.log("values");
+      console.log(values);
+      networkData.nn_input = JSON.stringify(values);
+      networkData.action = 2;
+      console.log("updated network data");
+      console.log(networkData);
+      axios.put(window.location.origin + `/api/backend/${networkData.pk}`, networkData, {
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
       })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+        .then((response) => {
+          console.log(response.status);
+          fetchQueryResponse(setApiData, setIsResponding, taskId, index);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
 
 
 
   // ------- SWITCHES -------
-
+/*
   const [isMontyPythonLover, setIsMontyPythonLover] = useState(false);
 
   const MontyPythonSwitch = () => {
@@ -646,28 +676,38 @@ function App() {
       </Switch.Root>
     )
   }
-
+*/
 
 
   // ------- SLIDERS -------
 
-  // initiate iterations and learning rate as variables with a useState hook
-  const [iterations11, setIterations11] = useState(200);
-  const [learningRate11, setLearningRate11] = useState(0.01);
+  // initialize an array to store the state for each slider
+  const [iterations, setIterations] = useState(Array(taskIds.length).fill(200));
+  const [learningRate, setLearningRate] = useState(Array(taskIds.length).fill(0.01));
 
-  const [iterations12, setIterations12] = useState(200);
-  const [learningRate12, setLearningRate12] = useState(0.01);
+  const handleIterationChange = (index, value) => {
+    setIterations(prev => {
+      const newIterations = [...prev];
+      newIterations[index] = value[0] * 2;
+      return newIterations;
+    });
+  };
+  
+  const handleLearningRateChange = (index, value) => {
+    setLearningRate(prev => {
+      const newLearningRates = [...prev];
+      newLearningRates[index] = (10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20));
+      return newLearningRates;
+    });
+  };
 
-  const [iterations13, setIterations13] = useState(200);
-  const [learningRate13, setLearningRate13] = useState(0.01);
-
-  // create a slider for iterations for each game
-  const iterationsSlider11 = useMemo(() => {
+  const iterationsSliders = taskIds.map((taskId, index) => {
     return (
       <Slider.Root
+        key={index}
         className="SliderRoot"
-        defaultValue={[iterations11]}
-        onValueChange={(value) => setIterations11(value[0]*2)}
+        defaultValue={[iterations[index]]}
+        onValueChange={(value) => handleIterationChange(index, value)}
         max={100}
         step={0.5}
         style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
@@ -678,52 +718,15 @@ function App() {
         <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
       </Slider.Root>
     );
-  }, [iterations11, setIterations11]);
+  });
 
-  const iterationsSlider12 = useMemo(() => {
+  const learningRateSliders = taskIds.map((challenge, index) => {
     return (
       <Slider.Root
+        key={index}
         className="SliderRoot"
-        defaultValue={[iterations12]}
-        onValueChange={(value) => setIterations12(value[0]*2)}
-        max={100}
-        step={0.5}
-        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
-      >
-        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
-          <Slider.Range className="SliderRange" />
-        </Slider.Track>
-        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
-      </Slider.Root>
-    );
-  }, [iterations12, setIterations12]);
-
-  const iterationsSlider13 = useMemo(() => {
-    return (
-      <Slider.Root
-        className="SliderRoot"
-        defaultValue={[iterations13]}
-        onValueChange={(value) => setIterations13(value[0]*2)}
-        max={100}
-        step={0.5}
-        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
-      >
-        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
-          <Slider.Range className="SliderRange" />
-        </Slider.Track>
-        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
-      </Slider.Root>
-    );
-  }, [iterations13, setIterations13]);
-
-
-  // create a slider for learning rate
-  const learningRateSlider11 = useMemo(() => {
-    return (
-      <Slider.Root id="learningRateSlider11"
-        className="SliderRoot"
-        defaultValue={[30]}
-        onValueChange={(value) => setLearningRate11((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
+        defaultValue={[learningRate[index]]}
+        onValueChange={(value) => handleLearningRateChange(index, value)}
         max={70}
         step={10}
         style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
@@ -731,60 +734,25 @@ function App() {
         <Slider.Track className="SliderTrack" style={{ height: 3 }}>
           <Slider.Range className="SliderRange" />
         </Slider.Track>
-        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
+        <Slider.Thumb className="SliderThumb" aria-label="Learning Rate" />
       </Slider.Root>
     );
-  }, []);
-
-  const learningRateSlider12 = useMemo(() => {
-    return (
-      <Slider.Root id="learningRateSlider12"
-        className="SliderRoot"
-        defaultValue={[30]}
-        onValueChange={(value) => setLearningRate12((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
-        max={70}
-        step={10}
-        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
-      >
-        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
-          <Slider.Range className="SliderRange" />
-        </Slider.Track>
-        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
-      </Slider.Root>
-    );
-  }, []);
-
-  const learningRateSlider13 = useMemo(() => {
-    return (
-      <Slider.Root id="learningRateSlider13"
-        className="SliderRoot"
-        defaultValue={[30]}
-        onValueChange={(value) => setLearningRate13((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
-        max={70}
-        step={10}
-        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
-      >
-        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
-          <Slider.Range className="SliderRange" />
-        </Slider.Track>
-        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
-      </Slider.Root>
-    );
-  }, []);
+  });
 
 
-  const updateCytoLayers = (setCytoLayers, nOfInputs, nOfOutputs) => {
+  const updateCytoLayers = (setCytoLayers, nOfInputs, nOfOutputs, index) => {
     setCytoLayers(prevCytoLayers => {
-      const newCytoLayers = prevCytoLayers.map((layer, index) => {
-        if (index === 0) {
+      const newCytoLayers = [...prevCytoLayers];
+      newCytoLayers[index] = newCytoLayers[index].map((layer, i) => {
+        if (i === 0) {
           return nOfInputs;
-        } else if (index === prevCytoLayers.length - 1) {
+        } else if (i === newCytoLayers[index].length - 1) {
           return nOfOutputs;
         } else {
           return layer;
         }
       });
-
+  
       return newCytoLayers;
     });
   };
@@ -837,7 +805,7 @@ function App() {
               <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 1</Heading>
                 <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
-                <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Link to="challenge11" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 1</label>
@@ -845,7 +813,7 @@ function App() {
                     </Flex>
                     </ChallengeButton>
                 </Link>
-                <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Link to="challenge12" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}> 
                         <label>Challenge 2</label>
@@ -853,7 +821,7 @@ function App() {
                     </Flex>
                     </ChallengeButton>
                 </Link>
-                <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Link to="challenge13" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 3</label>
@@ -866,7 +834,7 @@ function App() {
               <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 2</Heading>
                 <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
-                <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Link to="challenge11" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 1</label>
@@ -874,7 +842,7 @@ function App() {
                     </Flex>
                     </ChallengeButton>
                 </Link>
-                <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Link to="challenge12" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 2</label>
@@ -882,7 +850,7 @@ function App() {
                     </Flex>
                     </ChallengeButton>
                 </Link>
-                <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Link to="challenge13" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 3</label>
@@ -895,7 +863,7 @@ function App() {
               <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 3</Heading>
                 <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
-                <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Link to="challenge11" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 1</label>
@@ -903,7 +871,7 @@ function App() {
                     </Flex>
                     </ChallengeButton>
                 </Link>
-                <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Link to="challenge12" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 2</label>
@@ -911,7 +879,7 @@ function App() {
                     </Flex>
                     </ChallengeButton>
                 </Link>
-                <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Link to="challenge13" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Challenge 3</label>
@@ -939,151 +907,48 @@ function App() {
           <Route path="/introduction" element={
             <Introduction/>
           } />
-          <Route path="/tutorial" element={
-            <Tutorial 
-            nOfInputs={4}
-            nOfOutputs={3}
-            maxLayers={10}
-            taskId={0}
-            taskDescription={"This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
-            cytoElements={cytoElements11}
-            cytoStyle={cytoStyle11}
-            generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers11}
-            setCytoLayers={setCytoLayers11}
-            updateCytoLayers={updateCytoLayers}
-            loadLastCytoLayers={loadLastCytoLayers}
-            FloatingButton={FloatingButton}
-            addLayer={addLayer}
-            removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider11}
-            iterations={iterations11}
-            setIterations={setIterations11}
-            learningRateSlider={learningRateSlider11}
-            learningRate={learningRate11}
-            setLearningRate={setLearningRate11}
-            isTraining={isTraining11}
-            setIsTraining={setIsTraining11}
-            apiData={apiData11}
-            setApiData={setApiData11}
-            putRequest={putRequest}
-            accuracy={accuracy11}
-            setAccuracy={setAccuracy11}
-            accuracyColor={accuracyColor}
-            handleSubmit={handleSubmit}
-            isResponding={isResponding11}
-            setIsResponding={setIsResponding11}
-            MontyPythonSwitch={MontyPythonSwitch}
-          />
-          } />
-          <Route path="/challenge1" element={
-            <BuildView
-            nOfInputs={4}
-            nOfOutputs={3}
-            maxLayers={10}
-            taskId={11}
-            cytoElements={cytoElements11}
-            cytoStyle={cytoStyle11}
-            generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers11}
-            setCytoLayers={setCytoLayers11}
-            updateCytoLayers={updateCytoLayers}
-            loadLastCytoLayers={loadLastCytoLayers}
-            FloatingButton={FloatingButton}
-            addLayer={addLayer}
-            removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider11}
-            iterations={iterations11}
-            setIterations={setIterations11}
-            learningRateSlider={learningRateSlider11}
-            learningRate={learningRate11}
-            setLearningRate={setLearningRate11}
-            isTraining={isTraining11}
-            setIsTraining={setIsTraining11}
-            apiData={apiData11}
-            setApiData={setApiData11}
-            putRequest={putRequest}
-            accuracy={accuracy11}
-            setAccuracy={setAccuracy11}
-            accuracyColor={accuracyColor}
-            handleSubmit={handleSubmit}
-            isResponding={isResponding11}
-            setIsResponding={setIsResponding11}
-            MontyPythonSwitch={MontyPythonSwitch}
-          />
-          } />
-          <Route path="/challenge2" element={
-            <BuildView
-            nOfInputs={2}
-            nOfOutputs={5}
-            maxLayers={10}
-            taskId={12}
-            cytoElements={cytoElements12}
-            cytoStyle={cytoStyle12}
-            generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers12}
-            setCytoLayers={setCytoLayers12}
-            updateCytoLayers={updateCytoLayers}
-            loadLastCytoLayers={loadLastCytoLayers}
-            FloatingButton={FloatingButton}
-            addLayer={addLayer}
-            removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider12}
-            iterations={iterations12}
-            setIterations={setIterations12}
-            learningRateSlider={learningRateSlider12}
-            learningRate={learningRate12}
-            setLearningRate={setLearningRate12}
-            isTraining={isTraining12}
-            setIsTraining={setIsTraining12}
-            apiData={apiData12}
-            setApiData={setApiData12}
-            putRequest={putRequest}
-            accuracy={accuracy12}
-            setAccuracy={setAccuracy12}
-            accuracyColor={accuracyColor}
-            handleSubmit={handleSubmit}
-            isResponding={isResponding12}
-            setIsResponding={setIsResponding12}
-            MontyPythonSwitch={MontyPythonSwitch}
-          />
-          } />
-          <Route path="/challenge3" element={
-            <BuildView
-            nOfInputs={10}
-            nOfOutputs={1}
-            maxLayers={10}
-            taskId={13}
-            cytoElements={cytoElements13}
-            cytoStyle={cytoStyle13}
-            generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers13}
-            setCytoLayers={setCytoLayers13}
-            updateCytoLayers={updateCytoLayers}
-            loadLastCytoLayers={loadLastCytoLayers}
-            FloatingButton={FloatingButton}
-            addLayer={addLayer}
-            removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider13}
-            setIterations={setIterations13}
-            iterations={iterations13}
-            learningRateSlider={learningRateSlider13}
-            learningRate={learningRate13}
-            setLearningRate={setLearningRate13}
-            isTraining={isTraining13}
-            setIsTraining={setIsTraining13}
-            apiData={apiData13}
-            setApiData={setApiData13}
-            putRequest={putRequest}
-            accuracy={accurata13}
-            setAccuracy={setAccurata13}
-            accuracyColor={accuracyColor}
-            handleSubmit={handleSubmit}
-            isResponding={isResponding13}
-            setIsResponding={setIsResponding13}
-            MontyPythonSwitch={MontyPythonSwitch}
-          />
-          } />
+          {taskIds.map((taskId, index) => (
+            <Route
+              key={taskId}
+              path={`/challenge${taskId}`}
+              element={
+                <BuildView
+                  nOfInputs={4}
+                  nOfOutputs={3}
+                  maxLayers={10}
+                  taskId={taskId}
+                  index={index}
+                  cytoElements={cytoElements[index]}
+                  cytoStyle={cytoStyle[index]}
+                  generateFloatingButtons={generateFloatingButtons}
+                  cytoLayers={cytoLayers[index]}
+                  setCytoLayers={setCytoLayers}
+                  updateCytoLayers={updateCytoLayers}
+                  loadLastCytoLayers={loadLastCytoLayers}
+                  FloatingButton={FloatingButton}
+                  addLayer={addLayer}
+                  removeLayer={removeLayer}
+                  iterationsSlider={iterationsSliders[index]}
+                  iterations={iterations[index]}
+                  setIterations={setIterations}
+                  learningRateSlider={learningRateSliders[index]}
+                  learningRate={learningRate[index]}
+                  setLearningRate={setLearningRate}
+                  isTraining={isTraining[index]}
+                  setIsTraining={setIsTraining}
+                  apiData={apiData[index]}
+                  setApiData={setApiData}
+                  putRequest={putRequest}
+                  accuracy={accuracy[index]}
+                  setAccuracy={setAccuracy}
+                  accuracyColor={accuracyColor}
+                  handleSubmit={handleSubmit}
+                  isResponding={isResponding[index]}
+                  setIsResponding={setIsResponding}
+                />
+              }
+            />
+          ))}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>

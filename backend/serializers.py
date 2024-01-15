@@ -1,7 +1,5 @@
 from rest_framework import serializers
-from .models import Row, TaskDescription
-from rest_framework import serializers
-from .models import Row, TaskDescription
+from .models import Row, TaskDescription, Progress
 
 class RowSerializer(serializers.ModelSerializer):
 

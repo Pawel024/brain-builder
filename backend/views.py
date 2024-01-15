@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 
-from .models import Row, TaskDescription
+from .models import Row, TaskDescription, Progress
 from .serializers import *
 from .process_data import process
 
@@ -10,6 +10,8 @@ from django.shortcuts import render
 
 import uuid
 from django.views.decorators.csrf import csrf_protect
+
+from urllib.parse import urlparse
 
 
 def index(request, path=''):
@@ -47,6 +49,9 @@ def query_list(request):
     elif request.method == 'POST':
         user_id = request.data.get('user_id')
         task_id = request.data.get('task_id')
+        absolute_uri = request.build_absolute_uri('/')
+        parsed_uri = urlparse(absolute_uri)
+        root_url = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
         processed_data = process(request.data, root_url)
         processed_data['user_id'] = user_id
         processed_data['task_id'] = task_id
@@ -97,7 +102,6 @@ def task_description_detail(request):
         serializer = TaskDescriptionSerializer(task_description, context={'request': request})
         return Response(serializer.data)
 
-/* the two functions below still need to be changed */
 @csrf_protect
 @api_view(['GET', 'POST'])
 def q_list(request):
