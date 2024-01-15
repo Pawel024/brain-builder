@@ -28,7 +28,6 @@ def process(req, root_link, pk=None):
 
     """
     response = requests.post(root_link + 'api/progress/', json={'progress': 1, 'plots': json.dumps([]), 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
-    """
 
     # load the games dataframe from the API
     #  this dataframe contains all the game-specific info the backend uses
@@ -36,12 +35,14 @@ def process(req, root_link, pk=None):
     levels.games = response.json()
     levels.games = pd.DataFrame(levels.games)
 
+    """
+
     df.root_link, mn.root_link = root_link, root_link
     df.task_id, mn.task_id = task_id, task_id
     df.user_id, mn.user_id = user_id, user_id
     df.pk, mn.pk = pk, pk
 
-    assert False, req
+    # assert False, req
 
 
     if req['action'] == 1:  # create and train a network
