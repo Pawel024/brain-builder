@@ -13,7 +13,7 @@ import uuid
 def index(request):
     user_id = request.GET.get('user_id')
 
-    if user_id is None:
+    if user_id is None or user_id == '':
         # This is a new user, create a new user_id and store it in the session
         user_id = str(uuid.uuid4())
         request.session['user_id'] = user_id
