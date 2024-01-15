@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 
-from .models import Row
+from .models import Row, TaskDescription
 from .serializers import *
 from .process_data import process
 
@@ -79,3 +79,16 @@ def query_detail(request, pk):
     elif request.method == 'DELETE':
         query.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+@csrf_protect
+@api_view(['GET'])
+def task_description_detail(request, task_id):
+    try:
+        task_description = TaskDescription.objects.get(task_id=task_id)
+    except TaskDescription.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = TaskDescriptionSerializer(task_description, context={'request': request})
+        return Response(serializer.data)

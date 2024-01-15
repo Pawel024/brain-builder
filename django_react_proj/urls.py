@@ -24,6 +24,8 @@ urlpatterns = [
     re_path(r'^api/backend$', views.query_list),
     re_path(r'^api/backend/$', views.query_list),
     re_path(r'^api/backend/(?P<pk>[0-9]+)$', views.query_detail),
+    re_path(r'^api/tasks$', views.task_description_detail),
+    re_path(r'^api/tasks/$', views.task_description_detail),
 
     # catch-all pattern
     re_path(r'^.*$', views.index),

@@ -15,3 +15,11 @@ class Row(models.Model):
 
     def __str__(self):
         return self.network_setup
+
+
+class TaskDescription(models.Model):
+    task_id = models.IntegerField(unique=True)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.description

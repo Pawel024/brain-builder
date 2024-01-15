@@ -21,6 +21,7 @@ import {
   Tooltip, 
   Legend 
 } from 'chart.js';
+import axios from 'axios';
 
 function BuildingWrapper(props) {
   const navigate = useNavigate();
@@ -74,12 +75,14 @@ class Building extends React.Component {
     }
   };
 
-  async getTaskDescription(taskId) {
-    const response = await fetch(`${process.env.PUBLIC_URL}/task-${taskId}.txt`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return await response.text();
+  getTaskDescription = (taskId) => {
+    axios.get(window.location.origin + '/api/task/?task_id=' + taskId)
+    .then(response => {
+      return response.data.description;
+    })
+    .catch(error => {
+      console.error('Task description error:', error);
+    });
   }
 
   componentDidMount() {
@@ -98,13 +101,7 @@ class Building extends React.Component {
       });
     }
 
-    this.getTaskDescription(this.props.taskId)
-    .then(text => {
-      this.typeWriter(text);
-    })
-    .catch(error => {
-      console.error('Txt printing error:', error);
-    });
+    this.typeWriter(this.getTaskDescription(this.props.taskId));
   }
 
   chartRef = React.createRef();
