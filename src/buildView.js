@@ -25,6 +25,8 @@ import task11 from './task-11.txt';
 import task12 from './task-12.txt';
 import task13 from './task-13.txt';
 
+const tasks = {task11, task12, task13};
+
 function BuildingWrapper(props) {
   const navigate = useNavigate();
 
@@ -77,9 +79,15 @@ class Building extends React.Component {
     }
   };
 
+  /*
   async getTaskDescription(taskId) {
     const response = await fetch(process.env.PUBLIC_URL + "/task-" + taskId + ".txt"); // get the text file with the task description
     return await response.text();
+  }
+  */
+
+  getTaskDescription(taskId) {
+    return tasks[`task${taskId}`];
   }
 
   componentDidMount() {
