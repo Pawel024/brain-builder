@@ -119,34 +119,40 @@ class Building extends React.Component {
   chartInstance = null;
 
   componentDidUpdate(prevProps) {
-    if (this.props.isTraining !== prevProps.isTraining && this.props.isTraining === 2 && this.chartRef.current) {
+    if (this.chartRef.current) {
       const ctx = this.chartRef.current.getContext('2d');
 
       // Destroy the old chart if it exists
       if (this.chartInstance) {
         this.chartInstance.destroy();
       }
-
-      // Create a new chart and save a reference to it
-      this.chartInstance = new Chart(ctx, {
-          type: 'line',
-          data: {
-              labels: JSON.parse(this.props.apiData["error_list"])[0].map((_, i) => i + 1), // Generate labels based on error array length
-              datasets: [{
-                  label: 'Errors',
-                  data: JSON.parse(this.props.apiData["error_list"])[0],
-                  borderColor: 'rgba(7, 151, 185, 1)',
-                  backgroundColor: 'rgba(7, 151, 185, 0.2)',
-              }]
-          },
-          options: {
-              scales: {
-                  y: {
-                      beginAtZero: true
-                  }
+      
+      // Check if apiData and error_list are defined
+      if (this.props.apiData && this.props.apiData["error_list"]) {
+        // Create a new chart and save a reference to it
+        this.chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: JSON.parse(this.props.apiData["error_list"])[0].map((_, i) => i + 1), // Generate labels based on error array length
+                datasets: [{
+                    label: 'Errors',
+                    data: JSON.parse(this.props.apiData["error_list"])[0],
+                    borderColor: 'rgba(7, 151, 185, 1)',
+                    backgroundColor: 'rgba(7, 151, 185, 0.2)',
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true8
+                    }
+                },
+                animation: {
+                  duration: 0 // general animation time
+                }
               }
-          }
-      });
+        });
+      }
     }
   }
 
@@ -282,7 +288,10 @@ class Building extends React.Component {
                   <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:20 }}></canvas>
                 </Flex>
               ) : (this.props.isTraining===1 ? (
-                <div style={{ fontFamily:'monospace' }}><b>Training...</b></div>
+                <Flex direction= 'column'>
+                  <div style={{ fontFamily:'monospace' }}><b>Training...</b></div>
+                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:20 }}></canvas>
+                </Flex>
               ) : (
                 <div style={{ textAlign:'justify', width: Math.round(0.16 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
                   {this.props.taskDescription}

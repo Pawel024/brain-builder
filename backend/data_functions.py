@@ -23,6 +23,8 @@ from torch.utils.data import Dataset, DataLoader
 from matplotlib import pyplot as plt
 
 root_link = None
+task_id = None
+user_id = None
 
 
 class DataFromExcel(Dataset):
@@ -200,7 +202,7 @@ class DataFromExcel(Dataset):
         plt.savefig(img, format='png')
         img.seek(0)
         img = b64encode(img.getvalue()).decode('utf-8')
-        requests.post(root_link + 'api/backend/', json={'plots': img})
+        requests.put(root_link + 'progress/', json={'progress': -1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
         plt.clf()
 
     # This function is based on a CSE2510 Notebook and plots the decision boundary of a classifier
@@ -246,8 +248,8 @@ class DataFromExcel(Dataset):
                 plt.savefig(img, format='png')
                 img.seek(0)
                 img = b64encode(img.getvalue()).decode('utf-8')
-                requests.post(root_link + 'api/backend/', json={'plots': img})
                 plt.clf()
+                return img
                                 
 
         elif self.data_type == 2:
@@ -272,8 +274,8 @@ class DataFromExcel(Dataset):
                 plt.savefig(img, format='png')
                 img.seek(0)
                 img = b64encode(img.getvalue()).decode('utf-8')
-                requests.post(root_link + 'api/backend/', json={'plots': img})
                 plt.clf()
+                return img
 
 
 
@@ -385,7 +387,7 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
         plt.savefig(img, format='png')
         img.seek(0)
         img = b64encode(img.getvalue()).decode('utf-8')
-        requests.post(root_link + 'api/backend/', json={'plots': img})
+        requests.put(root_link + 'api/progress/', json={'progress':-1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
         plt.clf()
 
     def plot_decision_boundary(self, model, epoch=0):
@@ -428,8 +430,8 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
             plt.savefig(img, format='png')
             img.seek(0)
             img = b64encode(img.getvalue()).decode('utf-8')
-            requests.post(root_link + 'api/backend/', json={'plots': img})
             plt.clf()
+            return img
 
 
 class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_classification()
@@ -589,34 +591,34 @@ class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_c
         plt.savefig(img, format='png')
         img.seek(0)
         img = b64encode(img.getvalue()).decode('utf-8')
-        requests.post(root_link + 'api/backend/', json={'plots': img})
+        requests.put(root_link + 'api/progress/', json={'progress': -1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
         plt.clf()
 
     def plot_decision_boundary(self, model, epoch=0):
         if self.n_features < 2 and self.n_targets < 2:
-                step = 0.01
-                if self.normalization:
-                    inp = np.arange(-0.1, 1.1, step)
-                else:
-                    mini, maxi = self.minima[0], self.maxima[0]
-                    inp = np.arange(mini, maxi, step)
+            step = 0.01
+            if self.normalization:
+                inp = np.arange(-0.1, 1.1, step)
+            else:
+                mini, maxi = self.minima[0], self.maxima[0]
+                inp = np.arange(mini, maxi, step)
 
-                # Plot the decision boundary. For that, we will assign a color to each
-                # point in the mesh.
-                inp = np.array(inp)
-                Z = np.array(model.predict(inp.reshape(self.n_features, -1).T))
+            # Plot the decision boundary. For that, we will assign a color to each
+            # point in the mesh.
+            inp = np.array(inp)
+            Z = np.array(model.predict(inp.reshape(self.n_features, -1).T))
 
-                
-                plt.plot(inp, Z)
-                plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
-                plt.xlabel(self.feature_names[0])
-                plt.ylabel(self.target_names[0])
-                img = BytesIO.BytesIO()
-                plt.savefig(img, format='png')
-                img.seek(0)
-                img = b64encode(img.getvalue()).decode('utf-8')
-                requests.post(root_link + 'api/backend/', json={'plots': img})
-                plt.clf()
+            
+            plt.plot(inp, Z)
+            plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
+            plt.xlabel(self.feature_names[0])
+            plt.ylabel(self.target_names[0])
+            img = BytesIO.BytesIO()
+            plt.savefig(img, format='png')
+            img.seek(0)
+            img = b64encode(img.getvalue()).decode('utf-8')
+            plt.clf()
+            return img
 
 
 class DataFromFunction(Dataset):  # this one is for regression on simple functions
@@ -731,7 +733,7 @@ class DataFromFunction(Dataset):  # this one is for regression on simple functio
         plt.savefig(img, format='png')
         img.seek(0)
         img = b64encode(img.getvalue()).decode('utf-8')
-        requests.post(root_link + 'api/backend/', json={'plots': img})
+        requests.put(root_link + 'api/progress/', json={'progress': -1, plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
         plt.clf()
 
     def plot_decision_boundary(self, model, epoch=0):
@@ -757,5 +759,5 @@ class DataFromFunction(Dataset):  # this one is for regression on simple functio
                 plt.savefig(img, format='png')
                 img.seek(0)
                 img = b64encode(img.getvalue()).decode('utf-8')
-                requests.post(root_link + 'api/backend/', json={'plots': img})
                 plt.clf()
+                return img

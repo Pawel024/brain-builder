@@ -4,7 +4,7 @@ class Row(models.Model):
     action = models.IntegerField()
     user_id = models.CharField(max_length=100)
     task_id = models.IntegerField()
-    learning_rate = models.FloatField(max_length=20)
+    learning_rate = models.FloatField(max_length=10)
     epochs = models.IntegerField()
     normalization = models.BooleanField()
     network_setup = models.CharField(max_length=200)
@@ -12,7 +12,6 @@ class Row(models.Model):
     network_biases = models.CharField(max_length=100000)
     nn_input = models.CharField(max_length=2000)
     error_list = models.CharField(max_length=2000)
-    plots = models.CharField(max_length=1000000)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -31,3 +30,13 @@ class TaskDescription(models.Model):
 
     def __str__(self):
         return self.description
+
+class Progress(models.Model):
+    user_id = models.CharField(max_length=100)
+    task_id = models.IntegerField()
+    progress = models.FloatField(max_length = 10)
+    error_list = models.CharField(max_length=2000)
+    plots = models.CharField(max_length=1000000)
+
+    def __str__(self):
+        return self.user_id

@@ -18,6 +18,8 @@ import requests
 import json
 
 root_link = None
+task_id = None
+user_id = None
 
 
 class BuildNetwork(torch.nn.Module):
@@ -108,20 +110,26 @@ class BuildNetwork(torch.nn.Module):
                                     correct += 1
                                 total += 1
 
+                if epoch % (epochs // 10 if epochs >= 10 else 1) == 0:
+                    im = dat.plot_decision_boundary(self, epoch)
+                else: 
+                    im = []
+
                 if typ == 2:
                     error = torch.mean(mse / total)
                     error = error.item()
                     if epoch % (epochs // 10 if epochs >= 10 else 1) == 0:
-                        dat.plot_decision_boundary(self, epoch)
                         print("Error on training set after epoch ", epoch, ": ", error)
+        
                 else:
                     error = round((1 - correct / total), 2)
                     if epoch % (epochs // 10 if epochs >= 10 else 1) == 0:
-                        dat.plot_decision_boundary(self, epoch)
                         print("Accuracy on training set after epoch ", epoch, ": ", round(100 * correct / total, 1), "%")
                 errors += [error]
-                # pass the list of errors to the frontend
-                requests.post(root_link + 'api/backend/', json={'error_list': json.dumps(errors), 'action': 1, 'nn_input': epoch/epochs)
+
+                # let the frontend know how we're doing
+                requests.put(root_link + 'api/progress/', json={'error_list': json.dumps(errors), 'progress': epoch/epochs, 'plots': json.dumps(im), 'task_id': task_id, 'user_id': user_id})
+                
 
         with torch.no_grad():
             ys, mse, correct, total = torch.tensor([]), torch.tensor([self.input[-1][0]*[0.]]), 0, 0
@@ -137,6 +145,9 @@ class BuildNetwork(torch.nn.Module):
                         if torch.argmax(out) == y[idx]:
                             correct += 1
                         total += 1
+        
+        im = dat.plot_decision_boundary(self, epoch)
+        requests.put(root_link + 'api/progress/', json={'error_list': json.dumps(errors), 'progress': epoch/epochs, 'plots': json.dumps(im), 'task_id': task_id, 'user_id': user_id})
 
         if typ == 2:
             accuracy = torch.mean(1 - mse / torch.sum(torch.square(ys - torch.mean(ys, dim=0)), dim=0))
@@ -150,13 +161,3 @@ class BuildNetwork(torch.nn.Module):
             print("Accuracy on test set: ", accuracy * 100, "%")
 
         return errors, accuracy
-
-    """
-        # plot the error
-        plt.plot(errors)
-        plt.xlabel("% of Iterations")
-        plt.ylabel("% of errors")
-        plt.ylim(0, 100)
-        plt.text(30, 70, str('Accuracy on test set: ' + str(round(correct / total, 3)*100) + '%'))
-        plt.show()
-    """

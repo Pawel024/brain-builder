@@ -426,6 +426,62 @@ function App() {
     e.preventDefault();
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
+
+    const progressData = {
+      user_id: userId,
+      task_id: taskId,
+      progress: -1,
+      error_list: JSON.stringify([]),
+      plots: JSON.stringify([]),
+    };
+    axios.get(window.location.origin + `/api/progress/?user_id=${userId}&task_id=${taskId}`, {
+      headers: {
+        'X-CSRFToken': csrftoken
+      }
+    }).then((response) => {
+      if (response.data.length > 0) {
+          // If the record exists, update it
+          let pk = response.data[0].pk;
+          axios.put(window.location.origin + `/api/progress/${pk}`, progressData, {
+            headers: {
+              'X-CSRFToken': csrftoken
+            }
+          }).then((response) => {
+              console.log(response.status);
+              console.log(response.data[0]);
+          }, (error) => {
+              console.log(error);
+          });
+      } else {
+          // If the record doesn't exist, create it
+          axios.post(window.location.origin + "/api/progress/", progressData, {
+            headers: {
+              'X-CSRFToken': csrftoken
+            }
+          }).then((response) => {
+              console.log(response.status);
+              console.log(response.data[0]);
+          }, (error) => {
+              console.log(error);
+          });
+      }
+    }, (error) => {
+        console.log(error);
+    });
+
+    // Start the interval before making the PUT/POST request
+    let intervalId = setInterval(() => {
+      axios.get(window.location.origin + `/api/progress/?user_id=${userId}&task_id=${taskId}`, {
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
+      }).then((response) => {
+        //  fetchProgressData(response.data);  // we need to define fetchProgressData but also make sure it actually gets used
+      }, (error) => {
+        console.log(error);
+      });
+    }, 1000); // 1000 milliseconds = 1 second
+
     const trainingData = {
       action: 1,
       user_id: userId,
@@ -438,7 +494,6 @@ function App() {
       network_biases: JSON.stringify([]),
       nn_input: JSON.stringify([]),
       error_list: JSON.stringify([]),
-      plots: JSON.stringify([]),
     };
     setAccuracy(null);
     setIsTraining(1);
@@ -459,6 +514,9 @@ function App() {
               fetchTrainingData(apiData, setApiData, setAccuracy, setIsTraining, taskId);
           }, (error) => {
               console.log(error);
+          }).finally(() => {
+            // Stop the interval when the PUT/POST request is completed
+            clearInterval(intervalId);
           });
       } else {
           // If the record doesn't exist, create it
