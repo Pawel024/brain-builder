@@ -467,6 +467,7 @@ function App() {
           }).then((response) => {
               console.log(response.status);
               console.log(response.data[0]);
+
           }, (error) => {
               console.log(error);
           });
@@ -479,6 +480,20 @@ function App() {
           }).then((response) => {
               console.log(response.status);
               console.log(response.data[0]);
+
+              // Start the interval before making the PUT/POST request, but after the first PUT/POST request is completed
+              let intervalId = setInterval(() => {
+                axios.get(window.location.origin + `/api/progress/?user_id=${userId}&task_id=${taskId}`, {
+                  headers: {
+                    'X-CSRFToken': csrftoken
+                  }
+                }).then((response) => {
+                  //  fetchProgressData(response.data);  // we need to define fetchProgressData but also make sure it actually gets used
+                }, (error) => {
+                  console.log(error);
+                });
+              }, 5000); // 5000 milliseconds = 5 seconds
+
           }, (error) => {
               console.log(error);
           });
@@ -486,19 +501,6 @@ function App() {
     }, (error) => {
         console.log(error);
     });
-
-    // Start the interval before making the PUT/POST request
-    let intervalId = setInterval(() => {
-      axios.get(window.location.origin + `/api/progress/?user_id=${userId}&task_id=${taskId}`, {
-        headers: {
-          'X-CSRFToken': csrftoken
-        }
-      }).then((response) => {
-        //  fetchProgressData(response.data);  // we need to define fetchProgressData but also make sure it actually gets used
-      }, (error) => {
-        console.log(error);
-      });
-    }, 5000); // 5000 milliseconds = 5 seconds
 
     const trainingData = {
       action: 1,
