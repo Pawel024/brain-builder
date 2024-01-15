@@ -112,7 +112,7 @@ class BuildNetwork(torch.nn.Module):
                                 total += 1
 
                 if epoch % (epochs // 10 if epochs >= 10 else 1) == 0:
-                    im = dat.plot_decision_boundary(self, epoch)
+                    im = dat.plot_decision_boundary(self)
                 else: 
                     im = []
 
@@ -147,7 +147,7 @@ class BuildNetwork(torch.nn.Module):
                             correct += 1
                         total += 1
         
-        im = dat.plot_decision_boundary(self, epoch)
+        im = dat.plot_decision_boundary(self)
         requests.put(root_link + 'api/progress/' + pk + '/', json={'error_list': json.dumps(errors), 'progress': epoch/epochs, 'plots': json.dumps(im), 'task_id': task_id, 'user_id': user_id})
 
         if typ == 2:

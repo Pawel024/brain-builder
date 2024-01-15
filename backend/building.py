@@ -120,7 +120,7 @@ def predict(x, nn, tag, normalization=False, name=False):
         output = nn(x.view(-1, n_inputs))[0]
         output = dataset.denormalize(output.tolist())
         if name:
-            output = dict(zip(dataset.label_name(output), output))
+            output = dataset.target_names(output)
         return output
 
     else:

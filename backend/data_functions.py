@@ -18,6 +18,7 @@ import requests  # for sending the images
 from base64 import b64encode  # for sending the images
 import numpy as np
 import pandas as pd
+import json
 import torch
 from torch.utils.data import Dataset, DataLoader
 from matplotlib import pyplot as plt
@@ -159,7 +160,7 @@ class DataFromExcel(Dataset):
 
     def plot_data(self):
         """Plots the data."""
-        img = BytesIO.BytesIO()
+        img = BytesIO()
 
         if self.data_type == 1:
             n_plots = self.n_features * (self.n_features - 1) // 2
@@ -207,7 +208,7 @@ class DataFromExcel(Dataset):
         plt.clf()
 
     # This function is based on a CSE2510 Notebook and plots the decision boundary of a classifier
-    def plot_decision_boundary(self, model, epoch=0):
+    def plot_decision_boundary(self, model):
         step = 0.01
 
         if self.data_type == 1:
@@ -245,7 +246,7 @@ class DataFromExcel(Dataset):
                                 ax[row, col].set_xlabel(self.data.columns[i])
                                 ax[row, col].set_ylabel(self.data.columns[j])
                                 k += 1
-                img = BytesIO.BytesIO()
+                img = BytesIO()
                 plt.savefig(img, format='png')
                 img.seek(0)
                 img = b64encode(img.getvalue()).decode('utf-8')
@@ -271,7 +272,7 @@ class DataFromExcel(Dataset):
                 plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
                 plt.xlabel(self.feature_names[0])
                 plt.ylabel(self.target_names[0])
-                img = BytesIO.BytesIO()
+                img = BytesIO()
                 plt.savefig(img, format='png')
                 img.seek(0)
                 img = b64encode(img.getvalue()).decode('utf-8')
@@ -364,7 +365,7 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
 
     def plot_data(self):
         """Plots the data."""
-        img = BytesIO.BytesIO()
+        img = BytesIO()
 
         n_plots = self.n_features * (self.n_features - 1) // 2
         n_rows = int(n_plots**0.5)
@@ -391,7 +392,7 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
         requests.put(root_link + 'api/progress/' + pk + '/', json={'progress':-1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
         plt.clf()
 
-    def plot_decision_boundary(self, model, epoch=0):
+    def plot_decision_boundary(self, model):
         step = 0.01
 
         if self.n_features < 3:
@@ -411,6 +412,8 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
             n_cols = n_plots // n_rows
             if n_rows * n_cols < n_plots:
                 n_cols += 1
+            fig, ax = plt.subplots(n_rows, n_cols)
+            k = 0
 
             for i in range(self.n_features):
                 if type(self.data[0, i]) is not str:
@@ -427,7 +430,7 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
                             ax[row, col].set_ylabel(self.data.columns[j])
                             k += 1
 
-            img = BytesIO.BytesIO()
+            img = BytesIO()
             plt.savefig(img, format='png')
             img.seek(0)
             img = b64encode(img.getvalue()).decode('utf-8')
@@ -543,7 +546,7 @@ class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_c
 
     def plot_data(self):
         """Plots the data."""
-        img = BytesIO.BytesIO()
+        img = BytesIO()
 
         if self.data_type == 1:
             n_plots = self.n_features * (self.n_features - 1) // 2
@@ -595,7 +598,7 @@ class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_c
         requests.put(root_link + 'api/progress/' + pk + '/', json={'progress': -1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
         plt.clf()
 
-    def plot_decision_boundary(self, model, epoch=0):
+    def plot_decision_boundary(self, model):
         if self.n_features < 2 and self.n_targets < 2:
             step = 0.01
             if self.normalization:
@@ -614,7 +617,7 @@ class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_c
             plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
             plt.xlabel(self.feature_names[0])
             plt.ylabel(self.target_names[0])
-            img = BytesIO.BytesIO()
+            img = BytesIO()
             plt.savefig(img, format='png')
             img.seek(0)
             img = b64encode(img.getvalue()).decode('utf-8')
@@ -713,12 +716,14 @@ class DataFromFunction(Dataset):  # this one is for regression on simple functio
         c = self.feature_names + self.target_names
         # nothing to see here, just move along
 
-        img = BytesIO.BytesIO()
+        img = BytesIO()
         n_plots = (self.n_features + self.n_targets) * (self.n_features + self.n_targets - 1) // 2
         n_rows = int(n_plots**0.5)
         n_cols = n_plots // n_rows
         if n_rows * n_cols < n_plots:
             n_cols += 1
+        fig, ax = plt.subplots(n_rows, n_cols)
+        k = 0
 
         for i in range(self.n_features + self.n_targets - 1):
             if type(d[0, i]) is not str:
@@ -737,7 +742,7 @@ class DataFromFunction(Dataset):  # this one is for regression on simple functio
         requests.put(root_link + 'api/progress/' + pk + '/', json={'progress': -1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
         plt.clf()
 
-    def plot_decision_boundary(self, model, epoch=0):
+    def plot_decision_boundary(self, model):
         if self.n_features < 2 and self.n_targets < 2:
                 step = 0.01
                 if self.normalization:
@@ -756,7 +761,7 @@ class DataFromFunction(Dataset):  # this one is for regression on simple functio
                 plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
                 plt.xlabel(self.feature_names[0])
                 plt.ylabel(self.target_names[0])
-                img = BytesIO.BytesIO()
+                img = BytesIO()
                 plt.savefig(img, format='png')
                 img.seek(0)
                 img = b64encode(img.getvalue()).decode('utf-8')
