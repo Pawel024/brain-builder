@@ -573,6 +573,7 @@ function App() {
           });
       } else {
           // If the record doesn't exist, create it
+          console.log(trainingData);
           axios.post(window.location.origin + "/api/backend/", trainingData, {
             headers: {
               'X-CSRFToken': csrftoken
