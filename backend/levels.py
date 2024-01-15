@@ -27,14 +27,7 @@ import numpy as np
 
 normalization = False
 data = None
-
-# VERY IMPORTANT: the 'games' dataframe contains all the game-specific info the backend uses
-# Therefore: if changes are made, they only need to be made here and in the frontend.
-# For the frontend a similar method will be developed.
-# Note: for now still a work in progress, might give errors.
-
-# load the games dataframe from the csv
-games = pd.read_csv(os.path.join(os.path.dirname(__file__), 'Games.csv'), index_col=0)
+games = None
 
 
 # this is how you access data in the dataframe

@@ -12,26 +12,34 @@ When this happens, the data is sent to the process function, which reads out the
 # Idea: make the normalization an integer value so it's easier to expand
 
 import json
-# import .building  # UNCOMMENT THIS
-from . import building  # COMMENT THIS
+from . import building 
+from . import levels 
 import os
 import pickle
+import request
 
 
-def process(request, root_link):
-    request = dict(request)
+def process(req, root_link):
+    req = dict(req)
 
-    if request['action'] == 1:  # create and train a network
-        input_list = ((float(request['learning_rate']), int(request['epochs']), bool(request['normalization'])), json.loads(request['network_setup']))
-        tag = int(request['task_id'])
+    # load the games dataframe from the API
+    #  this dataframe contains all the game-specific info the backend uses
+    response = requests.get(root_link + 'api/tasks/')
+    levels.games = response.json()
+    levels.games = pd.DataFrame(levels.games)
+
+
+    if req['action'] == 1:  # create and train a network
+        input_list = ((float(req['learning_rate']), int(req['epochs']), bool(req['normalization'])), json.loads(req['network_setup']))
+        tag = int(req['task_id'])
         structure, errors, w, b = building.build_nn(input_list, tag)
-        request['network_setup'] = json.dumps(structure)  # list of integers representing nodes per layer, eg [4, 8, 8, 8, 2]
-        request['network_weights'] = json.dumps(w)  # list of lists of floats representing the weights
-        request['network_biases'] = json.dumps(b)  # list of lists of floats representing the biases
-        request['error_list'] = json.dumps(errors)
+        req['network_setup'] = json.dumps(structure)  # list of integers representing nodes per layer, eg [4, 8, 8, 8, 2]
+        req['network_weights'] = json.dumps(w)  # list of lists of floats representing the weights
+        req['network_biases'] = json.dumps(b)  # list of lists of floats representing the biases
+        req['error_list'] = json.dumps(errors)
         # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
 
-    elif request['action'] == 2:  # classify a given input
+    elif req['action'] == 2:  # classify a given input
 
         if 'nn.txt' in os.listdir() and 'data.txt' in os.listdir():
             # load neural network from json using nn_path
@@ -40,19 +48,19 @@ def process(request, root_link):
             with open('data.txt', 'rb') as inpu:
                 data = pickle.load(inpu)
 
-            setup = json.loads(request['network_setup'])
+            setup = json.loads(req['network_setup'])
             if setup[0] != nn.input[0][0] or setup[-1] != nn.input[-1][0]:
                 print("Wrong Network")
                 output_value = "Wrong Network"
             else:
-                input_vector = json.loads(request['nn_input'])
-                tag = int(request['task_id'])
+                input_vector = json.loads(req['nn_input'])
+                tag = int(req['task_id'])
                 building.dataset = data
-                output_value = building.predict(input_vector, nn, tag, normalization=bool(request['normalization']), name=False)
+                output_value = building.predict(input_vector, nn, tag, normalization=bool(req['normalization']), name=False)
         else:
             print("No Network")
             output_value = "No Network"
-        request['nn_input'] = output_value
+        req['nn_input'] = output_value
 
-    request['action'] = 0
-    return request
+    req['action'] = 0
+    return req
