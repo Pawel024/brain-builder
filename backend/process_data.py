@@ -18,7 +18,7 @@ import os
 import pickle
 
 
-def process(request, root_url):
+def process(request, root_link):
     request = dict(request)
 
     if request['action'] == 1:  # create and train a network
