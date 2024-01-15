@@ -228,8 +228,13 @@ function App() {
   // Define the functions to fetch API data
   const fetchTrainingData = (apiData, setApiData, setAccuracy, setIsTraining, taskId) => {
     var userId = getCookie('user_id');
+    var csrftoken = getCookie('csrftoken');
 
-    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`)
+    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+      headers: {
+        'X-CSRFToken': csrftoken
+      }
+    })
       .then((response) => {
         setApiData(response.data[0]);
         setAccuracy(parseFloat(JSON.parse(response.data[0]["error_list"])[1]))
@@ -246,8 +251,13 @@ function App() {
 
   const fetchQueryResponse = (setApiData, setIsResponding, taskId) => {
     var userId = getCookie('user_id');
+    var csrftoken = getCookie('csrftoken');
 
-    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`)
+    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+      headers: {
+        'X-CSRFToken': csrftoken
+      }
+    })
       .then((response) => {
         setApiData(response.data[0]);
         console.log(response.data[0]);
@@ -302,9 +312,14 @@ function App() {
     else {goToStep2 = true;};
 
     var userId = getCookie('user_id');
+    var csrftoken = getCookie('csrftoken');
 
     if (goToStep2) {
-      axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`)
+      axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
+      })
       .then((response) => {
           try {
               setApiData(response.data[0]);
@@ -410,6 +425,7 @@ function App() {
   const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId) => {
     e.preventDefault();
     var userId = getCookie('user_id');
+    var csrftoken = getCookie('csrftoken');
     const trainingData = {
       user_id: userId,
       task_id: taskId,
@@ -424,11 +440,19 @@ function App() {
     };
     setAccuracy(null);
     setIsTraining(1);
-    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`).then((response) => {
+    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+      headers: {
+        'X-CSRFToken': csrftoken
+      }
+    }).then((response) => {
       if (response.data.length > 0) {
           // If the record exists, update it
           let pk = response.data[0].id;
-          axios.put(window.location.origin + `/api/backend/${pk}`, trainingData).then((response) => {
+          axios.put(window.location.origin + `/api/backend/${pk}`, trainingData, {
+            headers: {
+              'X-CSRFToken': csrftoken
+            }
+          }).then((response) => {
               console.log(response.status);
               fetchTrainingData(apiData, setApiData, setAccuracy, setIsTraining, taskId);
           }, (error) => {
@@ -436,16 +460,20 @@ function App() {
           });
       } else {
           // If the record doesn't exist, create it
-          axios.post(window.location.origin + "/api/backend/", trainingData).then((response) => {
+          axios.post(window.location.origin + "/api/backend/", trainingData, {
+            headers: {
+              'X-CSRFToken': csrftoken
+            }
+          }).then((response) => {
               console.log(response.status);
               fetchTrainingData(apiData, setApiData, setAccuracy, setIsTraining, taskId);
           }, (error) => {
               console.log(error);
           });
       }
-  }, (error) => {
-      console.log(error);
-  });
+    }, (error) => {
+        console.log(error);
+    });
   };
 
 
@@ -510,8 +538,13 @@ function App() {
     setIsResponding(1);
 
     var userId = getCookie('user_id');
+    var csrftoken = getCookie('csrftoken');
 
-    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`)
+    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+      headers: {
+        'X-CSRFToken': csrftoken
+      }
+    })
       .then((response) => {
         const networkData = response.data[0];
         const formData = new FormData(event.target);
@@ -522,7 +555,11 @@ function App() {
         networkData.action = 2;
         console.log("updated network data");
         console.log(networkData);
-        axios.put(window.location.origin + `/api/backend/${networkData.pk}`, networkData)
+        axios.put(window.location.origin + `/api/backend/${networkData.pk}`, networkData, {
+          headers: {
+            'X-CSRFToken': csrftoken
+          }
+        })
           .then((response) => {
             console.log(response.status);
             fetchQueryResponse(setApiData, setIsResponding, taskId);
