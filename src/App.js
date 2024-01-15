@@ -506,7 +506,7 @@ function App() {
       task_id: taskId,
       learning_rate: learningRate,
       epochs: iterations,
-      normalization: 1, // 0 means no normalization, 1 means normalization
+      normalization: true, // 0 means no normalization, 1 means normalization
       network_setup: JSON.stringify(cytoLayers),
       network_weights: JSON.stringify([]),
       network_biases: JSON.stringify([]),
