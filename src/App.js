@@ -422,20 +422,22 @@ function App() {
 
 
   // ------- POST REQUEST -------
-  const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId) => {
+  const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, tag) => {
     e.preventDefault();
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
     const trainingData = {
+      action: 1,
+      tag: tag,
       user_id: userId,
       task_id: taskId,
       learning_rate: learningRate,
       epochs: iterations,
+      normalization: 1, // 0 means no normalization, 1 means normalization
       network_setup: JSON.stringify(cytoLayers),
       network_weights: JSON.stringify([]),
       network_biases: JSON.stringify([]),
       nn_input: JSON.stringify([]),
-      action: 1,
       error_list: JSON.stringify([]),
     };
     setAccuracy(null);
