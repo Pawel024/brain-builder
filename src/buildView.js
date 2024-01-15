@@ -87,8 +87,8 @@ class Building extends React.Component {
   */
 
   getTaskDescription(taskId) {
-    return tasks[`task${taskId}`];
-  }
+  return tasks[`task${taskId}`];
+}
 
   componentDidMount() {
     this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.taskId, this.props.taskId);
@@ -105,9 +105,14 @@ class Building extends React.Component {
         }, 0);
       });
     }
+
+    this.typeWriter(this.getTaskDescription(this.props.taskId));
+
+    /*
     this.getTaskDescription(this.props.taskId).then(text => {
       this.typeWriter(text.text());
     });
+    */
   }
 
   chartRef = React.createRef();
