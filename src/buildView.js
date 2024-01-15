@@ -95,7 +95,7 @@ class Building extends React.Component {
       });
     }
     this.getTaskDescription(this.props.taskId).then(text => {
-      this.typeWriter(text);
+      this.typeWriter(text.text());
     });
   }
 
