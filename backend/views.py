@@ -13,7 +13,7 @@ import uuid
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-def index(request):
+def index(request, path=''):
     user_id = request.GET.get('user_id')
 
     if user_id is None or user_id == '':
