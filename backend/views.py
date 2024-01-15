@@ -54,7 +54,7 @@ def query_detail(request, pk):
     if request.method == 'PUT':
         processed_data = process(request.data)
         processed_data['user_id'] = request.data.get('user_id')
-        processed_data['game_id'] = request.data.get('game_id')
+        processed_data['task_id'] = request.data.get('task_id')
         serializer = RowSerializer(query, data=processed_data,context={'request': request})
         if serializer.is_valid():
             serializer.save()
