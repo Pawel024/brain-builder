@@ -276,12 +276,35 @@ function App() {
   let accuracyColor = 'var(--slate-11)';
 
   // ------- CYTOSCAPE EDITING -------
-  const taskIds = useMemo(() => [11, 12, 13], []);
-  const [cytoLayers, setCytoLayers] = useState(taskIds.map(() => []));
-  const [isTraining, setIsTraining] = useState(taskIds.map(() => false));
-  const [apiData, setApiData] = useState(taskIds.map(() => null));
-  const [accuracy, setAccuracy] = useState(taskIds.map(() => 0));
-  const [isResponding, setIsResponding] = useState(taskIds.map(() => false));
+  useEffect(() => {
+    axios.get('/api/tasks')
+      .then(response => {
+        const taskIds = response.data.map(entry => entry.task_id);
+        setTaskIds(taskIds);
+        setCytoLayers(taskIds.map(() => []));
+        setIsTraining(taskIds.map(() => false));
+        setApiData(taskIds.map(() => null));
+        setAccuracy(taskIds.map(() => 0));
+        setIsResponding(taskIds.map(() => false));
+      })
+      .catch(error => {
+        console.error('Error fetching tasks:', error);
+        const defaultTaskIds = [11, 12, 13, 21, 22, 31];
+        setTaskIds(defaultTaskIds);
+        setCytoLayers(defaultTaskIds.map(() => []));
+        setIsTraining(defaultTaskIds.map(() => false));
+        setApiData(defaultTaskIds.map(() => null));
+        setAccuracy(defaultTaskIds.map(() => 0));
+        setIsResponding(defaultTaskIds.map(() => false));
+      });
+  }, []);
+  
+  const [taskIds, setTaskIds] = useState([]);
+  const [cytoLayers, setCytoLayers] = useState([]);
+  const [isTraining, setIsTraining] = useState([]);
+  const [apiData, setApiData] = useState([]);
+  const [accuracy, setAccuracy] = useState([]);
+  const [isResponding, setIsResponding] = useState([]);
   
   useEffect(() => {
     cytoLayers.forEach((cytoLayer, index) => {
@@ -761,6 +784,16 @@ function App() {
     });
   };
 
+  const tasksByLevel = taskIds.reduce((acc, taskId) => {
+    const level = Math.floor(taskId / 10);
+    const challenge = taskId % 10;
+    if (!acc[level]) {
+      acc[level] = [];
+    }
+    acc[level].push(challenge);
+    return acc;
+  }, {});
+
 
   // ------- RETURN THE APP CONTENT -------
   return (
@@ -786,6 +819,148 @@ function App() {
             <Flex direction='row' gap='3' style={{padding:'10px 10px', alignItems: 'flex-start'}}>
             <Flex direction='column' gap='3' style={{ flex: 1 }}>
               <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Get Started</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+                <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                        <label>Introduction</label>
+                        <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                    </ChallengeButton>
+                </Link>
+                <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                        <label>Tutorial</label>
+                        <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                    </ChallengeButton>
+                </Link>
+                </Box>
+              </Box>
+              {Object.entries(tasksByLevel).map(([level, challenges]) => (
+                <Box key={level} style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+                  <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level {level}</Heading>
+                  <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+                    {challenges.map((challenge, index) => (
+                      <Link key={index} to={`challenge${level}${challenge}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                        <ChallengeButton size="1" variant="outline">
+                          <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                            <label>Challenge {challenge}</label>
+                            <div><RocketIcon width="27" height="27" /></div>
+                          </Flex>
+                        </ChallengeButton>
+                      </Link>
+                    ))}
+                  </Box>
+                </Box>
+              ))} 
+            </Flex>
+            <Box style={{ flex: 1, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+            <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Readme</Heading>
+            <Box>
+                <Readme />
+            </Box>
+            </Box>
+            </Flex>
+          </div>
+          } />
+          <Route path="/introduction" element={
+            <Introduction/>
+          } />
+          {taskIds.map((taskId, index) => (
+            <Route
+              key={taskId}
+              path={`/challenge${taskId}`}
+              element={
+                <BuildView
+                  nOfInputs={4}
+                  nOfOutputs={3}
+                  maxLayers={10}
+                  taskId={taskId}
+                  index={index}
+                  cytoElements={cytoElements[index]}
+                  cytoStyle={cytoStyle[index]}
+                  generateFloatingButtons={generateFloatingButtons}
+                  cytoLayers={cytoLayers[index]}
+                  setCytoLayers={setCytoLayers}
+                  updateCytoLayers={updateCytoLayers}
+                  loadLastCytoLayers={loadLastCytoLayers}
+                  FloatingButton={FloatingButton}
+                  addLayer={addLayer}
+                  removeLayer={removeLayer}
+                  iterationsSlider={iterationsSliders[index]}
+                  iterations={iterations[index]}
+                  setIterations={setIterations}
+                  learningRateSlider={learningRateSliders[index]}
+                  learningRate={learningRate[index]}
+                  setLearningRate={setLearningRate}
+                  isTraining={isTraining[index]}
+                  setIsTraining={setIsTraining}
+                  apiData={apiData[index]}
+                  setApiData={setApiData}
+                  putRequest={putRequest}
+                  accuracy={accuracy[index]}
+                  setAccuracy={setAccuracy}
+                  accuracyColor={accuracyColor}
+                  handleSubmit={handleSubmit}
+                  isResponding={isResponding[index]}
+                  setIsResponding={setIsResponding}
+                />
+              }
+            />
+          ))}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+      </Theme>
+    </body>
+  );
+}
+
+export default App;
+
+/*
+<DropdownMenu.Root>
+  <DropdownMenu.Trigger>
+  <Box align='start' ml='3' >
+    <IconButton size="1" mt="2" variant="solid">
+      <DotsHorizontalIcon />
+    </IconButton>
+  </Box>
+  </DropdownMenu.Trigger>
+  <DropdownMenu.Content>
+    <DropdownMenu.Item shortcut="⌘ E">Edit</DropdownMenu.Item>
+    <DropdownMenu.Item shortcut="⌘ D">Duplicate</DropdownMenu.Item>
+    <DropdownMenu.Separator />
+    <DropdownMenu.Item shortcut="⌘ N">Archive</DropdownMenu.Item>
+
+    <DropdownMenu.Sub>
+      <DropdownMenu.SubTrigger>More</DropdownMenu.SubTrigger>
+      <DropdownMenu.SubContent>
+        <DropdownMenu.Item>Move to project…</DropdownMenu.Item>
+        <DropdownMenu.Item>Move to folder…</DropdownMenu.Item>
+
+        <DropdownMenu.Separator />
+        <DropdownMenu.Item>Advanced options…</DropdownMenu.Item>
+      </DropdownMenu.SubContent>
+    </DropdownMenu.Sub>
+
+    <DropdownMenu.Separator />
+    <DropdownMenu.Item>Share</DropdownMenu.Item>
+    <DropdownMenu.Item>Add to favorites</DropdownMenu.Item>
+    <DropdownMenu.Separator />
+    <DropdownMenu.Item shortcut="⌘ ⌫" color="red">
+      Delete
+    </DropdownMenu.Item>
+  </DropdownMenu.Content>
+</DropdownMenu.Root>
+*/
+
+
+/*
+            <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Get Started</Heading>
                 <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
@@ -893,109 +1068,4 @@ function App() {
                 </Link>
                 </Box>
               </Box>
-
-
-            {/* NOTE THAT THE 3 LEVELS ARE NOT YET INDEPENDENT AT ALL!!!!!! */}
-
-
-            </Flex>
-            <Box style={{ flex: 1, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-            <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Readme</Heading>
-            <Box>
-                <Readme />
-            </Box>
-            </Box>
-            </Flex>
-          </div>
-          } />
-          <Route path="/introduction" element={
-            <Introduction/>
-          } />
-          {taskIds.map((taskId, index) => (
-            <Route
-              key={taskId}
-              path={`/challenge${taskId}`}
-              element={
-                <BuildView
-                  nOfInputs={4}
-                  nOfOutputs={3}
-                  maxLayers={10}
-                  taskId={taskId}
-                  index={index}
-                  cytoElements={cytoElements[index]}
-                  cytoStyle={cytoStyle[index]}
-                  generateFloatingButtons={generateFloatingButtons}
-                  cytoLayers={cytoLayers[index]}
-                  setCytoLayers={setCytoLayers}
-                  updateCytoLayers={updateCytoLayers}
-                  loadLastCytoLayers={loadLastCytoLayers}
-                  FloatingButton={FloatingButton}
-                  addLayer={addLayer}
-                  removeLayer={removeLayer}
-                  iterationsSlider={iterationsSliders[index]}
-                  iterations={iterations[index]}
-                  setIterations={setIterations}
-                  learningRateSlider={learningRateSliders[index]}
-                  learningRate={learningRate[index]}
-                  setLearningRate={setLearningRate}
-                  isTraining={isTraining[index]}
-                  setIsTraining={setIsTraining}
-                  apiData={apiData[index]}
-                  setApiData={setApiData}
-                  putRequest={putRequest}
-                  accuracy={accuracy[index]}
-                  setAccuracy={setAccuracy}
-                  accuracyColor={accuracyColor}
-                  handleSubmit={handleSubmit}
-                  isResponding={isResponding[index]}
-                  setIsResponding={setIsResponding}
-                />
-              }
-            />
-          ))}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-      </Theme>
-    </body>
-  );
-}
-
-export default App;
-
-/*
-<DropdownMenu.Root>
-  <DropdownMenu.Trigger>
-  <Box align='start' ml='3' >
-    <IconButton size="1" mt="2" variant="solid">
-      <DotsHorizontalIcon />
-    </IconButton>
-  </Box>
-  </DropdownMenu.Trigger>
-  <DropdownMenu.Content>
-    <DropdownMenu.Item shortcut="⌘ E">Edit</DropdownMenu.Item>
-    <DropdownMenu.Item shortcut="⌘ D">Duplicate</DropdownMenu.Item>
-    <DropdownMenu.Separator />
-    <DropdownMenu.Item shortcut="⌘ N">Archive</DropdownMenu.Item>
-
-    <DropdownMenu.Sub>
-      <DropdownMenu.SubTrigger>More</DropdownMenu.SubTrigger>
-      <DropdownMenu.SubContent>
-        <DropdownMenu.Item>Move to project…</DropdownMenu.Item>
-        <DropdownMenu.Item>Move to folder…</DropdownMenu.Item>
-
-        <DropdownMenu.Separator />
-        <DropdownMenu.Item>Advanced options…</DropdownMenu.Item>
-      </DropdownMenu.SubContent>
-    </DropdownMenu.Sub>
-
-    <DropdownMenu.Separator />
-    <DropdownMenu.Item>Share</DropdownMenu.Item>
-    <DropdownMenu.Item>Add to favorites</DropdownMenu.Item>
-    <DropdownMenu.Separator />
-    <DropdownMenu.Item shortcut="⌘ ⌫" color="red">
-      Delete
-    </DropdownMenu.Item>
-  </DropdownMenu.Content>
-</DropdownMenu.Root>
-*/
+            */

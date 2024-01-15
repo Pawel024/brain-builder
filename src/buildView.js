@@ -360,7 +360,7 @@ class Building extends React.Component {
 
             <Form.Submit asChild>
               <button className="FormButton" style={{ marginTop: 10 }}>
-                Post query
+                Predict!
               </button>
             </Form.Submit>
           </Form.Root>
