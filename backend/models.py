@@ -2,7 +2,6 @@ from django.db import models
 
 class Row(models.Model):
     action = models.IntegerField()
-    timestamp = models.DateTimeField(auto_now=True)
     user_id = models.CharField(max_length=100)
     task_id = models.IntegerField()
     learning_rate = models.FloatField(max_length=20)
@@ -13,6 +12,8 @@ class Row(models.Model):
     network_biases = models.CharField(max_length=100000)
     nn_input = models.CharField(max_length=2000)
     error_list = models.CharField(max_length=2000)
+    plots = models.CharField(max_length=1000000)
+    timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.network_setup

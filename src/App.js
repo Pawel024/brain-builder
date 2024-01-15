@@ -438,6 +438,7 @@ function App() {
       network_biases: JSON.stringify([]),
       nn_input: JSON.stringify([]),
       error_list: JSON.stringify([]),
+      plots: JSON.stringify([]),
     };
     setAccuracy(null);
     setIsTraining(1);

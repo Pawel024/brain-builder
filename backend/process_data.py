@@ -14,9 +14,10 @@ When this happens, the data is sent to the process function, which reads out the
 import json
 from . import building 
 from . import levels 
+from . import data_functions as df
 import os
 import pickle
-import request
+import requests
 
 
 def process(req, root_link):
@@ -27,6 +28,7 @@ def process(req, root_link):
     response = requests.get(root_link + 'api/tasks/')
     levels.games = response.json()
     levels.games = pd.DataFrame(levels.games)
+    df.root_link = root_link
 
 
     if req['action'] == 1:  # create and train a network

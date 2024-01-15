@@ -10,7 +10,6 @@ There are 3 ways to obtain a dataset:
 """
 
 # Improvements:
-# TODO: add more games to games.csv
 # Idea: look into 'make_classification', 'make_regression' and 'make_blobs' from sklearn.datasets
 # Idea: add an 'image' option to load an image dataset from a folder
 # Idea: add a 'custom' option to load a custom dataset from a csv (and potentially expand this to images?)

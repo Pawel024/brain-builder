@@ -7,7 +7,7 @@ class RowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Row
-        fields = ('pk', 'action', 'task_id', 'user_id', 'learning_rate', 'epochs', 'normalization', 'network_setup', 'network_weights', 'network_biases', 'nn_input', 'error_list', 'timestamp')
+        fields = ('pk', 'action', 'task_id', 'user_id', 'learning_rate', 'epochs', 'normalization', 'network_setup', 'network_weights', 'network_biases', 'nn_input', 'error_list', 'plots', 'timestamp')
 
 class TaskDescriptionSerializer(serializers.ModelSerializer):
 

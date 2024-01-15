@@ -7,18 +7,22 @@ These classes and their functions are used in the building.py and levels.py modu
 """
 
 # Improvements:
-# TODO: fix the plot_decision_boundary functions for regression
 # idea: add custom feature selection
 # idea: add manually defined normalization to standard normal distribution
 # idea: add sklearn.preprocessing.MinMaxScaler(), .Normalizer() and .StandardScaler to scale the data
 # idea: add class for images
 
 import os
+from io import BytesIO  # for sending the images
+import requests  # for sending the images
+from base64 import b64encode  # for sending the images
 import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
 from matplotlib import pyplot as plt
+
+root_link = None
 
 
 class DataFromExcel(Dataset):
@@ -85,12 +89,7 @@ class DataFromExcel(Dataset):
             print("Data type not supported yet")
             pass
 
-        # clear the plots directory
-        self.plt_dir = 'plots'
-        files = os.listdir(self.plt_dir)
-        for file in files:
-            os.remove(self.plt_dir + '/' + file)
-        # self.plot_data()  # uncomment if you want plots of the data; they will be saved in plt_dir
+        self.plot_data()  # uncomment if you want plots of the data; they will be saved in plt_dir
 
     # modifying the inherited functions
 
@@ -157,45 +156,59 @@ class DataFromExcel(Dataset):
 
     def plot_data(self):
         """Plots the data."""
+        img = BytesIO.BytesIO()
+
         if self.data_type == 1:
+            n_plots = self.n_features * (self.n_features - 1) // 2
+            n_rows = int(n_plots**0.5)
+            n_cols = n_plots // n_rows
+            if n_rows * n_cols < n_plots:
+                n_cols += 1
+            fig, ax = plt.subplots(n_rows, n_cols)
+            k = 0
+
             for i in range(self.n_features):
                 if type(self.data.iloc[0, i]) is not str and self.data.columns[i] != 'Target':
                     for j in range(i+1, self.n_features+1):
                         if type(self.data.iloc[0, j]) is not str and self.data.columns[j] != 'Target':
-                            plt.clf()
-                            plt.scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
-                            plt.xlabel(self.data.columns[i])
-                            plt.ylabel(self.data.columns[j])
-                            plt.savefig(self.plt_dir + '/' + self.data.columns[i] + '_vs_' + self.data.columns[j] + '.png')
+                            row = k // n_cols
+                            col = k % n_cols
+                            ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
+                            ax[row, col].set_xlabel(self.data.columns[i])
+                            ax[row, col].set_ylabel(self.data.columns[j])
+                            k += 1
 
         elif self.data_type == 2:
-            for i in range(self.n_targets + self.n_features - 1):
+            n_plots = (self.n_features + self.n_targets) * (self.n_features + self.n_targets - 1) // 2
+            n_rows = int(n_plots**0.5)
+            n_cols = n_plots // n_rows
+            if n_rows * n_cols < n_plots:
+                n_cols += 1
+            fig, ax = plt.subplots(n_rows, n_cols)
+            k = 0
+            for i in range(self.n_features + self.n_targets - 1):
                 if type(self.data.iloc[0, i]) is not str:
-                    for j in range(i+1, self.n_features):
+                    for j in range(i+1, self.n_features + self.n_targets):
                         if type(self.data.iloc[0, j]) is not str:
-                            plt.clf()
-                            plt.scatter(self.data.iloc[:, i], self.data.iloc[:, j])
-                            plt.xlabel(self.data.columns[i])
-                            plt.ylabel(self.data.columns[j])
-                            plt.savefig(self.plt_dir + '/' + self.data.columns[i] + '_vs_' + self.data.columns[j] + '.png')
+                            row = k // n_cols
+                            col = k % n_cols
+                            ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j])
+                            ax[row, col].set_xlabel(self.data.columns[i])
+                            ax[row, col].set_ylabel(self.data.columns[j])
+                            k += 1
 
-    def show_plots(self):
-        # this function is only for debugging purposes and needs to be used in python!
-        # show all the images in plt_dir:
-        files = os.listdir(self.plt_dir)
-        n_plots = len(files)
-        for i in range(n_plots):
-            plt.clf()
-            img = plt.imread(self.plt_dir + '/' + files[i])
-            plt.imshow(img)
-            plt.show()
+        plt.savefig(img, format='png')
+        img.seek(0)
+        img = b64encode(img.getvalue()).decode('utf-8')
+        requests.post(root_link + 'api/backend/', json={'plots': img})
+        plt.clf()
 
     # This function is based on a CSE2510 Notebook and plots the decision boundary of a classifier
     def plot_decision_boundary(self, model, epoch=0):
         step = 0.01
 
         if self.data_type == 1:
-            if self.n_features < 4:
+            if self.n_features < 3:  # can probably go up to 4 or 5
                 if self.normalization:
                     mesh = np.meshgrid(*self.n_features*[np.arange(-0.1, 1.1, step)])
                 else:
@@ -207,45 +220,60 @@ class DataFromExcel(Dataset):
                 Z = np.array(model.predict(mesh.reshape(self.n_features, -1).T))
                 Z = Z.reshape(mesh[0].shape)
 
+                n_plots = self.n_features * (self.n_features - 1) // 2
+                n_rows = int(n_plots**0.5)
+                n_cols = n_plots // n_rows
+                if n_rows * n_cols < n_plots:
+                    n_cols += 1
+                fig, ax = plt.subplots(n_rows, n_cols)
+                k = 0
+
                 for i in range(self.n_features):
                     if type(self.data.iloc[0, i]) is not str and self.data.columns[i] != 'Target':
                         for j in range(i + 1, self.n_features + 1):
                             if type(self.data.iloc[0, j]) is not str and self.data.columns[i] != 'Target':
                                 # Put the result into a color plot
-                                plt.clf()
-                                plt.contourf(mesh[np.where(np.array(self.feature_names) == self.data.columns[i])[0]][0],
+                                row = k // n_cols
+                                col = k % n_cols
+                                ax[row, col].contourf(mesh[np.where(np.array(self.feature_names) == self.data.columns[i])[0]][0],
                                              mesh[np.where(np.array(self.feature_names) == self.data.columns[j])[0]][0],
                                              Z, alpha=0.5)
-                                plt.scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
-                                plt.xlabel(self.data.columns[i])
-                                plt.ylabel(self.data.columns[j])
-                                plt.savefig(self.plt_dir + '/' + 'boundary_epoch' + str(epoch) + '_' + self.data.columns[i] + '_vs_' + self.data.columns[j] + '.png')
+                                ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
+                                ax[row, col].set_xlabel(self.data.columns[i])
+                                ax[row, col].set_ylabel(self.data.columns[j])
+                                k += 1
+                img = BytesIO.BytesIO()
+                plt.savefig(img, format='png')
+                img.seek(0)
+                img = b64encode(img.getvalue()).decode('utf-8')
+                requests.post(root_link + 'api/backend/', json={'plots': img})
+                plt.clf()
+                                
 
         elif self.data_type == 2:
-            if self.n_features < 4:
+            if self.n_features < 2 and self.n_targets < 2:
                 if self.normalization:
-                    mesh = np.meshgrid(*self.n_features*[np.arange(-0.1, 1.1, step)])
+                    inp = np.arange(-0.1, 1.1, step)
                 else:
-                    mesh = np.meshgrid(*[np.arange(mini, maxi, step) for mini, maxi in zip(self.minima, self.maxima)])
+                    mini, maxi = self.minima[0], self.maxima[0]
+                    inp = np.arange(mini, maxi, step)
 
                 # Plot the decision boundary. For that, we will assign a color to each
                 # point in the mesh.
-                mesh = np.array(mesh)
-                Z = np.array(model.predict(mesh.reshape(self.n_features, -1).T))
-                Z = Z.reshape(self.n_targets, mesh[0].shape[0], mesh[0].shape[1])
+                inp = np.array(inp)
+                Z = np.array(model.predict(inp.reshape(self.n_features, -1).T))
 
-                for i in range(self.n_features + self.n_targets):
-                    if not self.data.columns[i].__contains__('Target'):
-                        # Put the result into a plot
-                        plt.clf()
-                        for k in range(self.n_targets):
-                            plt.contour(mesh[np.where(np.array(self.feature_names) == self.data.columns[i])[0]][0],
-                                        Z[k], levels=1, colors='red')
-                            plt.scatter(self.data.iloc[:, i], self.data.loc[:, self.target_names[k]])
-                            plt.xlabel(self.data.columns[i])
-                            plt.ylabel(self.target_names[k])
-                            plt.savefig(self.plt_dir + '/' + 'boundary_epoch' + str(epoch) + '_' + self.data.columns[i] + '_vs_' + self.target_names[k] + '.png')
-                # now do a similar thing as the above for-loops, but create plots for every target vs every feature
+                
+                plt.plot(inp, Z)
+                plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
+                plt.xlabel(self.feature_names[0])
+                plt.ylabel(self.target_names[0])
+                img = BytesIO.BytesIO()
+                plt.savefig(img, format='png')
+                img.seek(0)
+                img = b64encode(img.getvalue()).decode('utf-8')
+                requests.post(root_link + 'api/backend/', json={'plots': img})
+                plt.clf()
 
 
 
@@ -285,12 +313,7 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
             for i in range(self.n_features):
                 self.data[:, i] = ((self.data[:, i] - self.minima[i]) / (self.maxima[i] - self.minima[i]))
 
-        # clear the plots directory
-        self.plt_dir = 'plots'
-        files = os.listdir(self.plt_dir)
-        for file in files:
-            os.remove(self.plt_dir + '/' + file)
-        # self.plot_data()  # uncomment if you want plots of the data; they will be saved in plt_dir
+        self.plot_data()  # uncomment if you want plots of the data; they will be saved in plt_dir
 
     def __len__(self):
         return self.n_objects
@@ -338,31 +361,37 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
 
     def plot_data(self):
         """Plots the data."""
+        img = BytesIO.BytesIO()
+
+        n_plots = self.n_features * (self.n_features - 1) // 2
+        n_rows = int(n_plots**0.5)
+        n_cols = n_plots // n_rows
+        if n_rows * n_cols < n_plots:
+            n_cols += 1
+        fig, ax = plt.subplots(n_rows, n_cols)
+        k = 0
+
         for i in range(self.n_features-1):
             if type(self.data[0, i]) is not str:
                 for j in range(i+1, self.n_features):
                     if type(self.data[0, j]) is not str:
-                        plt.clf()
-                        plt.scatter(self.data[:, i], self.data[:, j], c=self.targets)
-                        plt.xlabel(self.data.columns[i])
-                        plt.ylabel(self.data.columns[j])
-                        plt.savefig(self.plt_dir + '/' + self.data.columns[i] + '_vs_' + self.data.columns[j] + '.png')
-
-    def show_plots(self):
-        # this function is only for debugging purposes and needs to be used in python!
-        # show all the images in plt_dir:
-        files = os.listdir(self.plt_dir)
-        n_plots = len(files)
-        for i in range(n_plots):
-            plt.clf()
-            img = plt.imread(self.plt_dir + '/' + files[i])
-            plt.imshow(img)
-            plt.show()
+                        row = k // n_cols
+                        col = k % n_cols
+                        ax[row, col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
+                        ax[row, col].set_xlabel(self.data.columns[i])
+                        ax[row, col].set_ylabel(self.data.columns[j])
+                        k += 1
+        
+        plt.savefig(img, format='png')
+        img.seek(0)
+        img = b64encode(img.getvalue()).decode('utf-8')
+        requests.post(root_link + 'api/backend/', json={'plots': img})
+        plt.clf()
 
     def plot_decision_boundary(self, model, epoch=0):
         step = 0.01
 
-        if self.n_features < 4:
+        if self.n_features < 3:
             if self.normalization:
                 mesh = np.meshgrid(*self.n_features * [np.arange(-0.1, 1.1, step)])
             else:
@@ -374,19 +403,33 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
             Z = np.array(model.predict(mesh.reshape(self.n_features, -1).T))
             Z = Z.reshape(mesh[0].shape)
 
+            n_plots = self.n_features * (self.n_features - 1) // 2
+            n_rows = int(n_plots ** 0.5)
+            n_cols = n_plots // n_rows
+            if n_rows * n_cols < n_plots:
+                n_cols += 1
+
             for i in range(self.n_features):
                 if type(self.data[0, i]) is not str:
                     for j in range(i + 1, self.n_features + 1):
                         if type(self.data[0, j]) is not str:
                             # Put the result into a color plot
-                            plt.clf()
-                            plt.contourf(mesh[i][0],
+                            row = k // n_cols
+                            col = k % n_cols
+                            ax[row, col].contourf(mesh[i][0],
                                          mesh[j][0],
                                          Z, alpha=0.5)
-                            plt.scatter(self.data[:, i], self.data[:, j], c=self.targets)
-                            plt.xlabel(self.data.columns[i])
-                            plt.ylabel(self.data.columns[j])
-                            plt.savefig(self.plt_dir + '/' + 'boundary_epoch' + str(epoch) + '_' + self.feature_names[i] + '_vs_' + self.feature_names[j] + '.png')
+                            ax[row, col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
+                            ax[row, col].set_xlabel(self.data.columns[i])
+                            ax[row, col].set_ylabel(self.data.columns[j])
+                            k += 1
+
+            img = BytesIO.BytesIO()
+            plt.savefig(img, format='png')
+            img.seek(0)
+            img = b64encode(img.getvalue()).decode('utf-8')
+            requests.post(root_link + 'api/backend/', json={'plots': img})
+            plt.clf()
 
 
 class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_classification()
@@ -497,46 +540,83 @@ class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_c
 
     def plot_data(self):
         """Plots the data."""
+        img = BytesIO.BytesIO()
+
         if self.data_type == 1:
+            n_plots = self.n_features * (self.n_features - 1) // 2
+            n_rows = int(n_plots**0.5)
+            n_cols = n_plots // n_rows
+            if n_rows * n_cols < n_plots:
+                n_cols += 1
+            fig, ax = plt.subplots(n_rows, n_cols)
+            k = 0
+
             for i in range(self.n_features - 1):
                 if type(self.data[0, i]) is not str:
                     for j in range(i + 1, self.n_features):
                         if type(self.data[0, j]) is not str:
-                            plt.clf()
-                            plt.scatter(self.data[:, i], self.data[:, j], c=self.targets)
-                            plt.xlabel(self.data.columns[i])
-                            plt.ylabel(self.data.columns[j])
-                            plt.savefig(
-                                self.plt_dir + '/' + self.data.columns[i] + '_vs_' + self.data.columns[j] + '.png')
+                            row = k // n_cols
+                            col = k % n_cols
+                            ax[row, col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
+                            ax[row, col].xlabel(self.data.columns[i])
+                            ax[row, col].ylabel(self.data.columns[j])
+                            k += 1
 
         else:
             d = np.concatenate((self.data, self.targets), axis=1)
             c = self.feature_names + self.target_names
             # nothing to see here, just move along
 
+            n_plots = (self.n_features + self.n_targets) * (self.n_features + self.n_targets - 1) // 2
+            n_rows = int(n_plots**0.5)
+            n_cols = n_plots // n_rows
+            if n_rows * n_cols < n_plots:
+                n_cols += 1
+            fig, ax = plt.subplots(n_rows, n_cols)
+            k = 0
+
             for i in range(self.n_features + self.n_targets - 1):
                 if type(d[0, i]) is not str:
                     for j in range(i+1, self.n_features + self.n_targets):
                         if type(d[0, j]) is not str:
-                            plt.clf()
-                            plt.scatter(d[:, i], d[:, j])
-                            plt.xlabel(c[i])
-                            plt.ylabel(c[j])
-                            plt.savefig(self.plt_dir + '/' + c[i] + '_vs_' + c[j] + '.png')
-
-    def show_plots(self):
-        # this function is only for debugging purposes and needs to be used in python!
-        # show all the images in plt_dir:
-        files = os.listdir(self.plt_dir)
-        n_plots = len(files)
-        for i in range(n_plots):
-            plt.clf()
-            img = plt.imread(self.plt_dir + '/' + files[i])
-            plt.imshow(img)
-            plt.show()
+                            row = k // n_cols
+                            col = k % n_cols
+                            ax[row, col].scatter(d[:, i], d[:, j])
+                            ax[row, col].set_xlabel(c[i])
+                            ax[row, col].set_ylabel(c[j])
+                            k += 1
+        
+        plt.savefig(img, format='png')
+        img.seek(0)
+        img = b64encode(img.getvalue()).decode('utf-8')
+        requests.post(root_link + 'api/backend/', json={'plots': img})
+        plt.clf()
 
     def plot_decision_boundary(self, model, epoch=0):
-        pass
+        if self.n_features < 2 and self.n_targets < 2:
+                step = 0.01
+                if self.normalization:
+                    inp = np.arange(-0.1, 1.1, step)
+                else:
+                    mini, maxi = self.minima[0], self.maxima[0]
+                    inp = np.arange(mini, maxi, step)
+
+                # Plot the decision boundary. For that, we will assign a color to each
+                # point in the mesh.
+                inp = np.array(inp)
+                Z = np.array(model.predict(inp.reshape(self.n_features, -1).T))
+
+                
+                plt.plot(inp, Z)
+                plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
+                plt.xlabel(self.feature_names[0])
+                plt.ylabel(self.target_names[0])
+                img = BytesIO.BytesIO()
+                plt.savefig(img, format='png')
+                img.seek(0)
+                img = b64encode(img.getvalue()).decode('utf-8')
+                requests.post(root_link + 'api/backend/', json={'plots': img})
+                plt.clf()
 
 
 class DataFromFunction(Dataset):  # this one is for regression on simple functions
@@ -630,26 +710,52 @@ class DataFromFunction(Dataset):  # this one is for regression on simple functio
         c = self.feature_names + self.target_names
         # nothing to see here, just move along
 
+        img = BytesIO.BytesIO()
+        n_plots = (self.n_features + self.n_targets) * (self.n_features + self.n_targets - 1) // 2
+        n_rows = int(n_plots**0.5)
+        n_cols = n_plots // n_rows
+        if n_rows * n_cols < n_plots:
+            n_cols += 1
+
         for i in range(self.n_features + self.n_targets - 1):
             if type(d[0, i]) is not str:
                 for j in range(i+1, self.n_features + self.n_targets):
                     if type(d[0, j]) is not str:
-                        plt.clf()
-                        plt.scatter(d[:, i], d[:, j])
-                        plt.xlabel(c[i])
-                        plt.ylabel(c[j])
-                        plt.savefig(self.plt_dir + '/' + c[i] + '_vs_' + c[j] + '.png')
-
-    def show_plots(self):
-        # this function is only for debugging purposes and needs to be used in python!
-        # show all the images in plt_dir:
-        files = os.listdir(self.plt_dir)
-        n_plots = len(files)
-        for i in range(n_plots):
-            plt.clf()
-            img = plt.imread(self.plt_dir + '/' + files[i])
-            plt.imshow(img)
-            plt.show()
+                        row = k // n_cols
+                        col = k % n_cols
+                        ax[row, col].scatter(d[:, i], d[:, j])
+                        ax[row, col].xlabel(c[i])
+                        ax[row, col].ylabel(c[j])
+                        k += 1
+        
+        plt.savefig(img, format='png')
+        img.seek(0)
+        img = b64encode(img.getvalue()).decode('utf-8')
+        requests.post(root_link + 'api/backend/', json={'plots': img})
+        plt.clf()
 
     def plot_decision_boundary(self, model, epoch=0):
-        pass
+        if self.n_features < 2 and self.n_targets < 2:
+                step = 0.01
+                if self.normalization:
+                    inp = np.arange(-0.1, 1.1, step)
+                else:
+                    mini, maxi = self.minima[0], self.maxima[0]
+                    inp = np.arange(mini, maxi, step)
+
+                # Plot the decision boundary. For that, we will assign a color to each
+                # point in the mesh.
+                inp = np.array(inp)
+                Z = np.array(model.predict(inp.reshape(self.n_features, -1).T))
+
+                
+                plt.plot(inp, Z)
+                plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
+                plt.xlabel(self.feature_names[0])
+                plt.ylabel(self.target_names[0])
+                img = BytesIO.BytesIO()
+                plt.savefig(img, format='png')
+                img.seek(0)
+                img = b64encode(img.getvalue()).decode('utf-8')
+                requests.post(root_link + 'api/backend/', json={'plots': img})
+                plt.clf()
