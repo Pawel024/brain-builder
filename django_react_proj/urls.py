@@ -21,9 +21,10 @@ from django.views.generic import TemplateView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index),
-    path('<path:path>', views.index),
     re_path(r'^api/backend$', views.query_list),
     re_path(r'^api/backend/$', views.query_list),
     re_path(r'^api/backend/(?P<pk>[0-9]+)$', views.query_detail),
-    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
+
+    # catch-all pattern
+    re_path(r'^.*$', views.index),
 ]
