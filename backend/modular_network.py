@@ -20,6 +20,7 @@ import json
 root_link = None
 task_id = None
 user_id = None
+pk = None
 
 
 class BuildNetwork(torch.nn.Module):
@@ -128,7 +129,7 @@ class BuildNetwork(torch.nn.Module):
                 errors += [error]
 
                 # let the frontend know how we're doing
-                requests.put(root_link + 'api/progress/', json={'error_list': json.dumps(errors), 'progress': epoch/epochs, 'plots': json.dumps(im), 'task_id': task_id, 'user_id': user_id})
+                requests.put(root_link + 'api/progress/' + pk + '/', json={'error_list': json.dumps(errors), 'progress': epoch/epochs, 'plots': json.dumps(im), 'task_id': task_id, 'user_id': user_id})
                 
 
         with torch.no_grad():
@@ -147,7 +148,7 @@ class BuildNetwork(torch.nn.Module):
                         total += 1
         
         im = dat.plot_decision_boundary(self, epoch)
-        requests.put(root_link + 'api/progress/', json={'error_list': json.dumps(errors), 'progress': epoch/epochs, 'plots': json.dumps(im), 'task_id': task_id, 'user_id': user_id})
+        requests.put(root_link + 'api/progress/' + pk + '/', json={'error_list': json.dumps(errors), 'progress': epoch/epochs, 'plots': json.dumps(im), 'task_id': task_id, 'user_id': user_id})
 
         if typ == 2:
             accuracy = torch.mean(1 - mse / torch.sum(torch.square(ys - torch.mean(ys, dim=0)), dim=0))

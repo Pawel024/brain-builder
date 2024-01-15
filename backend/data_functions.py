@@ -25,6 +25,7 @@ from matplotlib import pyplot as plt
 root_link = None
 task_id = None
 user_id = None
+pk = None
 
 
 class DataFromExcel(Dataset):
@@ -202,7 +203,7 @@ class DataFromExcel(Dataset):
         plt.savefig(img, format='png')
         img.seek(0)
         img = b64encode(img.getvalue()).decode('utf-8')
-        requests.put(root_link + 'progress/', json={'progress': -1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
+        requests.put(root_link + 'api/progress/' + pk + '/', json={'progress': -1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
         plt.clf()
 
     # This function is based on a CSE2510 Notebook and plots the decision boundary of a classifier
@@ -387,7 +388,7 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
         plt.savefig(img, format='png')
         img.seek(0)
         img = b64encode(img.getvalue()).decode('utf-8')
-        requests.put(root_link + 'api/progress/', json={'progress':-1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
+        requests.put(root_link + 'api/progress/' + pk + '/', json={'progress':-1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
         plt.clf()
 
     def plot_decision_boundary(self, model, epoch=0):
@@ -591,7 +592,7 @@ class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_c
         plt.savefig(img, format='png')
         img.seek(0)
         img = b64encode(img.getvalue()).decode('utf-8')
-        requests.put(root_link + 'api/progress/', json={'progress': -1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
+        requests.put(root_link + 'api/progress/' + pk + '/', json={'progress': -1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
         plt.clf()
 
     def plot_decision_boundary(self, model, epoch=0):
@@ -733,7 +734,7 @@ class DataFromFunction(Dataset):  # this one is for regression on simple functio
         plt.savefig(img, format='png')
         img.seek(0)
         img = b64encode(img.getvalue()).decode('utf-8')
-        requests.put(root_link + 'api/progress/', json={'progress': -1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
+        requests.put(root_link + 'api/progress/' + pk + '/', json={'progress': -1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
         plt.clf()
 
     def plot_decision_boundary(self, model, epoch=0):
