@@ -14,6 +14,10 @@ ReLu, Sigmoid, Softmax, Log_Softmax, or None.
 # Idea: look into different options for optimizers, e.g. Adam, Adagrad, RMSProp, etc.
 
 import torch
+import requests
+import json
+
+root_link = None
 
 
 class BuildNetwork(torch.nn.Module):
@@ -116,6 +120,8 @@ class BuildNetwork(torch.nn.Module):
                         dat.plot_decision_boundary(self, epoch)
                         print("Accuracy on training set after epoch ", epoch, ": ", round(100 * correct / total, 1), "%")
                 errors += [error]
+                # pass the list of errors to the frontend
+                requests.post(root_link + 'api/backend/', json={'error_list': json.dumps(errors), 'action': 1, 'nn_input': epoch/epochs)
 
         with torch.no_grad():
             ys, mse, correct, total = torch.tensor([]), torch.tensor([self.input[-1][0]*[0.]]), 0, 0

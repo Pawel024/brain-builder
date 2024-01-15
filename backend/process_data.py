@@ -15,6 +15,7 @@ import json
 from . import building 
 from . import levels 
 from . import data_functions as df
+from . import modular_network as mn
 import os
 import pickle
 import requests
@@ -28,7 +29,7 @@ def process(req, root_link):
     response = requests.get(root_link + 'api/tasks/')
     levels.games = response.json()
     levels.games = pd.DataFrame(levels.games)
-    df.root_link = root_link
+    df.root_link, mn.root_link = root_link, root_link
 
 
     if req['action'] == 1:  # create and train a network

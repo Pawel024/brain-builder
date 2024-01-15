@@ -1,9 +1,0 @@
-game_tag,explanation,type,n_inputs,n_outputs,dataset,max_layers,max_nodes,max_epochs,normalization_button
-1,The Iris dataset,1,4,3,load_iris(),6,16,200,0
-2,The Wine dataset,1,13,3,load_wine(),6,16,500,0
-21,"A custom dataset with satellite data for communication, navigation and earth observation satellites",1,4,3,Clas2a.csv,6,16,500,1
-111,This is a simple test set for classification (for debugging purposes),1,2,3,TestC.csv,6,16,500,1
-222,This is a simple test set for regression (for debugging purposes),2,2,1,TestR.csv,6,16,500,1
-333,A simple regression problem,2,1,1,"make_regression(n_samples=100, n_features=1, noise=10)",6,16,500,1
-444,A simple classification problem,1,2,2,"make_classification(n_samples=100, n_features=2, n_informative=2, n_redundant=0, n_classes=2)",6,16,500,1
-555,"A custom regression problem; dataset is [[functions], n_objects, n_inputs, n_outputs, lower_bound, upper_bound]; make sure that len(dataset)==6 and that len(functions)==n_inputs",2,1,1,"[[np.sin], 100, 1, 1, 0, 10]",,,,
