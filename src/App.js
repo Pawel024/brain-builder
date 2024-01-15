@@ -18,7 +18,6 @@ import Introduction from './introduction';
 
 const colorScale = chroma.scale(['#49329b', '#5e5cc2', '#8386d8', '#afb0e1', '#dddddd', '#e3a692', '#d37254', '#b64124', '#8f0500']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
 
-
 // ------- STYLED COMPONENTS -------
 
 const FloatingButton = styled(IconButton, {
@@ -60,6 +59,13 @@ const csrftoken = getCookie('csrftoken');
 
 axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
 */
+
+// ------- COOKIE FUNCTION -------
+function getCookie(name) {
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length === 2) return parts.pop().split(";").shift();
+}
 
 // ------- CYTOSCAPE FUNCTIONS -------
 
@@ -221,7 +227,7 @@ function App() {
 
   // Define the functions to fetch API data
   const fetchTrainingData = (apiData, setApiData, setAccuracy, setIsTraining, taskId) => {
-    let userId = localStorage.getItem('userId');
+    var userId = getCookie('user_id');
 
     axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`)
       .then((response) => {
@@ -239,7 +245,7 @@ function App() {
   };
 
   const fetchQueryResponse = (setApiData, setIsResponding, taskId) => {
-    let userId = localStorage.getItem('userId');
+    var userId = getCookie('user_id');
 
     axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`)
       .then((response) => {
@@ -295,7 +301,7 @@ function App() {
     }
     else {goToStep2 = true;};
 
-    let userId = localStorage.getItem('userId');
+    var userId = getCookie('user_id');
 
     if (goToStep2) {
       axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`)
@@ -403,7 +409,7 @@ function App() {
   // ------- POST REQUEST -------
   const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId) => {
     e.preventDefault();
-    let userId = localStorage.getItem('userId');
+    var userId = getCookie('user_id');
     const trainingData = {
       user_id: userId,
       task_id: taskId,
@@ -503,7 +509,7 @@ function App() {
     event.preventDefault();
     setIsResponding(1);
 
-    let userId = localStorage.getItem('userId');
+    var userId = getCookie('user_id');
 
     axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`)
       .then((response) => {

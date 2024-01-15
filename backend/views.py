@@ -10,13 +10,27 @@ from django.shortcuts import render
 
 import uuid
 
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
 def index(request):
     user_id = request.GET.get('user_id')
 
     if user_id is None or user_id == '':
-        # This is a new user, create a new user_id and store it in the session
-        user_id = str(uuid.uuid4())
-        request.session['user_id'] = user_id
+        # No user_id provided in GET parameters, check the cookies
+        user_id = request.COOKIES.get('user_id')
+
+        if user_id is None or user_id == '':
+            # This is a new user, create a new user_id
+            user_id = str(uuid.uuid4())
+
+            # Render the page with the user_id
+            response = render(request, 'index.html', {'user_id': user_id})
+
+            # Set a cookie with the user_id
+            response.set_cookie('user_id', user_id, max_age=365*24*60*60)
+
+            return response
 
     return render(request, 'index.html', {'user_id': user_id})
 
