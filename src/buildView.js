@@ -93,7 +93,7 @@ class Building extends React.Component {
 
     axios.get(window.location.origin + '/api/tasks/?task_id=' + this.props.taskId)
     .then(response => {
-      this.typeWriter(response.data[0].description);
+      this.typeWriter(response.data.description);
     })
     .catch(error => {
       console.error('Task description error:', error);
