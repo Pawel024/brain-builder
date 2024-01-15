@@ -9,9 +9,8 @@ from .process_data import process
 from django.shortcuts import render
 
 import uuid
+from django.views.decorators.csrf import csrf_protect
 
-from django.http import HttpResponseRedirect
-from django.urls import reverse
 
 def index(request, path=''):
     user_id = request.GET.get('user_id')
@@ -34,7 +33,8 @@ def index(request, path=''):
 
     return render(request, 'index.html', {'user_id': user_id})
 
-    
+
+@csrf_protect
 @api_view(['GET', 'POST'])
 def query_list(request):
     user_id = request.GET.get('user_id')
@@ -58,6 +58,8 @@ def query_list(request):
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@csrf_protect
 @api_view(['PUT', 'DELETE'])
 def query_detail(request, pk):
     try:
