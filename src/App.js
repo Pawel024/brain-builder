@@ -498,7 +498,7 @@ function App() {
       }, (error) => {
         console.log(error);
       });
-    }, 1000); // 1000 milliseconds = 1 second
+    }, 5000); // 5000 milliseconds = 5 seconds
 
     const trainingData = {
       action: 1,
