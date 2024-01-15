@@ -1,0 +1,1 @@
+This is your first challenge! You are tasked with creating a classification network to distinguish between navigation, communications, and earth observation satellites based on the following 4 characteristics: semi-major axis, inclination, expected life, and launch mass.
