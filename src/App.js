@@ -277,7 +277,7 @@ function App() {
 
   // ------- CYTOSCAPE EDITING -------
   useEffect(() => {
-    axios.get('/api/tasks')
+    axios.get('/api/all_tasks/')
       .then(response => {
         const taskIds = response.data.map(entry => entry.task_id);
         setTaskIds(taskIds);

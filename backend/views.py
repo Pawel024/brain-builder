@@ -102,6 +102,16 @@ def task_description_detail(request):
         serializer = TaskDescriptionSerializer(task_description, context={'request': request})
         return Response(serializer.data)
 
+
+@csrf_protect
+@api_view(['GET'])
+def all_tasks(request):
+    if request.method == 'GET':
+        tasks = TaskDescription.objects.all()
+        serializer = TaskDescriptionSerializer(tasks, many=True, context={'request': request})
+        return Response(serializer.data)
+
+
 @csrf_protect
 @api_view(['GET', 'POST'])
 def q_list(request):
