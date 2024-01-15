@@ -733,7 +733,7 @@ class DataFromFunction(Dataset):  # this one is for regression on simple functio
         plt.savefig(img, format='png')
         img.seek(0)
         img = b64encode(img.getvalue()).decode('utf-8')
-        requests.put(root_link + 'api/progress/', json={'progress': -1, plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
+        requests.put(root_link + 'api/progress/', json={'progress': -1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
         plt.clf()
 
     def plot_decision_boundary(self, model, epoch=0):
