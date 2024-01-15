@@ -26,7 +26,7 @@ def process(req, root_link):
 
     # load the games dataframe from the API
     #  this dataframe contains all the game-specific info the backend uses
-    response = requests.get(root_link + 'api/tasks/?user_id=' + req['user_id'] + '&task_id=' + req['task_id'] + '/')
+    response = requests.get(root_link + 'api/tasks/?user_id=' + str(req['user_id']) + '&task_id=' + str(req['task_id']) + '/')
     levels.games = response.json()
     levels.games = pd.DataFrame(levels.games)
     df.root_link, mn.root_link = root_link, root_link
