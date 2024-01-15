@@ -37,17 +37,16 @@ def index(request, path=''):
 @csrf_protect
 @api_view(['GET', 'POST'])
 def query_list(request):
-    user_id = request.GET.get('user_id')
-    task_id = request.GET.get('task_id')
-
     if request.method == 'GET':
+        user_id = request.GET.get('user_id')
+        task_id = request.GET.get('task_id')
         data = Row.objects.filter(user_id=user_id, task_id=task_id).order_by('-id')[:1]
-
         serializer = RowSerializer(data, context={'request': request}, many=True)
-
         return Response(serializer.data)
 
     elif request.method == 'POST':
+        user_id = request.data.get('user_id')
+        task_id = request.data.get('task_id')
         processed_data = process(request.data)
         processed_data['user_id'] = user_id
         processed_data['task_id'] = task_id
