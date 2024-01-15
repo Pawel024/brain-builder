@@ -21,6 +21,9 @@ import {
   Tooltip, 
   Legend 
 } from 'chart.js';
+import task11 from './task-11.txt';
+import task12 from './task-12.txt';
+import task13 from './task-13.txt';
 
 function BuildingWrapper(props) {
   const navigate = useNavigate();
