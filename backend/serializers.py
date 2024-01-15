@@ -12,4 +12,4 @@ class TaskDescriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskDescription
-        fields = ('task_id', 'description')
+        fields = ('pk', 'task_id', 'description')
