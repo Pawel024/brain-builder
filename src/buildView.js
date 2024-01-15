@@ -76,7 +76,7 @@ class Building extends React.Component {
   };
 
   getTaskDescription = (taskId) => {
-    axios.get(window.location.origin + '/api/task/?task_id=' + taskId)
+    axios.get(window.location.origin + '/api/tasks/?task_id=' + taskId)
     .then(response => {
       return response.data.description;
     })
