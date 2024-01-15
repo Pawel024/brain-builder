@@ -83,7 +83,8 @@ def query_detail(request, pk):
 
 @csrf_protect
 @api_view(['GET'])
-def task_description_detail(request, task_id):
+def task_description_detail(request):
+    task_id = request.GET.get('task_id')
     try:
         task_description = TaskDescription.objects.get(task_id=task_id)
     except TaskDescription.DoesNotExist:
