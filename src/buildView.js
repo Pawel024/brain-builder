@@ -1,6 +1,6 @@
 import React from 'react'
 import './App.css';
-import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator } from '@radix-ui/themes';
+import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator, Checkbox } from '@radix-ui/themes';
 import * as Form from '@radix-ui/react-form';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
@@ -265,7 +265,10 @@ class Building extends React.Component {
             <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Learning rate: {this.props.learningRate}</div>
           </Box>
           
-          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
+          {this.props.taskData[this.props.index]['normalization'] ? (<Checkbox style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97))}}>Normalize training data</Checkbox>):(<div></div>)}
+
+          {/* make the position of the box shift down if normalization is true */}
+          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)) + (this.props.taskData[this.props.index]['normalization'] ? 50 : 0), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
             <div id="/api-data">
               {this.props.isTraining===2 ? (
                 <Flex direction='column' >
@@ -275,7 +278,6 @@ class Building extends React.Component {
               ) : (this.props.isTraining===1 ? (
                 <Flex direction= 'column'>
                   <div style={{ fontFamily:'monospace' }}><b>Training...</b></div>
-                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:20 }}></canvas>
                 </Flex>
               ) : (
                 <div style={{ textAlign:'justify', width: Math.round(0.16 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>

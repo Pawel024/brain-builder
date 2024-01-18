@@ -274,6 +274,7 @@ function App() {
   };
 
   let accuracyColor = 'var(--slate-11)';
+  const [taskData, setTaskData] = useState([]);
 
   // ------- CYTOSCAPE EDITING -------
   useEffect(() => {
@@ -282,7 +283,9 @@ function App() {
         let taskIds = response.data.map(entry => entry.task_id);
         taskIds = taskIds.filter(taskId => taskId !== 0); // filter out taskId 0
         taskIds.sort((a, b) => a - b); // sort the taskIds
-        
+        console.log("first task id: ", taskIds[0]);
+
+        setTaskData(taskIds);
         setTaskIds(taskIds);
         setCytoLayers(taskIds.map(() => []));
         setIsTraining(taskIds.map(() => false));
@@ -904,6 +907,8 @@ function App() {
                   setIsTraining={setIsTraining}
                   apiData={apiData[index]}
                   setApiData={setApiData}
+                  taskData={taskData}
+                  setTaskData={setTaskData}
                   putRequest={putRequest}
                   accuracy={accuracy[index]}
                   setAccuracy={setAccuracy}
