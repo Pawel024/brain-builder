@@ -816,7 +816,7 @@ function App() {
                 <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
                 <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
                 </Link>
-                <Box align='end' mr='3' >
+                <Box display='flex' justifyContent='flex-end' mr='3' >
                     <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
                     <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
                     </Link>
