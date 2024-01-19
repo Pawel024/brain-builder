@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { Theme, Flex, Box, Heading, Grid, IconButton, Button } from '@radix-ui/themes';
 import * as Slider from '@radix-ui/react-slider';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { PlusIcon, MinusIcon, RocketIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, RocketIcon, QuestionMarkIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
@@ -14,6 +14,7 @@ import Tutorial from './tutorial';
 import chroma from 'chroma-js';
 import Readme from './readme';
 import Introduction from './introduction';
+import QuizApp from './quiz';
 
 
 const colorScale = chroma.scale(['#49329b', '#5e5cc2', '#8386d8', '#afb0e1', '#dddddd', '#e3a692', '#d37254', '#b64124', '#8f0500']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
@@ -816,7 +817,7 @@ function App() {
                 <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
                 <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
                 </Link>
-                <Box display='flex' justifyContent='flex-end' mr='3' >
+                <Box align='end' mr='3' >
                     <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
                     <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
                     </Link>
@@ -860,6 +861,14 @@ function App() {
                         </ChallengeButton>
                       </Link>
                     ))}
+                    <Link to={`quiz1`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                      <ChallengeButton size="1" variant="outline">
+                        <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                          <label>Quiz</label>
+                          <div><QuestionMarkIcon width="27" height="27" /></div>
+                        </Flex>
+                      </ChallengeButton>
+                    </Link>
                   </Box>
                 </Box>
               ))} 
@@ -920,6 +929,24 @@ function App() {
               }
             />
           ))}
+          <Route path="/quiz1" element={
+            <div>
+              <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
+              <Grid columns='3' mt='1'>
+                  <Box/>
+                  <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
+                  <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
+                  </Link>
+                  <Box align='end' mr='3' >
+                      <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
+                      <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
+                      </Link>
+                  </Box>
+              </Grid>
+              </Box>
+              <QuizApp />
+            </div>
+          } />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
