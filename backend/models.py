@@ -30,7 +30,7 @@ class TaskDescription(models.Model):
     normalization = models.BooleanField()
 
     def __str__(self):
-        return self.task_id
+        return str(self.task_id)
 
 class Progress(models.Model):
     user_id = models.CharField(max_length=100)
@@ -45,40 +45,40 @@ class Progress(models.Model):
 class Quiz(models.Model):
     quiz_id = models.IntegerField(unique=True)
     
-    question_1 = models.TextField()
-    option_1_a = models.TextField()
-    option_1_b = models.TextField()
-    option_1_c = models.TextField()
-    option_1_d = models.TextField()
-    answer_1 = models.CharField(max_length=200)
+    question_1 = models.TextField(null=True)
+    option_1_a = models.CharField(max_length=200, null=True)
+    option_1_b = models.CharField(max_length=200, null=True)
+    option_1_c = models.CharField(max_length=200, null=True)
+    option_1_d = models.CharField(max_length=200, null=True)
+    answer_1 = models.CharField(max_length=200, null=True)
     
-    question_2 = models.TextField()
-    option_2_a = models.TextField()
-    option_2_b = models.TextField()
-    option_2_c = models.TextField()
-    option_2_d = models.TextField()
-    answer_2 = models.CharField(max_length=200)
+    question_2 = models.TextField(null=True)
+    option_2_a = models.CharField(max_length=200, null=True)
+    option_2_b = models.CharField(max_length=200, null=True)
+    option_2_c = models.CharField(max_length=200, null=True)
+    option_2_d = models.CharField(max_length=200, null=True)
+    answer_2 = models.CharField(max_length=200, null=True)
 
-    answer_3 = models.CharField(max_length=200)
-    option_3_a = models.TextField()
-    option_3_b = models.TextField()
-    option_3_c = models.TextField()
-    option_3_d = models.TextField()
-    answer_3 = models.CharField(max_length=200)
+    question_3 = models.TextField(null=True)
+    option_3_a = models.CharField(max_length=200, null=True)
+    option_3_b = models.CharField(max_length=200, null=True)
+    option_3_c = models.CharField(max_length=200, null=True)
+    option_3_d = models.CharField(max_length=200, null=True)
+    answer_3 = models.CharField(max_length=200, null=True)
 
-    question_4 = models.TextField()
-    option_4_a = models.TextField()
-    option_4_b = models.TextField()
-    option_4_c = models.TextField()
-    option_4_d = models.TextField()
-    answer_4 = models.CharField(max_length=200)
+    question_4 = models.TextField(null=True)
+    option_4_a = models.CharField(max_length=200, null=True)
+    option_4_b = models.CharField(max_length=200, null=True)
+    option_4_c = models.CharField(max_length=200, null=True)
+    option_4_d = models.CharField(max_length=200, null=True)
+    answer_4 = models.CharField(max_length=200, null=True)
 
-    question_5 = models.TextField()
-    option_5_a = models.TextField()
-    option_5_b = models.TextField()
-    option_5_c = models.TextField()
-    option_5_d = models.TextField()
-    answer_5 = models.CharField(max_length=200)
+    question_5 = models.TextField(null=True)
+    option_5_a = models.CharField(max_length=200, null=True)
+    option_5_b = models.CharField(max_length=200, null=True)
+    option_5_c = models.CharField(max_length=200, null=True)
+    option_5_d = models.CharField(max_length=200, null=True)
+    answer_5 = models.CharField(max_length=200, null=True)
 
     def __str__(self):
-        return self.quiz_id
+        return str(self.quiz_id)
