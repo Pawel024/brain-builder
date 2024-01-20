@@ -5,6 +5,7 @@ import '@radix-ui/themes/styles.css';
 import * as RadioGroup from '@radix-ui/react-radio-group';
 import * as Progress from '@radix-ui/react-progress';
 import './App.css';
+import axios from 'axios';
 
 const Quiz = ({ questions }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -124,7 +125,7 @@ const Quiz = ({ questions }) => {
   );
 };
 
-const questions = [
+let questions = [
     {
       question: 'What is the capital of France?',
       answers: [
@@ -164,6 +165,12 @@ const questions = [
   ];
   
   function QuizApp() {
+    axios.get(window.location.origin + '/api/tasks/?task_id=' + this.props.taskId)
+    .then(response => response.json())
+    .then(data => {
+        questions = data.questions;
+    })
+    .catch(error => console.log(error));
     return <Quiz questions={questions} />;
   }
   

@@ -5,6 +5,7 @@ from rest_framework import status
 from .models import Row, TaskDescription, Progress, Quiz
 from .serializers import *
 from .process_data import process
+from django.http import JsonResponse
 
 from django.shortcuts import render
 
@@ -118,12 +119,31 @@ def quiz_description_detail(request):
     quiz_id = request.GET.get('quiz_id')
     try:
         quiz = Quiz.objects.get(quiz_id=quiz_id)
+        data = {
+            'questions': []
+        }
+
+        for i in range(1, 6):  # adjust the range according to the number of questions
+            question_text = getattr(quiz, f'question_{i}')
+            options = [
+                getattr(quiz, f'option_{i}_{option}')
+                for option in ['a', 'b', 'c', 'd']
+            ]
+            answer = getattr(quiz, f'answer_{i}')
+
+            question_data = {
+                'question': question_text,
+                'answers': [
+                    {'answerText': option, 'isCorrect': option == answer}
+                    for option in options
+                ],
+            }
+
+            data['questions'].append(question_data)
+
+        return JsonResponse(data)
     except Quiz.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = QuizSerializer(quiz, context={'request': request})
-        return Response(serializer.data)
 
 
 @csrf_protect
