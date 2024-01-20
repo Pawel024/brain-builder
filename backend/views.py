@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 
-from .models import Row, TaskDescription, Progress
+from .models import Row, TaskDescription, Progress, Quiz
 from .serializers import *
 from .process_data import process
 
@@ -109,6 +109,29 @@ def all_tasks(request):
     if request.method == 'GET':
         tasks = TaskDescription.objects.all()
         serializer = TaskDescriptionSerializer(tasks, many=True, context={'request': request})
+        return Response(serializer.data)
+    
+
+@csrf_protect
+@api_view(['GET'])
+def quiz_description_detail(request):
+    quiz_id = request.GET.get('quiz_id')
+    try:
+        quiz = Quiz.objects.get(quiz_id=quiz_id)
+    except Quiz.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = QuizSerializer(quiz, context={'request': request})
+        return Response(serializer.data)
+
+
+@csrf_protect
+@api_view(['GET'])
+def all_quizzes(request):
+    if request.method == 'GET':
+        quizzes = Quiz.objects.all()
+        serializer = QuizSerializer(quizzes, many=True, context={'request': request})
         return Response(serializer.data)
 
 
