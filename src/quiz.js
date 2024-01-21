@@ -124,8 +124,9 @@ const Quiz = ({ questions }) => {
     </Box>
   );
 };
-
-let questions = [
+  
+function QuizApp() {
+  const [questions, setQuestions] = useState([
     {
       question: 'What is the capital of France?',
       answers: [
@@ -162,16 +163,16 @@ let questions = [
         { answerText: '7', isCorrect: true },
       ],
     },
-  ];
-  
-  function QuizApp() {
+  ]);
+
+  useEffect(() => {
     axios.get(window.location.origin + '/api/tasks/?task_id=11')
-    .then(response => response.json())
-    .then(data => {
-        questions = data.questions;
-    })
+    .then(response => {
+      setQuestions(response.data.questions);
+  })
     .catch(error => console.log(error));
-    return <Quiz questions={questions} />;
-  }
-  
-  export default QuizApp;
+  }, []);
+  return <Quiz questions={questions} />;
+}
+
+export default QuizApp;
