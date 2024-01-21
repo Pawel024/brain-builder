@@ -166,7 +166,7 @@ function QuizApp() {
   ]);
 
   useEffect(() => {
-    axios.get(window.location.origin + '/api/tasks/?task_id=11')
+    axios.get(window.location.origin + '/api/quizzes/?quiz_id=11')
     .then(response => {
       setQuestions(response.data.questions);
   })
