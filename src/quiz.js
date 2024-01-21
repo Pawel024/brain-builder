@@ -165,7 +165,7 @@ let questions = [
   ];
   
   function QuizApp() {
-    axios.get(window.location.origin + '/api/tasks/?task_id=' + this.props.taskId)
+    axios.get(window.location.origin + '/api/tasks/?task_id=11')
     .then(response => response.json())
     .then(data => {
         questions = data.questions;
