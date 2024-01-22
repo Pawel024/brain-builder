@@ -132,7 +132,7 @@ def quiz_description_detail(request):
             ]
 
             if getattr(quiz, f"answer_{i}") in possible_options:
-                answer = getattr(quiz, f'option_{getattr(quiz, f"answer_{i}")}')
+                answer = getattr(quiz, f'option_{i}_{getattr(quiz, f"answer_{i}")}')
             else:
                 answer = getattr(quiz, f"answer_{i}")
 
