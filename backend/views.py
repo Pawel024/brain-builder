@@ -138,15 +138,15 @@ def quiz_description_detail(request):
 
             question_data = {
                 'question': question_text,
-                'answers': [
-                    {'answerText': option, 'isCorrect': option == answer}
+                'options': [
+                    {'optionText': option, 'isCorrect': option == answer}
                     for option in options
                 ],
                 'question_type': 'text' if all(not option for option in options) else 'multiple choice',
             }
 
             if question_data['question_type'] == 'text':
-                question_data['answers'] = [{'answerText': answer, 'isCorrect': True}]
+                question_data['options'] = [{'optionText': answer, 'isCorrect': True}]
 
             data['questions'].append(question_data)
 
