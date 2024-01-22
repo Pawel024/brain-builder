@@ -125,11 +125,16 @@ def quiz_description_detail(request):
 
         for i in range(1, 6):  # adjust the range according to the number of questions
             question_text = getattr(quiz, f'question_{i}')
+            possible_options = ['a', 'b', 'c', 'd']
             options = [
                 getattr(quiz, f'option_{i}_{option}')
-                for option in ['a', 'b', 'c', 'd']
+                for option in possible_options
             ]
-            answer = getattr(quiz, f'answer_{i}')
+
+            if getattr(quiz, f"answer_{i}") in possible_options:
+                answer = getattr(quiz, f'option_{getattr(quiz, f"answer_{i}")}')
+            else:
+                answer = getattr(quiz, f"answer_{i}")
 
             question_data = {
                 'question': question_text,
@@ -137,7 +142,11 @@ def quiz_description_detail(request):
                     {'answerText': option, 'isCorrect': option == answer}
                     for option in options
                 ],
+                'question_type': 'text' if all(not option for option in options) else 'multiple choice',
             }
+
+            if question_data['question_type'] == 'text':
+                question_data['answers'] = [{'answerText': answer, 'isCorrect': True}]
 
             data['questions'].append(question_data)
 

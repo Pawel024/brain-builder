@@ -930,7 +930,7 @@ function App() {
             />
           ))}
           <Route path="/quiz1" element={
-            <div>
+            <div className="App">
               <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
               <Grid columns='3' mt='1'>
                 <Box ml='3' style={{display:"flex"}}>  

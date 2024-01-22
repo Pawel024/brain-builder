@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Flex, Box, Button, Heading } from '@radix-ui/themes';
+import { Flex, Box, Button, Heading, TextArea } from '@radix-ui/themes';
 import { CheckCircledIcon, CrossCircledIcon } from '@radix-ui/react-icons';
 import '@radix-ui/themes/styles.css';
 import * as RadioGroup from '@radix-ui/react-radio-group';
@@ -7,47 +7,79 @@ import * as Progress from '@radix-ui/react-progress';
 import './App.css';
 import axios from 'axios';
 
+
+const ScoreScreen = ({ score, userAnswers, handleRetry }) => (
+  <Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", padding: '30px 50px', background:"solid", backgroundColor:"white" }}>
+    <Flex gap="1" direction="column" style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <Heading size='5' style={{ color: 'var(--slate-12)', marginBottom:20 }}>
+          Quiz Finished!
+      </Heading>
+      <Box>
+          <Heading size='3' style={{ color: 'var(--slate-12)', marginBottom:20 }}>
+          Your score is: {score}
+          </Heading>
+      </Box>
+      <Box>
+        <Heading size='3' style={{ color: 'var(--slate-12)', marginBottom:15 }}>
+          Your answers:
+        </Heading>
+        {userAnswers.map((option, index) => (
+          <p key={index}>
+            Question {index + 1}: {option.selectedOption} {option.isCorrect ? (<CheckCircledIcon color='green'/>) : (<CrossCircledIcon color='red'/>)}
+          </p>
+        ))}
+      </Box>
+      <Button onClick={(event) => handleRetry(event)} style={{marginTop:10}}>Retry</Button>
+    </Flex>
+  </Box>
+);
+
+
 const Quiz = ({ questions }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [isQuizFinished, setIsQuizFinished] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(null);
   const [userAnswers, setUserAnswers] = useState([]);
   const [progress, setProgress] = useState(0);
-
+  const [textInputValue, setTextInputValue] = useState("");
+  
   useEffect(() => {
     const timer = setTimeout(() => setProgress((currentQuestion+1)/(questions.length)*100-currentQuestion), 250);
     return () => clearTimeout(timer);
   }, [currentQuestion, questions.length]);
 
   useEffect(() => {
-    if (isQuizFinished) {
-      setTimeout(() => {
-        setIsQuizFinished(false);
-        setScore(0);
-        setCurrentQuestion(0);
-        setUserAnswers([]);
-      }, 5000);
-    }
-  }, [isQuizFinished, score]);
-
-  useEffect(() => {
-    setSelectedAnswer(null);
+    setSelectedOption(null);
   }, [currentQuestion]);
 
-  const handleAnswerOptionClick = (event) => {
+  const handleOptionClick = (event) => {
     event.preventDefault();
-  
-    const isCorrect = questions[currentQuestion].answers[selectedAnswer].isCorrect;
+    
+    let isCorrect = false;
+    if (questions[currentQuestion].question_type === "text") {
+      isCorrect = questions[currentQuestion].options[0].optionText === textInputValue;        
+    }
+    else {
+      isCorrect = questions[currentQuestion].options[selectedOption].isCorrect;
+    }
+
     if (isCorrect) {
       setScore((prevScore) => prevScore + 1);
     }
 
     // save the answer in userAnswers
-    setUserAnswers((prevUserAnswers) => [
-      ...prevUserAnswers,
-      { selectedAnswer: questions[currentQuestion].answers[selectedAnswer].answerText, isCorrect },
-    ]);
+    if (questions[currentQuestion].question_type === "text") {
+      setUserAnswers((prevUserAnswers) => [
+        ...prevUserAnswers,
+        { selectedOption: textInputValue, isCorrect },
+      ]);
+    } else {
+      setUserAnswers((prevUserAnswers) => [
+        ...prevUserAnswers,
+        { selectedOption: questions[currentQuestion].options[selectedOption].optionText, isCorrect },
+      ]);
+    }
   
     const nextQuestion = currentQuestion + 1;
     if (nextQuestion < questions.length) {
@@ -57,34 +89,19 @@ const Quiz = ({ questions }) => {
     }
   };
 
-  const ScoreScreen = ({ score }) => (
-    <Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", padding: '30px 50px', background:"solid", backgroundColor:"white" }}>
-      <Flex gap="1" direction="column" style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <Heading size='5' style={{ color: 'var(--slate-12)', marginBottom:20 }}>
-            Quiz Finished!
-        </Heading>
-        <Box style={{ marginBottom:10 }}>
-            <Heading size='3' style={{ color: 'var(--slate-12)', marginBottom:20 }}>
-            Your score is: {score}
-            </Heading>
-        </Box>
-        <Box>
-          <Heading size='3' style={{ color: 'var(--slate-12)', marginBottom:20 }}>
-            Your answers:
-          </Heading>
-          {userAnswers.map((answer, index) => (
-            <p key={index}>
-              Question {index + 1}: {answer.selectedAnswer} {answer.isCorrect ? (<CheckCircledIcon color='green'/>) : (<CrossCircledIcon color='red'/>)}
-            </p>
-          ))}
-        </Box>
-      </Flex>
-    </Box>
-  );
+  const handleRetry = (event) => {
+    event.preventDefault();
+    setIsQuizFinished(false);
+    setScore(0);
+    setCurrentQuestion(0);
+    setUserAnswers([]);
+    setSelectedOption(null);
+    setProgress(0);
+  };
 
   return (
-    <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'monospace', backgroundImage: 'linear-gradient(330deg, rgba(7,62,185, 0.15) 0%, rgba(7,185,130, 0.15) 100%)'}}>
-    {isQuizFinished ? <ScoreScreen score={score} /> : (
+    <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: window.innerHeight-52, fontFamily: 'monospace', backgroundImage: 'linear-gradient(330deg, rgba(7,62,185, 0.15) 0%, rgba(7,185,130, 0.15) 100%)'}}>
+    {isQuizFinished ? <ScoreScreen score={score} userAnswers={userAnswers} handleRetry={handleRetry} /> : (
       <Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", padding: '30px 50px', background:"solid", backgroundColor:"white" }}>
         <Flex gap="1" direction="column" style={{ justifyContent: 'center', alignItems: 'center' }}>
           <Progress.Root className="ProgressRoot" value={progress} style={{ marginBottom:5 }}>
@@ -104,19 +121,19 @@ const Quiz = ({ questions }) => {
         </Flex>
         <form>
           <Flex gap="2" direction="column" style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <RadioGroup.Root className="RadioGroupRoot" defaultValue="default" aria-label="View density" value={selectedAnswer !== null ? selectedAnswer.toString() : ''} onValueChange={setSelectedAnswer}>
-            {questions[currentQuestion].answers.map((answer, index) => (
+          {questions[currentQuestion].question_type === "multiple choice" ? (<RadioGroup.Root className="RadioGroupRoot" defaultValue="default" aria-label="Multiple choice question" value={selectedOption !== null ? selectedOption.toString() : ''} onValueChange={setSelectedOption}>
+            {questions[currentQuestion].options.map((option, index) => (
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <RadioGroup.Item className="RadioGroupItem" value={index.toString()} key={index} id="r1">
+                <RadioGroup.Item className="RadioGroupItem" value={index.toString()} key={index}>
                   <RadioGroup.Indicator className="RadioGroupIndicator" />
                 </RadioGroup.Item>
                 <label className="Label" htmlFor="r1">
-                  {answer.answerText}
+                  {option.optionText}
                 </label>
               </div>
             ))}
-          </RadioGroup.Root>
-          <Button onClick={(event) => handleAnswerOptionClick(event)} style={{marginTop:20}}>Next</Button>
+          </RadioGroup.Root>): (<TextArea color="gray" placeholder="Type your answer…" style={{ width:window.innerWidth/3, height:window.innerHeight/5 }} onChange={event => setTextInputValue(event.target.value)} />)}
+          <Button onClick={(event) => handleOptionClick(event)} style={{marginTop:20}}>Next</Button>
           </Flex>
         </form>
       </Box>
@@ -126,42 +143,66 @@ const Quiz = ({ questions }) => {
 };
   
 function QuizApp() {
+
+  // ------- WINDOW RESIZING -------
+
+  function getWindowSize() {
+    const {innerWidth, innerHeight} = window;
+    return {innerWidth, innerHeight};
+  }
+  
+  // eslint-disable-next-line no-unused-vars
+  const [windowSize, setWindowSize] = useState(getWindowSize());
+
+  // update window size when window is resized
+  useEffect(() => {
+    function handleWindowResize() {
+      setWindowSize(getWindowSize());
+    }
+
+    window.addEventListener('resize', handleWindowResize);
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, []);
+
+  // ------- ACTUAL QUIZ -------
+
   const [questions, setQuestions] = useState([
     {
       question: 'What is the capital of France?',
-      answers: [
-        { answerText: 'Paris', isCorrect: true },
-        { answerText: 'London', isCorrect: false },
-        { answerText: 'Berlin', isCorrect: false },
-        { answerText: 'Madrid', isCorrect: false },
+      options: [
+        { optionText: 'Paris', isCorrect: true },
+        { optionText: 'London', isCorrect: false },
+        { optionText: 'Berlin', isCorrect: false },
+        { optionText: 'Madrid', isCorrect: false },
       ],
+      question_type: "multiple choice",
     },
     {
       question: 'Who is CEO of Tesla?',
-      answers: [
-        { answerText: 'Jeff Bezos', isCorrect: false },
-        { answerText: 'Elon Musk', isCorrect: true },
-        { answerText: 'Bill Gates', isCorrect: false },
-        { answerText: 'Tony Stark', isCorrect: false },
+      options: [
+        { optionText: 'Jeff Bezos', isCorrect: false },
+        { optionText: 'Elon Musk', isCorrect: true },
+        { optionText: 'Bill Gates', isCorrect: false },
+        { optionText: 'Tony Stark', isCorrect: false },
       ],
+      question_type: "multiple choice",
     },
     {
       question: 'The iPhone was created by which company?',
-      answers: [
-        { answerText: 'Apple', isCorrect: true },
-        { answerText: 'Intel', isCorrect: false },
-        { answerText: 'Amazon', isCorrect: false },
-        { answerText: 'Microsoft', isCorrect: false },
+      options: [
+        { optionText: 'Apple', isCorrect: true },
+        { optionText: 'Intel', isCorrect: false },
+        { optionText: 'Amazon', isCorrect: false },
+        { optionText: 'Microsoft', isCorrect: false },
       ],
+      question_type: "multiple choice",
     },
     {
       question: 'How many Harry Potter books are there?',
-      answers: [
-        { answerText: '1', isCorrect: false },
-        { answerText: '4', isCorrect: false },
-        { answerText: '6', isCorrect: false },
-        { answerText: '7', isCorrect: true },
-      ],
+      options: [ {optionText: '7', isCorrect: true }, ],
+      question_type: "text",
     },
   ]);
 
@@ -172,6 +213,13 @@ function QuizApp() {
   })
     .catch(error => console.log(error));
   }, []);
+
+  useEffect(() => {
+    setQuestions(questions.filter((question) => {
+      return !(question.question === "");
+    }));
+  }, [questions]);
+
   return <Quiz questions={questions} />;
 }
 
