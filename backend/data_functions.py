@@ -7,26 +7,19 @@ These classes and their functions are used in the building.py and levels.py modu
 """
 
 # Improvements:
+# idea: try to make the code more efficient, maybe merge some functions somehow?
 # idea: add custom feature selection
 # idea: add manually defined normalization to standard normal distribution
 # idea: add sklearn.preprocessing.MinMaxScaler(), .Normalizer() and .StandardScaler to scale the data
 # idea: add class for images
 
 import os
-from io import BytesIO  # for sending the images
-import requests  # for sending the images
-from base64 import b64encode  # for sending the images
+from io import BytesIO  # for saving the images
 import numpy as np
 import pandas as pd
-import json
 import torch
 from torch.utils.data import Dataset, DataLoader
 from matplotlib import pyplot as plt
-
-root_link = None
-task_id = None
-user_id = None
-pk = None
 
 
 class DataFromExcel(Dataset):
@@ -63,8 +56,8 @@ class DataFromExcel(Dataset):
             for i in range(self.n_objects):
                 self.data.loc[i, 'Target'] = np.where(self.target_names == self.data.loc[i, 'Target'])[0][0]
 
-            self.minima = np.min(self.data.loc[:, self.feature_names], axis=0)
-            self.maxima = np.max(self.data.loc[:, self.feature_names], axis=0)
+            self.minima = self.data.loc[:, self.feature_names].min(axis=0)
+            self.maxima = self.data.loc[:, self.feature_names].max(axis=0)
 
             if self.normalization:
                 for i, f in enumerate(self.feature_names):
@@ -93,7 +86,8 @@ class DataFromExcel(Dataset):
             print("Data type not supported yet")
             pass
 
-        self.plot_data()  # uncomment if you want plots of the data; they will be saved in plt_dir
+        self.images = []
+        self.plot_data()  # plots all of the features against each other and stores the bytes data in 'images'
 
     # modifying the inherited functions
 
@@ -148,7 +142,7 @@ class DataFromExcel(Dataset):
     def label_name(self, i):
         assert type(i) is int
         try:
-            return self.target_names[i]
+            return str(self.target_names[i])
         except IndexError:
             print("Target name not found")
             return None
@@ -164,10 +158,8 @@ class DataFromExcel(Dataset):
 
         if self.data_type == 1:
             n_plots = self.n_features * (self.n_features - 1) // 2
-            n_rows = int(n_plots**0.5)
-            n_cols = n_plots // n_rows
-            if n_rows * n_cols < n_plots:
-                n_cols += 1
+            n_cols = 2
+            n_rows = int(np.ceil(n_plots / n_cols))
             fig, ax = plt.subplots(n_rows, n_cols)
             k = 0
 
@@ -178,16 +170,14 @@ class DataFromExcel(Dataset):
                             row = k // n_cols
                             col = k % n_cols
                             ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
-                            ax[row, col].set_xlabel(self.data.columns[i])
-                            ax[row, col].set_ylabel(self.data.columns[j])
+                            ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
+                            ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
                             k += 1
 
         elif self.data_type == 2:
             n_plots = (self.n_features + self.n_targets) * (self.n_features + self.n_targets - 1) // 2
-            n_rows = int(n_plots**0.5)
-            n_cols = n_plots // n_rows
-            if n_rows * n_cols < n_plots:
-                n_cols += 1
+            n_cols = 2
+            n_rows = int(np.ceil(n_plots / n_cols))
             fig, ax = plt.subplots(n_rows, n_cols)
             k = 0
             for i in range(self.n_features + self.n_targets - 1):
@@ -197,15 +187,16 @@ class DataFromExcel(Dataset):
                             row = k // n_cols
                             col = k % n_cols
                             ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j])
-                            ax[row, col].set_xlabel(self.data.columns[i])
-                            ax[row, col].set_ylabel(self.data.columns[j])
+                            ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
+                            ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
                             k += 1
 
-        plt.savefig(img, format='png')
+        fig.tight_layout()
+        fig.savefig(img, format='png')
         img.seek(0)
-        img = b64encode(img.getvalue()).decode('utf-8')
-        requests.put(root_link + 'api/progress/' + pk + '/', json={'progress': 10, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
+        self.images.append(img.getvalue())
         plt.clf()
+        print("Plot created.")
 
     # This function is based on a CSE2510 Notebook and plots the decision boundary of a classifier
     def plot_decision_boundary(self, model):
@@ -225,10 +216,8 @@ class DataFromExcel(Dataset):
                 Z = Z.reshape(mesh[0].shape)
 
                 n_plots = self.n_features * (self.n_features - 1) // 2
-                n_rows = int(n_plots**0.5)
-                n_cols = n_plots // n_rows
-                if n_rows * n_cols < n_plots:
-                    n_cols += 1
+                n_cols = 2
+                n_rows = int(np.ceil(n_plots / n_cols))
                 fig, ax = plt.subplots(n_rows, n_cols)
                 k = 0
 
@@ -243,15 +232,15 @@ class DataFromExcel(Dataset):
                                              mesh[np.where(np.array(self.feature_names) == self.data.columns[j])[0]][0],
                                              Z, alpha=0.5)
                                 ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
-                                ax[row, col].set_xlabel(self.data.columns[i])
-                                ax[row, col].set_ylabel(self.data.columns[j])
+                                ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
+                                ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
                                 k += 1
                 img = BytesIO()
-                plt.savefig(img, format='png')
+                fig.tight_layout()
+                fig.savefig(img, format='png')
                 img.seek(0)
-                img = b64encode(img.getvalue()).decode('utf-8')
+                self.images.append(img.getvalue())
                 plt.clf()
-                return img
                                 
 
         elif self.data_type == 2:
@@ -270,14 +259,15 @@ class DataFromExcel(Dataset):
                 
                 plt.plot(inp, Z)
                 plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
-                plt.xlabel(self.feature_names[0])
-                plt.ylabel(self.target_names[0])
+                plt.xlabel(self.feature_names[0].replace('_', ' '))
+                plt.ylabel(self.target_names[0].replace('_', ' '))
                 img = BytesIO()
+                plt.tight_layout()
                 plt.savefig(img, format='png')
                 img.seek(0)
                 img = b64encode(img.getvalue()).decode('utf-8')
+                self.images.append(img.getvalue())
                 plt.clf()
-                return img
 
 
 
@@ -317,6 +307,7 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
             for i in range(self.n_features):
                 self.data[:, i] = ((self.data[:, i] - self.minima[i]) / (self.maxima[i] - self.minima[i]))
 
+        self.images = []
         self.plot_data()  # uncomment if you want plots of the data; they will be saved in plt_dir
 
     def __len__(self):
@@ -349,7 +340,7 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
     def label_name(self, i):
         assert type(i) is int
         assert i < self.n_targets
-        return self.target_names[i]
+        return str(self.target_names[i])
 
     def sort_data(self, column='Target'):
         """Sorts the labels of the dataset in ascending order and returns the sorted dataset."""
@@ -368,10 +359,8 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
         img = BytesIO()
 
         n_plots = self.n_features * (self.n_features - 1) // 2
-        n_rows = int(n_plots**0.5)
-        n_cols = n_plots // n_rows
-        if n_rows * n_cols < n_plots:
-            n_cols += 1
+        n_cols = 2
+        n_rows = int(np.ceil(n_plots / n_cols))
         fig, ax = plt.subplots(n_rows, n_cols)
         k = 0
 
@@ -382,14 +371,14 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
                         row = k // n_cols
                         col = k % n_cols
                         ax[row, col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
-                        ax[row, col].set_xlabel(self.data.columns[i])
-                        ax[row, col].set_ylabel(self.data.columns[j])
+                        ax[row, col].set_xlabel(self.feature_names[i].replace('_', ' '))
+                        ax[row, col].set_ylabel(self.feature_names[j].replace('_', ' '))
                         k += 1
         
-        plt.savefig(img, format='png')
+        fig.tight_layout()
+        fig.savefig(img, format='png')
         img.seek(0)
-        img = b64encode(img.getvalue()).decode('utf-8')
-        requests.put(root_link + 'api/progress/' + pk + '/', json={'progress':-1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
+        self.images.append(img.getvalue())
         plt.clf()
 
     def plot_decision_boundary(self, model):
@@ -408,10 +397,8 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
             Z = Z.reshape(mesh[0].shape)
 
             n_plots = self.n_features * (self.n_features - 1) // 2
-            n_rows = int(n_plots ** 0.5)
-            n_cols = n_plots // n_rows
-            if n_rows * n_cols < n_plots:
-                n_cols += 1
+            n_cols = 2
+            n_rows = int(np.ceil(n_plots / n_cols))
             fig, ax = plt.subplots(n_rows, n_cols)
             k = 0
 
@@ -426,35 +413,39 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
                                          mesh[j][0],
                                          Z, alpha=0.5)
                             ax[row, col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
-                            ax[row, col].set_xlabel(self.data.columns[i])
-                            ax[row, col].set_ylabel(self.data.columns[j])
+                            ax[row, col].set_xlabel(self.feature_names[i].replace('_', ' '))
+                            ax[row, col].set_ylabel(self.feature_names[j].replace('_', ' '))
                             k += 1
 
             img = BytesIO()
-            plt.savefig(img, format='png')
+            fig.tight_layout()
+            fig.savefig(img, format='png')
             img.seek(0)
-            img = b64encode(img.getvalue()).decode('utf-8')
+            self.images.append(img.getvalue())
             plt.clf()
-            return img
 
 
-class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_classification()
+class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise), make_regression() and make_classification()
     def __init__(self, dataset, normalize=False, data_type=2):  # works for up to 10 features and 10 targets
         self.data_type = data_type
         self.data, self.targets = dataset
+        if len(self.data.shape) == 1:
+            self.data = self.data.reshape(-1, 1)
         if len(self.targets.shape) == 1:
             self.targets = self.targets.reshape(-1, 1)
-
-        self.target_names = ['Target_1', 'Target_2', 'Target_3', 'Target_4', 'Target_5', 'Target_6', 'Target_7',
-                             'Target_8', 'Target_9', 'Target_10']
-        self.feature_names = ['Feature_1', 'Feature_2', 'Feature_3', 'Feature_4', 'Feature_5', 'Feature_6',
-                              'Feature_7', 'Feature_8', 'Feature_9', 'Feature_10']
-
+        
         self.n_targets = len(self.targets[0])
         self.n_features = len(self.data[0])
         self.n_objects = len(self.data)
         if self.data_type == 1:
             self.n_targets = np.unique(self.targets).shape[0]
+
+        self.target_names = ['Target_1', 'Target_2', 'Target_3', 'Target_4', 'Target_5', 'Target_6', 'Target_7',
+                             'Target_8', 'Target_9', 'Target_10']
+        self.feature_names = ['Feature_1', 'Feature_2', 'Feature_3', 'Feature_4', 'Feature_5', 'Feature_6',
+                              'Feature_7', 'Feature_8', 'Feature_9', 'Feature_10']
+        self.feature_names = self.feature_names[:self.n_features]
+        self.target_names = self.target_names[:self.n_targets]
 
         self.minima = np.min(self.data, axis=0)
         self.maxima = np.max(self.data, axis=0)
@@ -469,6 +460,7 @@ class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_c
                     self.targets[:, i] = ((self.targets[:, i] - self.target_minima[i]) /
                                           (self.target_maxima[i] - self.target_minima[i]))
 
+        self.images = []
         self.plot_data()  # uncomment if you want plots of the data; they will be saved in plt_dir
 
     def __len__(self):
@@ -514,7 +506,7 @@ class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_c
     def label_name(self, i):
         assert type(i) is int
         assert i < self.n_targets
-        return self.target_names[i]
+        return str(self.target_names[i])
 
     def sort_data(self, column='Target'):
         """Sorts the labels of the dataset in ascending order and returns the sorted dataset."""
@@ -545,10 +537,8 @@ class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_c
 
         if self.data_type == 1:
             n_plots = self.n_features * (self.n_features - 1) // 2
-            n_rows = int(n_plots**0.5)
-            n_cols = n_plots // n_rows
-            if n_rows * n_cols < n_plots:
-                n_cols += 1
+            n_cols = 2
+            n_rows = int(np.ceil(n_plots / n_cols))
             fig, ax = plt.subplots(n_rows, n_cols)
             k = 0
 
@@ -559,8 +549,8 @@ class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_c
                             row = k // n_cols
                             col = k % n_cols
                             ax[row, col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
-                            ax[row, col].xlabel(self.data.columns[i])
-                            ax[row, col].ylabel(self.data.columns[j])
+                            ax[row, col].xlabel(self.feature_names[i].replace('_', ' '))
+                            ax[row, col].ylabel(self.feature_names[j].replace('_', ' '))
                             k += 1
 
         else:
@@ -569,10 +559,8 @@ class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_c
             # nothing to see here, just move along
 
             n_plots = (self.n_features + self.n_targets) * (self.n_features + self.n_targets - 1) // 2
-            n_rows = int(n_plots**0.5)
-            n_cols = n_plots // n_rows
-            if n_rows * n_cols < n_plots:
-                n_cols += 1
+            n_cols = 2
+            n_rows = int(np.ceil(n_plots / n_cols))
             fig, ax = plt.subplots(n_rows, n_cols)
             k = 0
 
@@ -583,14 +571,14 @@ class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_c
                             row = k // n_cols
                             col = k % n_cols
                             ax[row, col].scatter(d[:, i], d[:, j])
-                            ax[row, col].set_xlabel(c[i])
-                            ax[row, col].set_ylabel(c[j])
+                            ax[row, col].set_xlabel(c[i].replace('_', ' '))
+                            ax[row, col].set_ylabel(c[j].replace('_', ' '))
                             k += 1
         
-        plt.savefig(img, format='png')
+        fig.tight_layout()
+        fig.savefig(img, format='png')
         img.seek(0)
-        img = b64encode(img.getvalue()).decode('utf-8')
-        requests.put(root_link + 'api/progress/' + pk + '/', json={'progress': -1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
+        self.images.append(img.getvalue())
         plt.clf()
 
     def plot_decision_boundary(self, model):
@@ -610,46 +598,38 @@ class DataFromSklearn2(Dataset):  # this one is for make_regression() and make_c
             
             plt.plot(inp, Z)
             plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
-            plt.xlabel(self.feature_names[0])
-            plt.ylabel(self.target_names[0])
+            plt.xlabel(self.feature_names[0].replace('_', ' '))
+            plt.ylabel(self.target_names[0].replace('_', ' '))
             img = BytesIO()
+            plt.tight_layout()
             plt.savefig(img, format='png')
             img.seek(0)
-            img = b64encode(img.getvalue()).decode('utf-8')
+            self.images.append(img.getvalue())
             plt.clf()
-            return img
 
 
-class DataFromFunction(Dataset):  # this one is for regression on simple functions
+class DataFromFunction(Dataset):  # this one is for one to one regression on simple functions
     def __init__(self, inp, normalize=False):  # works for up to 10 features and 10 targets
-        self.functions, self.n_objects, self.n_features, self.n_targets, lower, upper = inp
-        if type(self.functions) is not list:
-            self.functions = [self.functions]
-        self.data = np.random.rand(self.n_objects, self.n_features) * (upper - lower) + lower
+        self.n_features, self.n_targets = 1, 1
+        self.function, self.n_objects, lower, upper, noise = inp
+        self.data = np.random.rand(self.n_objects) * (upper - lower) + lower
 
-        self.targets = np.zeros((self.n_objects, self.n_targets))
-        for i in range(self.n_targets):
-            self.targets[:, i] = sum(self.functions[j](self.data[:, j]) for j in range(self.n_features))
+        self.targets = self.function(self.data) + np.random.normal(0, noise, self.n_objects)
 
-        self.feature_names = ['x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'x10']
-        self.target_names = ['y1', 'y2', 'y3', 'y4', 'y5', 'y6', 'y7', 'y8', 'y9', 'y10']
+        self.feature_names = ['x']
+        self.target_names = ['y']
 
-        self.minima = np.min(self.data, axis=0)
-        self.maxima = np.max(self.data, axis=0)
-        self.target_minima = np.min(self.targets, axis=0)
-        self.target_maxima = np.max(self.targets, axis=0)
+        self.minima = min(self.data)
+        self.maxima = max(self.data)
+        self.target_minima = min(self.targets)
+        self.target_maxima = max(self.targets)
 
         if normalize:
-            for i in range(self.n_features):
-                self.data[:, i] = ((self.data[:, i] - self.minima[i]) / (self.maxima[i] - self.minima[i]))
-                self.targets[:, i] = ((self.targets[:, i] - self.target_minima[i]) /
-                                          (self.target_maxima[i] - self.target_minima[i]))
+            self.data = ((self.data - self.minima) / (self.maxima - self.minima))
+            self.targets = ((self.targets - self.target_minima) /
+                                        (self.target_maxima - self.target_minima))
 
-        # clear the plots directory
-        self.plt_dir = 'plots'
-        files = os.listdir(self.plt_dir)
-        for file in files:
-            os.remove(self.plt_dir + '/' + file)
+        self.images = []
         self.plot_data()  # uncomment if you want plots of the data; they will be saved in plt_dir
 
     def __len__(self):
@@ -662,7 +642,7 @@ class DataFromFunction(Dataset):  # this one is for regression on simple functio
 
         target = self.targets[idx]
         target = np.array([target], dtype=int).reshape(-1, self.n_targets)
-        dat = self.data[idx, :]
+        dat = self.data[idx]
         dat = np.array([dat], dtype=float).reshape(-1, self.n_features)
         sample = {'data': dat, 'target': target}
 
@@ -671,94 +651,74 @@ class DataFromFunction(Dataset):  # this one is for regression on simple functio
     # adding some extra functions
 
     def normalize(self, x):
-        assert len(x) == self.n_features
+        assert len(x) == 1 or type(x) is float
         out = []
         for i, x in enumerate(x):
-            mini = self.minima[i]
-            maxi = self.maxima[i]
+            mini = self.minima
+            maxi = self.maxima
             out += [(x-mini)/(maxi-mini)]
         return out
 
     def denormalize(self, y):
-        assert len(y) == self.n_targets
+        assert len(y) == 1 or type(y) is float
         out = []
         for i, y in enumerate(y):
-            mini = self.target_minima[i]
-            maxi = self.target_maxima[i]
+            mini = self.target_minima
+            maxi = self.target_maxima
             out += [y*(maxi-mini)+mini]
         return out
 
     def label_name(self, i):
         assert type(i) is int
         assert i < self.n_targets
-        return self.target_names[i]
+        return str(self.target_names[i])
 
-    def sort_data(self, column='Target'):
+    def sort_data(self, column='y'):
         """Sorts the labels of the dataset in ascending order and returns the sorted dataset."""
 
-        if column.__contains__('Target'):
-            idx = np.argsort(self.targets[:, np.where(self.target_names == column)])
+        if column.__contains__('y'):
+            idx = np.argsort(self.targets)
             self.targets = self.targets[idx]
-            self.data = self.data[idx, :]
+            self.data = self.data[idx]
         else:
-            idx = np.argsort(self.data[:, np.where(self.feature_names == column)])
-            self.data = self.data[idx, :]
+            idx = np.argsort(self.data)
+            self.data = self.data[idx]
             self.targets = self.targets[idx]
 
     def plot_data(self):
         """Plots the data."""
-        d = np.concatenate((self.data, self.targets), axis=1)
-        c = self.feature_names + self.target_names
-        # nothing to see here, just move along
-
         img = BytesIO()
-        n_plots = (self.n_features + self.n_targets) * (self.n_features + self.n_targets - 1) // 2
-        n_rows = int(n_plots**0.5)
-        n_cols = n_plots // n_rows
-        if n_rows * n_cols < n_plots:
-            n_cols += 1
-        fig, ax = plt.subplots(n_rows, n_cols)
-        k = 0
-
-        for i in range(self.n_features + self.n_targets - 1):
-            if type(d[0, i]) is not str:
-                for j in range(i+1, self.n_features + self.n_targets):
-                    if type(d[0, j]) is not str:
-                        row = k // n_cols
-                        col = k % n_cols
-                        ax[row, col].scatter(d[:, i], d[:, j])
-                        ax[row, col].xlabel(c[i])
-                        ax[row, col].ylabel(c[j])
-                        k += 1
+        plt.scatter(self.data, self.targets)
+        plt.xlabel(self.feature_names[0].replace('_', ' '))
+        plt.ylabel(self.target_names[0].replace('_', ' '))
         
+        plt.tight_layout()
         plt.savefig(img, format='png')
         img.seek(0)
-        img = b64encode(img.getvalue()).decode('utf-8')
-        requests.put(root_link + 'api/progress/' + pk + '/', json={'progress': -1, 'plots': img, 'error_list': json.dumps([]), 'user_id': user_id, 'task_id': task_id})
+        self.images.append(img.getvalue())
         plt.clf()
 
     def plot_decision_boundary(self, model):
-        if self.n_features < 2 and self.n_targets < 2:
-                step = 0.01
-                if self.normalization:
-                    inp = np.arange(-0.1, 1.1, step)
-                else:
-                    mini, maxi = self.minima[0], self.maxima[0]
-                    inp = np.arange(mini, maxi, step)
+        step = 0.01
+        if self.normalization:
+            inp = np.arange(-0.1, 1.1, step)
+        else:
+            mini, maxi = self.minima, self.maxima
+            inp = np.arange(mini, maxi, step)
 
-                # Plot the decision boundary. For that, we will assign a color to each
-                # point in the mesh.
-                inp = np.array(inp)
-                Z = np.array(model.predict(inp.reshape(self.n_features, -1).T))
+        # Plot the decision boundary. For that, we will assign a color to each
+        # point in the mesh.
+        inp = np.array(inp)
+        Z = np.array(model.predict(inp.reshape(self.n_features, -1).T))
 
-                
-                plt.plot(inp, Z)
-                plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
-                plt.xlabel(self.feature_names[0])
-                plt.ylabel(self.target_names[0])
-                img = BytesIO()
-                plt.savefig(img, format='png')
-                img.seek(0)
-                img = b64encode(img.getvalue()).decode('utf-8')
-                plt.clf()
-                return img
+        
+        plt.plot(inp, Z)
+        plt.scatter(self.data, self.targets)
+        plt.xlabel(self.feature_names[0].replace('_', ' '))
+        plt.ylabel(self.target_names[0].replace('_', ' '))
+        img = BytesIO()
+        plt.tight_layout()
+        plt.savefig(img, format='png')
+        img.seek(0)
+        self.images.append(img.getvalue())
+        plt.clf()

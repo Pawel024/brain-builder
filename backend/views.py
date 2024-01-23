@@ -53,7 +53,7 @@ def query_list(request):
         absolute_uri = request.build_absolute_uri('/')
         parsed_uri = urlparse(absolute_uri)
         root_url = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
-        processed_data = process(request.data, root_url)
+        processed_data = process(request.data, root_url, csrf_token=request.META.get('HTTP_X_CSRFTOKEN'))
         processed_data['user_id'] = user_id
         processed_data['task_id'] = task_id
         serializer = RowSerializer(data=processed_data)
@@ -76,7 +76,7 @@ def query_detail(request, pk):
         absolute_uri = request.build_absolute_uri('/')
         parsed_uri = urlparse(absolute_uri)
         root_url = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
-        processed_data = process(request.data, root_url, pk)
+        processed_data = process(request.data, root_url, pk, csrf_token=request.META.get('HTTP_X_CSRFTOKEN'))
         processed_data['user_id'] = request.data.get('user_id')
         processed_data['task_id'] = request.data.get('task_id')
         serializer = RowSerializer(query, data=processed_data,context={'request': request})
@@ -178,7 +178,7 @@ def q_list(request):
         serializer = ProgressSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(request.data, status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_201_CREATED)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -200,7 +200,7 @@ def q_detail(request, pk):
         serializer = ProgressSerializer(query, data=processed_data,context={'request': request})
         if serializer.is_valid():
             serializer.save()
-            return Response(request.data, status=status.HTTP_204_NO_CONTENT)
+            return Response(request.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':

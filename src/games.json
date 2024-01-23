@@ -1,0 +1,110 @@
+[
+ {
+   "game_tag": 1,
+   "explanation": "The Iris dataset",
+   "type": 1,
+   "n_inputs": 4,
+   "n_outputs": 3,
+   "dataset": "load_iris()",
+   "max_layers": 6,
+   "max_nodes": 16,
+   "max_epochs": 200,
+   "normalization_button": 0
+ },
+ {
+   "game_tag": 2,
+   "explanation": "The Wine dataset",
+   "type": 1,
+   "n_inputs": 13,
+   "n_outputs": 3,
+   "dataset": "load_wine()",
+   "max_layers": 6,
+   "max_nodes": 16,
+   "max_epochs": 500,
+   "normalization_button": 0
+ },
+ {
+   "game_tag": 11,
+   "explanation": "A custom dataset with satellite data for communication, navigation and earth observation satellites",
+   "type": 1,
+   "n_inputs": 4,
+   "n_outputs": 3,
+   "dataset": "Clas2a.csv",
+   "max_layers": 6,
+   "max_nodes": 16,
+   "max_epochs": 500,
+   "normalization_button": 1
+ },
+ {
+   "game_tag": 21,
+   "explanation": "A custom dataset with satellite data for communication, navigation and earth observation satellites",
+   "type": 1,
+   "n_inputs": 4,
+   "n_outputs": 3,
+   "dataset": "Clas2a.csv",
+   "max_layers": 6,
+   "max_nodes": 16,
+   "max_epochs": 500,
+   "normalization_button": 1
+ },
+ {
+   "game_tag": 111,
+   "explanation": "This is a simple test set for classification (for debugging purposes)",
+   "type": 1,
+   "n_inputs": 2,
+   "n_outputs": 3,
+   "dataset": "TestC.csv",
+   "max_layers": 6,
+   "max_nodes": 16,
+   "max_epochs": 500,
+   "normalization_button": 1
+ },
+ {
+   "game_tag": 222,
+   "explanation": "This is a simple test set for regression (for debugging purposes)",
+   "type": 2,
+   "n_inputs": 2,
+   "n_outputs": 1,
+   "dataset": "TestR.csv",
+   "max_layers": 6,
+   "max_nodes": 16,
+   "max_epochs": 500,
+   "normalization_button": 1
+ },
+ {
+   "game_tag": 333,
+   "explanation": "A simple regression problem",
+   "type": 2,
+   "n_inputs": 1,
+   "n_outputs": 1,
+   "dataset": "make_regression(n_samples=100, n_features=1, noise=10)",
+   "max_layers": 6,
+   "max_nodes": 16,
+   "max_epochs": 500,
+   "normalization_button": 1
+ },
+ {
+   "game_tag": 444,
+   "explanation": "A simple classification problem",
+   "type": 1,
+   "n_inputs": 2,
+   "n_outputs": 2,
+   "dataset": "make_classification(n_samples=100, n_features=2, n_informative=2, n_redundant=0, n_classes=2)",
+   "max_layers": 6,
+   "max_nodes": 16,
+   "max_epochs": 500,
+   "normalization_button": 1
+ },
+ {
+   "game_tag": 555,
+   "explanation": "A custom regression problem; dataset is [[functions], n_objects, n_inputs, n_outputs, lower_bound, upper_bound]; make sure that len(dataset)==6 and that len(functions)==n_inputs",
+   "type": 2,
+   "n_inputs": 1,
+   "n_outputs": 1,
+   "dataset": "[[np.sin], 100, 1, 1, 0, 10]",
+   "max_layers": 6,
+   "max_nodes": 16,
+   "max_epochs": 500,
+   "normalization_button": 1
+ }
+]

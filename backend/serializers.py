@@ -5,19 +5,19 @@ class RowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Row
-        fields = ('pk', 'action', 'task_id', 'user_id', 'learning_rate', 'epochs', 'normalization', 'network_setup', 'network_weights', 'network_biases', 'nn_input', 'error_list', 'timestamp')
+        fields = ('pk', 'action', 'task_id', 'user_id', 'progress_pk', 'learning_rate', 'epochs', 'normalization', 'network_input', 'games_data','timestamp')
 
 class TaskDescriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskDescription
-        fields = ('pk', 'task_id', 'description', 'dataset', 'n_inputs', 'n_outputs', 'max_epochs', 'max_layers', 'max_nodes', 'normalization')
+        fields = ('pk', 'task_id', 'description', 'type', 'dataset', 'n_inputs', 'n_outputs', 'max_epochs', 'max_layers', 'max_nodes', 'normalization')
 
 class ProgressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Progress
-        fields = ('pk', 'task_id', 'user_id', 'progress', 'error_list', 'plots')
+        fields = ('pk', 'task_id', 'user_id', 'progress', 'error_list', 'network_weights', 'network_biases', 'plots', 'feature_names', 'timestamp')
 
 
 class QuizSerializer(serializers.ModelSerializer):

@@ -15,8 +15,7 @@ There are 3 ways to obtain a dataset:
 # Idea: add a 'custom' option to load a custom dataset from a csv (and potentially expand this to images?)
 # Idea: look into reinforcement learning
 
-from . import data_functions as df  # UNCOMMENT THIS
-#import data_functions as df  # COMMENT THIS
+from . import data_functions as df
 import os
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
@@ -65,6 +64,13 @@ def get_data(tag):
     data, train, test = None, None, None
     if games.loc[tag, 'dataset'] is None:
         pass
+    
+    # if the dataset is already saved as a txt file, load it
+    elif os.path.isfile(games.loc[tag, 'dataset']+'.txt'):
+        with open(games.loc[tag, 'dataset']+'.txt', 'rb') as input:
+            data = pickle.load(input)
+        data.images = []
+        data.plot_data()
 
     elif type(games.loc[tag, 'dataset']) is str and games.loc[tag, 'dataset'].startswith('load_'):
         # import a dataset from sklearn
@@ -74,14 +80,14 @@ def get_data(tag):
 
     elif type(games.loc[tag, 'dataset']) is str and games.loc[tag, 'dataset'].startswith('make_'):
         # import a dataset from sklearn
-        exec('data = df.DataFromSklearn2(datasets.' + games.loc[tag, 'dataset'] + ', normalize=normalization)', magic_box)
+        exec('data = df.DataFromSklearn2(datasets.' + games.loc[tag, 'dataset'] + ', normalize=normalization, data_type=' + str(find_type(tag)) + ')', magic_box)
         data = magic_box['data']
         # Note: exec may cause security problems if games is defined elsewhere, but should be fine for now
 
     elif type(games.loc[tag, 'dataset']) is str and games.loc[tag, 'dataset'].startswith('['):
         # Note: I had to use eval here on the external csv file,
         # so first some basic security measures:
-        if (len(games.loc[tag, 'dataset']) < 30 and list(games.loc[tag, 'dataset'])[-1] == ']' and
+        if (len(games.loc[tag, 'dataset']) < 100 and list(games.loc[tag, 'dataset'])[-1] == ']' and
                 not games.loc[tag, 'dataset'].__contains__('(') and not games.loc[tag, 'dataset'].__contains__(')')):
             data = df.DataFromFunction(eval(games.loc[tag, 'dataset']), normalize=normalization)
 
@@ -90,7 +96,7 @@ def get_data(tag):
         data = df.DataFromExcel(os.path.join(os.path.dirname(__file__), games.loc[tag, 'dataset']), data_type=games.loc[tag, 'type'], normalize=normalization)
 
     # save the dataset to a pickle file
-    with open('data.txt', 'wb') as output:
+    with open(games.loc[tag, 'dataset']+'.txt', 'wb') as output:
         pickle.dump(data, output, pickle.HIGHEST_PROTOCOL)
 
-    return train_test_split(data, test_size=0.1, random_state=42)
+    return train_test_split(data, test_size=0.1, random_state=np.random.randint(1000))

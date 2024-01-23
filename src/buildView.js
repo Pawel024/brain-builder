@@ -29,6 +29,58 @@ function BuildingWrapper(props) {
   return <Building {...props} navigate={navigate} />;
 }
 
+{/*
+// ------- EVENTSOURCE -------
+// this listens to the backend and updates the progress, error list, data plots and feature names
+function ProgressComponent(setProgress, setFeatureNames) {
+  const [errorList, setErrorList] = useState([]);
+  const [dataPlots, setDataPlots] = useState([]);
+
+  useEffect(() => {
+    const source = new EventSource('/progress');
+
+    source.onmessage = function(event) {
+      const progress = JSON.parse(event.data);
+      const errorList = JSON.parse(event.data);
+      const featureNames = JSON.parse(event.data);
+      
+      // COMMENT THESE OUT
+      const dataPlots = JSON.parse(event.data["dataplots"]).map(base64String => {  
+        const binaryString = atob(base64String);  // decode from base64 to binary string
+        const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+        }
+        const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+        const url = URL.createObjectURL(blob);
+        // now images can be accessed with <img src={url} />
+        return url;
+      })
+      setDataPlots(dataPlots);
+    // END OF COMMENT
+
+      setProgress(progress);
+      setErrorList(errorList);
+      setFeatureNames(featureNames);
+    };
+
+    source.onerror = function(event) {
+      if (source.readyState === EventSource.CLOSED) {
+        console.log("SSE connection was lost. Attempting to reconnect...");
+        source = new EventSource('/progress');
+      }
+    };
+
+    // Clean up the event source when the component is unmounted
+    return () => {
+      source.close();
+    };
+  }, []);
+
+  return null;
+}
+*/}
+
 Chart.register(
   CategoryScale, 
   LinearScale, 
@@ -76,7 +128,8 @@ class Building extends React.Component {
   };
 
   componentDidMount() {
-    this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.taskId, this.props.taskId, this.props.index);
+    this.props.loadData(this.props.taskId, this.props.index)  // let the backend load the data, then set the images and feature names
+    this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.taskId, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs);
     this.props.updateCytoLayers(this.props.setCytoLayers, this.props.nOfInputs, this.props.nOfOutputs, this.props.index);
     if (this.props.taskId === 0) {
       this.setState({ runTutorial: true }, () => {
@@ -107,36 +160,48 @@ class Building extends React.Component {
     if (this.chartRef.current) {
       const ctx = this.chartRef.current.getContext('2d');
 
-      // Destroy the old chart if it exists
-      if (this.chartInstance) {
-        this.chartInstance.destroy();
-      }
-      
-      // Check if apiData and error_list are defined
-      if (this.props.apiData && this.props.apiData["error_list"]) {
-        // Create a new chart and save a reference to it
-        this.chartInstance = new Chart(ctx, {
+      if (this.chartInstance && (this.props.errorList[0].slice(0, prevProps.errorList[0].length) === prevProps.errorList[0] && this.props.errorList[0].length !== prevProps.errorList[0].length)) {
+        // Update the chart if the error list has changed and is longer than before
+        console.log("Updating chart")
+        this.chartInstance.data.labels = this.props.errorList[0].map((_, i) => i + 1);
+        this.chartInstance.data.datasets[0].data = this.props.errorList[0];
+        this.chartInstance.update();
+      } else {
+        // Destroy the old chart if a different error list was received and a chart exists
+        if (this.props.errorList[0].slice(0, prevProps.errorList[0].length) !== prevProps.errorList[0]) {
+          // If an old chart exists, destroy it
+          if (this.chartInstance) {
+            console.log("Destroying old chart")
+            this.chartInstance.destroy();
+          }
+        } 
+        // Create a new chart if there is no chart now
+        if (this.chartInstance === null) {
+          // create a new chart
+          console.log("Creating new chart")
+          this.chartInstance = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: JSON.parse(this.props.apiData["error_list"])[0].map((_, i) => i + 1), // Generate labels based on error array length
-                datasets: [{
-                    label: 'Errors',
-                    data: JSON.parse(this.props.apiData["error_list"])[0],
-                    borderColor: 'rgba(7, 151, 185, 1)',
-                    backgroundColor: 'rgba(7, 151, 185, 0.2)',
-                }]
+              labels: this.props.errorList[0].map((_, i) => i + 1), // Generate labels based on error array length
+              datasets: [{
+                  label: 'Errors',
+                  data: this.props.errorList[0],
+                  borderColor: 'rgba(7, 151, 185, 1)',
+                  backgroundColor: 'rgba(7, 151, 185, 0.2)',
+              }]
             },
             options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                },
-                animation: {
-                  duration: 0 // general animation time
-                }
+              scales: {
+                  y: {
+                      beginAtZero: true
+                  }
+              },
+              animation: {
+                duration: 1000 // general animation time
               }
-        });
+            }  
+          });
+        }
       }
     }
   }
@@ -175,8 +240,6 @@ class Building extends React.Component {
           </Box>
         </Grid>
       </Box>
-      
-      
 
       <Tabs.Root defaultValue={this.props.taskId === 0 ? "building" : "task"} style={{ fontFamily:'monospace' }}>
 
@@ -207,7 +270,7 @@ class Building extends React.Component {
 
               <this.props.FloatingButton
                 variant="outline"
-                onClick = {() => this.props.addLayer(this.props.setCytoLayers, this.props.nOfOutputs, this.props.index)}
+                onClick = {() => this.props.addLayer(this.props.setCytoLayers, this.props.nOfOutputs, this.props.index, this.props.maxLayers)}
                 size="0"
                 disabled={this.props.cytoLayers.length>this.props.maxLayers-1}
                 style={{top: window.innerHeight*0.285, 
@@ -272,12 +335,14 @@ class Building extends React.Component {
             <div id="/api-data">
               {this.props.isTraining===2 ? (
                 <Flex direction='column' >
-                  <div style={{ color: this.props.accuracyColor, fontFamily:'monospace' }}><b>Accuracy: {(parseFloat(JSON.parse(this.props.apiData["error_list"])[1])*100).toFixed(2)}%</b></div>
+                  <div style={{ color: this.props.accuracyColor, fontFamily:'monospace' }}><b>Accuracy: {(parseFloat(this.props.errorList[1])*100).toFixed(2)}%</b></div>
                   <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:20 }}></canvas>
                 </Flex>
               ) : (this.props.isTraining===1 ? (
                 <Flex direction= 'column'>
-                  <div style={{ fontFamily:'monospace' }}><b>Training...</b></div>
+                  <div style={{ fontFamily:'monospace' }}><b>Training: </b></div>
+                  <div style={{ fontFamily:'monospace' }}><b>Progress: {(parseFloat(this.state.progress)).toFixed(2)}%</b></div>
+                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:20 }}></canvas>
                 </Flex>
               ) : (
                 <div style={{ textAlign:'justify', width: Math.round(0.16 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
@@ -288,7 +353,7 @@ class Building extends React.Component {
             </div>
           </Box>
 
-          <IconButton onClick={(event) => this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index)} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.16 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+          <IconButton onClick={(event) => this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs)} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.16 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
             <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
               <PlayIcon width="18" height="18" />Start training!
             </Flex>
@@ -297,86 +362,128 @@ class Building extends React.Component {
         </Tabs.Content>
       
         <Tabs.Content value="stuff">
-          <Flex direction="column" gap="2">
-          
-          <Form.Root className="FormRoot" onSubmit={(event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData, this.props.taskId, this.props.index)} style={{ fontFamily:'monospace' }}>
-            <Form.Field className="FormField" name="s-m_axis">
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                <Form.Label className="FormLabel">Semi-Major Axis [km]</Form.Label>
-                <Form.Message className="FormMessage" match="valueMissing">
-                  Please enter the semi-major axis
-                </Form.Message>
-                <Form.Message className="FormMessage" match="typeMismatch">
-                  Please provide a valid semi-major axis
-                </Form.Message>
-              </div>
-              <Form.Control asChild>
-                <input className="FormInput" type="number" required />
-              </Form.Control>
-            </Form.Field>
+          <Flex direction="row" gap = "2">
+            <Flex direction="column" gap="2">
+            
+            {/* This will render the form with the feature names received from the backend, if it exists */}
+            <Form.Root className="FormRoot" onSubmit={(event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData, this.props.taskId, this.props.index)} style={{ fontFamily:'monospace' }}>
+              {this.props.featureNames.length > 0 && this.props.featureNames.map((featureName, index) => (
+                <Form.Field className="FormField" name={featureName} key={index}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                    <Form.Label className="FormLabel">{featureName}</Form.Label>
+                    <Form.Message className="FormMessage" match="valueMissing">
+                      Please enter the {featureName}
+                    </Form.Message>
+                    <Form.Message className="FormMessage" match="typeMismatch">
+                      Please provide a valid {featureName}
+                    </Form.Message>
+                  </div>
+                  <Form.Control asChild>
+                    <input className="FormInput" type="number" required />
+                  </Form.Control>
+                </Form.Field>
+              ))}
+              {this.props.featureNames.length > 0 &&
+              <Form.Submit asChild>
+                <button className="FormButton" style={{ marginTop: 10 }}>
+                  Predict!
+                </button>
+              </Form.Submit>}
+            </Form.Root>
+            
+            {/*  // This is the old form
+            <Form.Root className="FormRoot" onSubmit={(event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData, this.props.taskId, this.props.index)} style={{ fontFamily:'monospace' }}>
+              <Form.Field className="FormField" name="s-m_axis">
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                  <Form.Label className="FormLabel">Semi-Major Axis [km]</Form.Label>
+                  <Form.Message className="FormMessage" match="valueMissing">
+                    Please enter the semi-major axis
+                  </Form.Message>
+                  <Form.Message className="FormMessage" match="typeMismatch">
+                    Please provide a valid semi-major axis
+                  </Form.Message>
+                </div>
+                <Form.Control asChild>
+                  <input className="FormInput" type="number" required />
+                </Form.Control>
+              </Form.Field>
 
-            <Form.Field className="FormField" name="inclination">
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                <Form.Label className="FormLabel">Inclination [degrees]</Form.Label>
-                <Form.Message className="FormMessage" match="valueMissing">
-                  Please enter the inclination
-                </Form.Message>
-                <Form.Message className="FormMessage" match="typeMismatch">
-                  Please provide a valid inclination
-                </Form.Message>
-              </div>
-              <Form.Control asChild>
-                <input className="FormInput" type="number" required />
-              </Form.Control>
-            </Form.Field>
+              <Form.Field className="FormField" name="inclination">
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                  <Form.Label className="FormLabel">Inclination [degrees]</Form.Label>
+                  <Form.Message className="FormMessage" match="valueMissing">
+                    Please enter the inclination
+                  </Form.Message>
+                  <Form.Message className="FormMessage" match="typeMismatch">
+                    Please provide a valid inclination
+                  </Form.Message>
+                </div>
+                <Form.Control asChild>
+                  <input className="FormInput" type="number" required />
+                </Form.Control>
+              </Form.Field>
 
-            <Form.Field className="FormField" name="expected_life">
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                <Form.Label className="FormLabel">Expected Life [years]</Form.Label>
-                <Form.Message className="FormMessage" match="valueMissing">
-                  Please enter the expected life
-                </Form.Message>
-                <Form.Message className="FormMessage" match="typeMismatch">
-                  Please provide a valid expected life
-                </Form.Message>
-              </div>
-              <Form.Control asChild>
-                <input className="FormInput" type="number" required />
-              </Form.Control>
-            </Form.Field>
+              <Form.Field className="FormField" name="expected_life">
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                  <Form.Label className="FormLabel">Expected Life [years]</Form.Label>
+                  <Form.Message className="FormMessage" match="valueMissing">
+                    Please enter the expected life
+                  </Form.Message>
+                  <Form.Message className="FormMessage" match="typeMismatch">
+                    Please provide a valid expected life
+                  </Form.Message>
+                </div>
+                <Form.Control asChild>
+                  <input className="FormInput" type="number" required />
+                </Form.Control>
+              </Form.Field>
 
-            <Form.Field className="FormField" name="launch_mass">
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                <Form.Label className="FormLabel">Launch Mass [kg]</Form.Label>
-                <Form.Message className="FormMessage" match="valueMissing">
-                  Please enter the launch mass
-                </Form.Message>
-                <Form.Message className="FormMessage" match="typeMismatch">
-                  Please provide a valid launch mass
-                </Form.Message>
-              </div>
-              <Form.Control asChild>
-                <input className="FormInput" type="number" required />
-              </Form.Control>
-            </Form.Field>
+              <Form.Field className="FormField" name="launch_mass">
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                  <Form.Label className="FormLabel">Launch Mass [kg]</Form.Label>
+                  <Form.Message className="FormMessage" match="valueMissing">
+                    Please enter the launch mass
+                  </Form.Message>
+                  <Form.Message className="FormMessage" match="typeMismatch">
+                    Please provide a valid launch mass
+                  </Form.Message>
+                </div>
+                <Form.Control asChild>
+                  <input className="FormInput" type="number" required />
+                </Form.Control>
+              </Form.Field>
 
-            <Form.Submit asChild>
-              <button className="FormButton" style={{ marginTop: 10 }}>
-                Predict!
-              </button>
-            </Form.Submit>
-          </Form.Root>
-          
-          <div id="query-response" style={{ fontFamily:'monospace' }}>
-              {this.props.isResponding===2 ? (
-                <div>Output: {this.props.apiData["nn_input"]}</div>
-              ) : (this.props.isResponding===1 ? (
-                <div>Getting your reply...</div>
+              <Form.Submit asChild>
+                <button className="FormButton" style={{ marginTop: 10 }}>
+                  Predict!
+                </button>
+              </Form.Submit>
+            </Form.Root>
+            */}
+            
+            <div id="query-response" style={{ fontFamily:'monospace' }}>
+                {this.props.isResponding===2 ? (
+                  <div>Output: {this.props.apiData["network_input"]}</div>
+                ) : (this.props.isResponding===1 ? (
+                  <div>Getting your reply...</div>
+                ) : (
+                  <div></div>
+                )
+                )}
+              </div>
+            </Flex>
+            
+            {/* This will render the images, if they exist */}
+            <Flex direction="column" gap="2">
+              {this.props.imgs.length > 0 ? (
+                this.props.imgs.map((img, index) => (
+                  <img key={index} src={img} alt={`Image ${index}`} />
+                ))
               ) : (
-                <div></div>
-              )
+                <div>No data loaded. Try reloading the page? If this problem persists, please contact us.</div>
               )}
-            </div>
+            {/* TODO: Only print last image, maybe add button to print all or smth */}
+            </Flex>
           </Flex>
         </Tabs.Content>
 

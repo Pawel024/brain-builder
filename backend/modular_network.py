@@ -14,14 +14,6 @@ ReLu, Sigmoid, Softmax, Log_Softmax, or None.
 # Idea: look into different options for optimizers, e.g. Adam, Adagrad, RMSProp, etc.
 
 import torch
-import requests
-import json
-
-root_link = None
-task_id = None
-user_id = None
-pk = None
-
 
 class BuildNetwork(torch.nn.Module):
     def __init__(self, inp):
@@ -53,7 +45,7 @@ class BuildNetwork(torch.nn.Module):
 
     def select_activation(self, x, activation):
         if activation == 'Sigmoid':
-            return torch.nn.functional.sigmoid(x)
+            return torch.sigmoid(x)
         elif activation == 'ReLu':
             return torch.nn.functional.relu(x)
         elif activation == 'Softmax':
@@ -72,11 +64,68 @@ class BuildNetwork(torch.nn.Module):
         with torch.no_grad():
             predictions = []
             for datapoint in data:
-                datapoint = torch.tensor(datapoint, dtype=torch.float32)
+                if not torch.is_tensor(datapoint):
+                    datapoint = torch.tensor(datapoint, dtype=torch.float32)
                 predictions += [torch.argmax(self(datapoint.float().view(-1, self.input[0][0]))).item()]
             return predictions
 
-    def train_network(self, epochs, training_set, test_set, optimizer, typ=1, dat=None):
+    def train_epoch(self, data, optimizer, typ=1):
+        for datapoint in data:
+            X, y = datapoint['data'], datapoint['target']
+            self.zero_grad()  # start the gradients at zero
+
+            assert torch.is_tensor(X)
+            output = self(X.float().view(-1, self.input[0][0]))  # use -1!
+            if typ == 2:  # regression
+                y = y.float().view(-1, self.input[-1][0])
+                loss = torch.nn.functional.mse_loss(output, y)
+            else:  # classification
+                y = y.long().view(-1)
+                loss = torch.nn.functional.nll_loss(output, y)
+            loss.backward()  # backpropagation done for us, thanks PyTorch!
+            optimizer.step()  # adjust the weights and biases
+    
+    def test(self, data, typ=1, acc=False):
+        accuracy = None
+        with torch.no_grad():
+            ys, mse, correct, total = torch.tensor([]), torch.tensor([self.input[-1][0]*[0.]]), 0, 0
+            for datapoint in data:
+                X, y = datapoint['data'], datapoint['target']
+                output = self(X.float().view(-1, self.input[0][0]))
+                if typ == 2:  # regression
+                    for idx, out in enumerate(output):
+                        mse += torch.square(out - y[idx].float())
+                        ys = torch.cat((ys, y[idx]), dim=0)
+                        total += 1
+                else:  # classification
+                    for idx, out in enumerate(output):
+                        if torch.argmax(out) == y[idx]:
+                            correct += 1
+                        total += 1
+                    
+        if typ == 2:
+            error = torch.mean(mse / total)
+            error = error.item()
+            if acc:
+                if torch.sum(torch.square(ys - torch.mean(ys, dim=0))) == 0:
+                    accuracy = torch.mean(1 - mse / 10**(-6))
+                else:
+                    accuracy = torch.mean(1 - mse / torch.sum(torch.square(ys - torch.mean(ys, dim=0)), dim=0))
+                accuracy = accuracy.item()
+                print("R^2 on test set: ", accuracy)
+        
+        else:
+            error = round((1 - correct / total), 2)
+            if acc:
+                accuracy = round(correct / total, 3)
+                print("Accuracy on test set: ", accuracy * 100, "%")
+
+        return error, accuracy
+
+
+"""  # previous training function:
+
+    def train_network(self, epochs, training_set, test_set, optimizer, typ=1, dat=None, pk=None, task_id=None, user_id=None, root_link=None):
         errors = []
         for epoch in range(epochs):
             for data in training_set:
@@ -112,9 +161,24 @@ class BuildNetwork(torch.nn.Module):
                                 total += 1
 
                 if epoch % (epochs // 10 if epochs >= 10 else 1) == 0:
-                    im = dat.plot_decision_boundary(self)
-                else: 
-                    im = []
+                    dat.plot_decision_boundary(self)
+
+                    # now send a progress update to the frontend
+                    d = {
+                        'user_id': user_id,
+                        'task_id': int(task_id),
+                        'progress': round(epoch / epochs, 2),
+                        'feature_names': json.dumps([x.replace('_', ' ') for x in dat.feature_names]),
+                        'plots': json.dumps([]),
+                        # 'plots': dat.plot_decision_boundary(self, return_plots=True)  # TODO: add a return_plots option to plot_decision_boundary
+                        'error_list': errors
+                    }
+
+                    if pk is not None:
+                        requests.put(root_link + f"api/progress/{pk}", data=d)
+                    elif not requests.get(root_link + f"/api/progress/?user_id={user_id}&task_id={task_id}").json():
+                        requests.post(root_link + f"/api/progress/", data=d)
+
 
                 if typ == 2:
                     error = torch.mean(mse / total)
@@ -127,9 +191,6 @@ class BuildNetwork(torch.nn.Module):
                     if epoch % (epochs // 10 if epochs >= 10 else 1) == 0:
                         print("Accuracy on training set after epoch ", epoch, ": ", round(100 * correct / total, 1), "%")
                 errors += [error]
-
-                # let the frontend know how we're doing
-                requests.put(root_link + 'api/progress/' + pk + '/', json={'error_list': json.dumps(errors), 'progress': epoch/epochs, 'plots': json.dumps(im), 'task_id': task_id, 'user_id': user_id})
                 
 
         with torch.no_grad():
@@ -147,9 +208,8 @@ class BuildNetwork(torch.nn.Module):
                             correct += 1
                         total += 1
         
-        im = dat.plot_decision_boundary(self)
-        requests.put(root_link + 'api/progress/' + pk + '/', json={'error_list': json.dumps(errors), 'progress': epoch/epochs, 'plots': json.dumps(im), 'task_id': task_id, 'user_id': user_id})
-
+        dat.plot_decision_boundary(self)
+        
         if typ == 2:
             accuracy = torch.mean(1 - mse / torch.sum(torch.square(ys - torch.mean(ys, dim=0)), dim=0))
             if torch.sum(torch.square(ys - torch.mean(ys, dim=0))) == 0:
@@ -162,3 +222,4 @@ class BuildNetwork(torch.nn.Module):
             print("Accuracy on test set: ", accuracy * 100, "%")
 
         return errors, accuracy
+"""

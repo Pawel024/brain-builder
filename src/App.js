@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import './App.css';
 import { Theme, Flex, Box, Heading, Grid, IconButton, Button } from '@radix-ui/themes';
 import * as Slider from '@radix-ui/react-slider';
@@ -15,6 +15,11 @@ import chroma from 'chroma-js';
 import Readme from './readme';
 import Introduction from './introduction';
 import QuizApp from './quiz';
+import pako from 'pako';
+// import Papa from 'papaparse';
+import gamesData from './games.json';
+import { use } from 'cytoscape';
+import { clear } from '@testing-library/user-event/dist/clear';
 
 
 const colorScale = chroma.scale(['#49329b', '#5e5cc2', '#8386d8', '#afb0e1', '#dddddd', '#e3a692', '#d37254', '#b64124', '#8f0500']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
@@ -71,7 +76,8 @@ function getCookie(name) {
 // ------- CYTOSCAPE FUNCTIONS -------
 
 // function to generate cytoscape elements
-function generateCytoElements(list, apiData, isTraining) {
+function generateCytoElements(list, apiData, isTraining, weights, biases) {
+  console.log("Length of weights: ", weights.length, "Weights: ", weights);
   const cElements = [];
 
   // Generate nodes
@@ -89,16 +95,11 @@ function generateCytoElements(list, apiData, isTraining) {
   });
 
   // Generate lines between nodes
-  let weights;
+  // let weights;
   let max;
   let min;
   let absMax;
-  if (apiData && apiData["network_weights"]) {
-    try {
-      weights = JSON.parse(apiData["network_weights"]);
-    } catch (error) {
-      console.error("Error parsing JSON:", error);
-    }
+  if (apiData && weights) {
     try {
     max = weights.reduce((max, part) => Math.max(max, part.reduce((subMax, arr) => Math.max(subMax, ...arr.map(Number)), 0)), 0);
     min = weights.reduce((min, part) => Math.min(min, part.reduce((subMin, arr) => Math.min(subMin, ...arr.map(Number)), Infinity)), Infinity);
@@ -126,7 +127,7 @@ function generateCytoElements(list, apiData, isTraining) {
         const target = cumulativeSums[i] + k;
         if (target <= cElements.length) {
           let weight = 5;
-          if (apiData && apiData["network_weights"] && isTraining === 2) { 
+          if (apiData && weights.length > 0 && isTraining !== 0) { 
             try {
               weight = parseFloat(weights[i][k][j])/absMax;
             }
@@ -188,6 +189,13 @@ function NotFound() {
 
 function App() {
 
+    // Setting the interval- and timing-related states
+  const cancelTokenSourceRef = useRef(null);
+  const intervalIdRef = useRef(null);
+  const intervalTimestep = 1000;  // in milliseconds, the time between each progress check -> low values mean low latency but high server load
+  const intervalTimeout = 60000;  // in milliseconds, the time to wait before ending the interval
+  const pendingTime = 3000;  // in milliseconds, the time to wait when putting or posting a request -> set this close to 0 in production, but higher for debugging
+
   // ------- WINDOW RESIZING -------
 
   function getWindowSize() {
@@ -210,43 +218,107 @@ function App() {
     };
   }, []);
 
-  // Define the functions to fetch API data
-  const fetchTrainingData = (apiData, setApiData, setAccuracy, setIsTraining, taskId, index) => {
+  const loadData = (taskId, index) => {
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
 
+    const dataData = {
+      action: 0,
+      user_id: userId,
+      task_id: taskId,
+      progress_pk: null,
+      learning_rate: 0,
+      epochs: 0,
+      normalization: true, // 0 means no normalization, 1 means normalization
+      network_input: JSON.stringify([]),
+      games_data: gamesData,
+    };
+    let dataFeatureNames = [];
+    let dataImages = [];
+    
+    // first, check if there is an entry in /api/backend:
     axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
       headers: {
         'X-CSRFToken': csrftoken
       }
-    })
-      .then((response) => {
-        setApiData(prevApiData => {
-          const newApiData = [...prevApiData];
-          newApiData[index] = response.data[0];
-          return newApiData;
+    }).then((response) => {
+      if (response.data.length > 0) {
+        // If the record exists, update it
+        let pk = response.data[0].pk;
+        axios.put(window.location.origin + `/api/backend/${pk}`, dataData, {
+          headers: {
+            'X-CSRFToken': csrftoken
+          }
+        }).catch((error) => {
+          console.log(error);
         });
-        setAccuracy(prevAccuracy => {
-          const newAccuracy = [...prevAccuracy];
-          newAccuracy[index] = parseFloat(JSON.parse(response.data[0]["error_list"])[1]);
-          return newAccuracy;
+      } else {
+        // If the record does not exist, throw an error
+        throw new Error('No Record in /api/backend');
+      };
+    }).catch((error) => {
+      console.log(error);
+      if (error.message == 'No Record') {
+        console.log('No record found, creating a new one');
+        axios.post(window.location.origin + "/api/backend/", dataData, {
+          headers: {
+            'X-CSRFToken': csrftoken
+          }
+        }).catch((error) => {
+          console.log(error);
+        })
+      }
+    }).finally(() => {
+      //  wait 1 second and then check the progress API
+      setTimeout(() => {
+        axios.get(window.location.origin + `/api/progress/?user_id=${userId}&task_id=${taskId}`, {
+          headers: {
+            'X-CSRFToken': csrftoken
+          }
+        }).then((response) => {
+          if (response.data.length > 0) {
+            dataFeatureNames = response.data[0].feature_names;
+            dataImages = response.data[0].plots;
+
+            if (dataFeatureNames.length > 0 && dataFeatureNames !== featureNames[index]) {  // if the feature names have changed, update them
+              setFeatureNames(prevFeatureNames => {
+                const newFeatureNames = [...prevFeatureNames];
+                newFeatureNames[index] = JSON.parse(dataFeatureNames);
+                return newFeatureNames;
+              });
+            }
+
+            // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
+            if (dataImages.length > 0 && dataImages.length !== imgs[index].length) {
+              setImgs(prevImgs => {
+                const newImgs = [...prevImgs];
+                newImgs[index] = JSON.parse(dataImages).map(base64String => { 
+                  const binaryString = atob(base64String);  // decode from base64 to binary string
+                  const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+                  for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+                  }
+                  const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+                  const url = URL.createObjectURL(blob);
+                  // now images can be accessed with <img src={url} />
+                  return url;
+                })
+                return newImgs;
+              });
+            }
+            console.log(`Data for challenge ${taskId} loaded`)
+          } else {
+            throw new Error('No Record in /api/progress');
+          }
+        }).catch((error) => {
+          console.log('Failed to load data for challenge ' + taskId);
+          console.log(error);
         });
-        console.log(response.data[0]);
-      })
-      .catch((error) => {
-        console.log(`Error fetching API data: ${error}`);
-      });
-    setTimeout(() => {
-      setIsTraining(prevIsTraining => {
-        const newIsTraining = [...prevIsTraining];
-        newIsTraining[index] = 2;
-        return newIsTraining;
-      });
-      console.log("Training finished")
-    }, 1000);
+      }, 1000);  // wait 1 second before checking the progress API
+    });
   };
 
-  const fetchQueryResponse = (setApiData, setIsResponding, taskId, index) => {
+  const fetchQueryResponse = (setApiData, setIsResponding, taskId, index) => {  // updates the apiData state with the response from the backend
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
 
@@ -271,13 +343,34 @@ function App() {
         newIsResponding[index] = 2;
         return newIsResponding;
       });
-    console.log("Training finished")
+    console.log("Response received")
   };
 
   let accuracyColor = 'var(--slate-11)';
   const [taskData, setTaskData] = useState([]);
 
+  const [taskIds, setTaskIds] = useState([]);
+  const [gamesData, setGamesData] = useState([[]]);
+  const [nInputs, setNInputs] = useState([]);
+  const [nOutputs, setNOutputs] = useState([]);
+  const [maxEpochs, setMaxEpochs] = useState([]);
+  const [maxLayers, setMaxLayers] = useState([]);
+  const [maxNodes, setMaxNodes] = useState([]);
+  const [cytoLayers, setCytoLayers] = useState([]);
+  const [isTraining, setIsTraining] = useState([]);
+  const [apiData, setApiData] = useState([]);
+  const [accuracy, setAccuracy] = useState([]);
+  const [isResponding, setIsResponding] = useState([]);
+  // Setting default values for the network-related states
+  const [progress, setProgress] = useState(-1);
+  const [errorList, setErrorList] = useState([[], null]);
+  const [featureNames, setFeatureNames] = useState([]);
+  const [weights, setWeights] = useState([]);
+  const [biases, setBiases] = useState([]);
+  const [imgs, setImgs] = useState([]);
+
   // ------- CYTOSCAPE EDITING -------
+  let loadedTasks = false
   useEffect(() => {
     axios.get('/api/all_tasks/')
       .then(response => {
@@ -287,57 +380,99 @@ function App() {
         console.log("first task id: ", taskIds[0]);
 
         setTaskData(taskIds);
+        const gamesData = JSON.stringify(response.data)
+        const nInputs = response.data.map(entry => entry.n_inputs);
+        const nOutputs = response.data.map(entry => entry.n_outputs);
+        const maxEpochs = response.data.map(entry => entry.max_epochs);
+        const maxLayers = response.data.map(entry => entry.max_layers);
+        const maxNodes = response.data.map(entry => entry.max_nodes);
         setTaskIds(taskIds);
+        setGamesData(gamesData);
+        setNInputs(nInputs);
+        setNOutputs(nOutputs);
+        setMaxEpochs(maxEpochs);
+        setMaxLayers(maxLayers);
+        setMaxNodes(maxNodes);
         setCytoLayers(taskIds.map(() => []));
         setIsTraining(taskIds.map(() => false));
         setApiData(taskIds.map(() => null));
         setAccuracy(taskIds.map(() => 0));
         setIsResponding(taskIds.map(() => false));
+        setProgress(taskIds.map(() => 0));
+        setErrorList(taskIds.map(() => [[], null]));
+        setFeatureNames(taskIds.map(() => []));  // TODO: load these somewhere else
+        setWeights(taskIds.map(() => []));
+        setBiases(taskIds.map(() => []));
+        setImgs(taskIds.map(() => []));
+        loadedTasks = true
       })
       .catch(error => {
         console.error('Error fetching tasks:', error);
-        const defaultTaskIds = [11, 12, 13, 21, 22, 31];
+        const defaultTaskIds = [11, 12];
         setTaskIds(defaultTaskIds);
+        setGamesData(JSON.stringify([{task_id: 11, n_inputs: 4, n_outputs: 3, type: 1, dataset: 'Clas2.csv'}, {task_id: 12, n_inputs: 4, n_outputs: 3, type: 1, dataset: 'load_iris()'}]));
+        setNInputs(defaultTaskIds.map(() => 4));  // TODO: set a default value for this
+        setNOutputs(defaultTaskIds.map(() => 3));  // TODO: set a default value for this
+        setMaxEpochs(defaultTaskIds.map(() => 200));
+        setMaxLayers(defaultTaskIds.map(() => 10));
+        setMaxNodes(defaultTaskIds.map(() => 16));
         setCytoLayers(defaultTaskIds.map(() => []));
         setIsTraining(defaultTaskIds.map(() => false));
         setApiData(defaultTaskIds.map(() => null));
         setAccuracy(defaultTaskIds.map(() => 0));
         setIsResponding(defaultTaskIds.map(() => false));
+        setProgress(defaultTaskIds.map(() => 0));
+        setErrorList(defaultTaskIds.map(() => [[], null]));
+        setFeatureNames(defaultTaskIds.map(() => []));  // TODO: load these somewhere else
+        setWeights(defaultTaskIds.map(() => []));
+        setBiases(defaultTaskIds.map(() => []));
+        setImgs(defaultTaskIds.map(() => []));
+        console.log("Setting default states instead.")
       });
   }, []);
   
-  const [taskIds, setTaskIds] = useState([]);
-  const [cytoLayers, setCytoLayers] = useState([]);
-  const [isTraining, setIsTraining] = useState([]);
-  const [apiData, setApiData] = useState([]);
-  const [accuracy, setAccuracy] = useState([]);
-  const [isResponding, setIsResponding] = useState([]);
-  
-  useEffect(() => {
-    cytoLayers.forEach((cytoLayer, index) => {
-      localStorage.setItem(`cytoLayers${taskIds[index]}`, JSON.stringify(cytoLayer));
-      setIsTraining(prevIsTraining => {
+  useEffect(() => {  // TODO: figure out what this is doing and if it's necessary
+    if (cytoLayers.every(subArray => subArray.length === 0)) {
+      console.log("cytoLayers is empty, setting [4, 8, 8, 3]");
+      // cytoLayers is empty, set it to a default value
+      taskIds.forEach((taskId, index) => {
+        localStorage.setItem(`cytoLayers${taskId}`, JSON.stringify([nInputs[index], 8, 8, nOutputs[index]]));
+      });
+    } else {
+      // cytoLayers is not empty, proceed as usual
+      cytoLayers.forEach((cytoLayer, index) => {
+        localStorage.setItem(`cytoLayers${taskIds[index]}`, JSON.stringify(cytoLayer));
+        setIsTraining(prevIsTraining => {
         const newIsTraining = [...prevIsTraining];
         newIsTraining[index] = 0;
         return newIsTraining;
       });
     });
+    }
   }, [cytoLayers, taskIds]);
 
   
-  const loadLastCytoLayers = (setCytoLayers, apiData, setApiData, propertyName, taskId, index) => {
+  const loadLastCytoLayers = (setCytoLayers, apiData, setApiData, propertyName, taskId, index, nInputs, nOutputs) => {
     // Check localStorage for a saved setting
     const savedSetting = localStorage.getItem(propertyName);
     let goToStep2 = false;
-  
-    if (savedSetting && savedSetting !== '[]') {
+
+    if (savedSetting && savedSetting !== '[]' && JSON.parse(savedSetting).some(element => element === undefined)) {
         try {
             // If a saved setting is found, try to parse it from JSON
             const cytoLayersSetting = JSON.parse(savedSetting);
             // try to set the cytoLayers to the saved setting, if there is an error, set it to default
             setCytoLayers(prevCytoLayers => {
               const newCytoLayers = [...prevCytoLayers];
+              console.log(nInputs)  // for debugging
+              console.log("setting cytoLayers to saved setting"); 
+              console.log(localStorage.getItem(propertyName));  // for debugging
               newCytoLayers[index] = cytoLayersSetting;
+              console.log("saved setting:", cytoLayersSetting);
+              // make the number of nodes in the first and last layer match the number of inputs and outputs
+              newCytoLayers[index][0] = nInputs;  
+              newCytoLayers[index][newCytoLayers[index].length - 1] = nOutputs;
+              console.log("new setting: ", newCytoLayers)  // for debugging
               return newCytoLayers;
             });
         }
@@ -358,7 +493,6 @@ function App() {
         }
       })
       .then((response) => {
-          try {
             setApiData(prevApiData => {
               const newApiData = [...prevApiData];
               newApiData[index] = response.data[0];
@@ -366,28 +500,30 @@ function App() {
             });
             console.log("apiData:");
             console.log(response.data[0]);
-            if (typeof response.data[0] === 'undefined') {
-              throw new Error('response.data[0] is undefined');
+            if (typeof response.data[0] === 'undefined' || !response.data[0]["network_input"] || response.data[0]["network_input"].length === 0) {
+              throw new Error('response.data[0] is undefined or network_input is empty');
             }
             setCytoLayers(prevCytoLayers => {
               const newCytoLayers = [...prevCytoLayers];
-              newCytoLayers[index] = JSON.parse(response.data[0]["network_setup"]);
+              newCytoLayers[index] = JSON.parse(response.data[0]["network_input"]);
+              // make the number of nodes in the first and last layer match the number of inputs and outputs
+              newCytoLayers[index][0] = nInputs;
+              newCytoLayers[index][newCytoLayers[index].length - 1] = nOutputs;
               return newCytoLayers;
             });
-          }
-          catch (error) {
-            console.log(error);
-            console.log("setting cytoLayers to default");
-            setCytoLayers(prevCytoLayers => {
-              const newCytoLayers = [...prevCytoLayers];
-              newCytoLayers[index] = [4, 7, 7, 3];
-              return newCytoLayers;
-            });
-            console.log("done doing that, this is what cytoLayers are now: ", cytoLayers);
-          }
       })
       .catch((error) => {
         console.log(error);
+        console.log("setting cytoLayers to default");  // for debugging
+            setCytoLayers(prevCytoLayers => {
+              const newCytoLayers = [...prevCytoLayers];
+              newCytoLayers[index] = [4, 8, 8, 3];
+              // make the number of nodes in the first and last layer match the number of inputs and outputs
+              newCytoLayers[index][0] = nInputs;
+              newCytoLayers[index][newCytoLayers[index].length - 1] = nOutputs;
+              return newCytoLayers;
+            });
+            console.log("done doing that, this is what cytoLayers are now: ", cytoLayers);
       });
     }
   };
@@ -398,10 +534,10 @@ function App() {
   // Update the state when the dependencies change
   useEffect(() => {
     setCytoElements(taskIds.map((taskId, index) => 
-      generateCytoElements(cytoLayers[index], apiData[index], isTraining[index])
+      generateCytoElements(cytoLayers[index], apiData[index], isTraining[index], weights[index], biases[index])
     ));
     console.log("cytoLayers:", cytoLayers);
-  }, [taskIds, cytoLayers, apiData, isTraining]);
+  }, [taskIds, cytoLayers, apiData, isTraining, weights, biases]);
 
   useEffect(() => {
     setCytoStyle(taskIds.map((taskId, index) => 
@@ -410,10 +546,11 @@ function App() {
   }, [taskIds, cytoLayers]);
 
   // function to add a layer
-  const addLayer = useCallback((setCytoLayers, nOfOutputs, index) => {
+  const addLayer = useCallback((setCytoLayers, nOfOutputs, index, max_layers) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      if (newLayers[index].length < 10) {newLayers[index].push(nOfOutputs)};
+      console.log("max_layers: ", max_layers);  // for debugging");
+      if (newLayers[index].length < max_layers) {newLayers[index].push(nOfOutputs)};
       return newLayers;
     });
   }, []);
@@ -428,10 +565,10 @@ function App() {
   }, []);
 
   // function to add a node to a layer
-  const addNode = useCallback((column, setCytoLayers, taskId, index) => {
+  const addNode = useCallback((column, setCytoLayers, taskId, index, max_nodes) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      newLayers[index][column] < 16 ? newLayers[index][column] += 1 : newLayers[index][column] = 16;
+      newLayers[index][column] < max_nodes ? newLayers[index][column] += 1 : newLayers[index][column] = max_nodes;
       document.getElementById(taskId + "-input" + column).value = newLayers[index][column];
       return newLayers;
     });
@@ -453,8 +590,8 @@ function App() {
     if (nodeInput && Number.isInteger(nodeInput)) {
       if (nodeInput < 1) {
         nodeInput = 1;
-      } else if (nodeInput > 16) {
-        nodeInput = 16;
+      } else if (nodeInput > maxNodes[index]) {
+        nodeInput = maxNodes[index];
       }
       setCytoLayers(prevLayers => {
         const newLayers = [...prevLayers];
@@ -467,133 +604,233 @@ function App() {
     document.getElementById(taskId + "-input" + column).value = nodeInput;
   }, []);
 
-
-
   // ------- POST REQUEST -------
-  const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index) => {
+  const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs) => {
     e.preventDefault();
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
 
-    const progressData = {
-      user_id: userId,
-      task_id: taskId,
-      progress: -1,
-      error_list: JSON.stringify([]),
-      plots: JSON.stringify([]),
-    };
+    setProgress(prevProgress => {
+      const newProgress = [...prevProgress]; // create a copy of the old progress array
+      newProgress[index] = 0; // update the specific element
+      return newProgress; // return the new array
+    });
+    setErrorList(prevErrorList => {
+      const newErrorList = [...prevErrorList];
+      newErrorList[index] = [[], null];
+      return newErrorList;
+    });
+    setWeights(prevWeights => {
+      const newWeights = [...prevWeights];
+      newWeights[index] = [];
+      return newWeights;
+    });
+    setBiases(prevBiases => {
+      const newBiases = [...prevBiases];
+      newBiases[index] = [];
+      return newBiases;
+    });
+
+    // first, check if there is an entry in /api/progress and get the pk
+    let pk = null;
     axios.get(window.location.origin + `/api/progress/?user_id=${userId}&task_id=${taskId}`, {
       headers: {
         'X-CSRFToken': csrftoken
-      }
+      }, 
+      timeout: pendingTime
     }).then((response) => {
       if (response.data.length > 0) {
-          // If the record exists, update it
-          let pk = response.data[0].pk;
-          axios.put(window.location.origin + `/api/progress/${pk}`, progressData, {
-            headers: {
-              'X-CSRFToken': csrftoken
-            }
-          }).then((response) => {
-              console.log(response.status);
-              console.log(response.data[0]);
-          }, (error) => {
-              console.log(error);
-          });
+        pk = response.data[0].pk;
       } else {
-          // If the record doesn't exist, create it
-          axios.post(window.location.origin + "/api/progress/", progressData, {
-            headers: {
-              'X-CSRFToken': csrftoken
-            }
-          }).then((response) => {
-              console.log(response.status);
-              console.log(response.data[0]);
-          }, (error) => {
-              console.log(error);
-          });
+        throw new Error('No Record');
       }
-    }, (error) => {
+    }).catch((error) => {
         console.log(error);
-    });
+    }).finally(() => {
 
-    /*
-    // Start the interval before making the PUT/POST request
-    let intervalId = setInterval(() => {
-      axios.get(window.location.origin + `/api/progress/?user_id=${userId}&task_id=${taskId}`, {
-        headers: {
-          'X-CSRFToken': csrftoken
-        }
-      }).then((response) => {
-        //  fetchProgressData(response.data);  // we need to define fetchProgressData but also make sure it actually gets used
-      }, (error) => {
-        console.log(error);
+        {/*
+        let flatdata = pako.deflate(jsondata, { to: 'string' });
+        // let bs = Array.prototype.reduce.call(flatdata, (acc, byte) => acc + String.fromCharCode(byte), '');
+        let b64s = btoa(flatdata);
+        console.log("b64s: ", b64s);  // for debugging
+        */}
+        // make sure the cytoLayers have the right input and output nodes
+        cytoLayers[0] = nOfInputs;
+        cytoLayers[cytoLayers.length - 1] = nOfOutputs;
+        const trainingData = {
+          action: 1,
+          user_id: userId,
+          task_id: taskId,
+          progress_pk: pk,
+          learning_rate: learningRate,
+          epochs: iterations,
+          normalization: true, // 0 means no normalization, 1 means normalization
+          network_input: JSON.stringify(cytoLayers),
+          games_data: gamesData,  
+        };
+        console.log("trainingData: ", trainingData);  // for debugging
+        setApiData(prevApiData => {
+          const newApiData = [...prevApiData];
+          newApiData[index] = trainingData;
+          return newApiData;
+        });
+        setAccuracy(prevAccuracy => {
+          const newAccuracy = [...prevAccuracy];
+          newAccuracy[index] = null;
+          return newAccuracy;
+        });
+        setIsTraining(prevIsTraining => {
+          const newIsTraining = [...prevIsTraining];
+          newIsTraining[index] = 1;
+          return newIsTraining;
+        });
+        axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+          headers: {
+            'X-CSRFToken': csrftoken
+          },
+          timeout: pendingTime
+        }).then((response) => {
+          if (response.data.length > 0) {
+              // If the record exists, update it
+              let pk = response.data[0].pk;
+              axios.put(window.location.origin + `/api/backend/${pk}`, trainingData, {
+                headers: {
+                  'X-CSRFToken': csrftoken
+                }, 
+                timeout: pendingTime
+              }).catch((error) => {
+                  console.log(error);
+            });
+          } else {
+              // If the record does not exist, throw an error
+              throw new Error('No Record');
+          }
+        }).catch((error) => {
+            console.log(error);
+            if (axios.isCancel(error) || error.message == 'No Record' || error.code == 'ECONNABORTED') {
+              console.log('No record found, creating a new one');
+              axios.post(window.location.origin + "/api/backend/", trainingData, {
+                headers: {
+                  'X-CSRFToken': csrftoken
+                }, 
+                timeout: pendingTime
+              }).catch((error) => {
+                  console.log(error);
+              })
+            }
+        }).finally(() => {
+          // SET UP AN INTERVAL - this will poll the progress API every n milliseconds and stop when the progress is 1 or when intervalTimeout is reached
+          let k = 0
+          let timeoutId = setTimeout(() => {
+            clearInterval(intervalIdRef.current);
+            setIsTraining(prevIsTraining => {
+              const newIsTraining = [...prevIsTraining];
+              newIsTraining[index] = 0;
+              return newIsTraining;
+            });
+            console.log("Training failed")
+            alert("Training failed. Please try again. If the problem persists, please contact us.");
+          }, intervalTimeout); // stop after n milliseconds
+          // Start the interval
+          intervalIdRef.current = setInterval(() => {
+
+            // Cancel the previous request if it exists
+            if (cancelTokenSourceRef.current) {
+              cancelTokenSourceRef.current.cancel('Operation canceled due to new request.');
+            }
+
+            // Create a new cancel token
+            cancelTokenSourceRef.current = axios.CancelToken.source();
+
+            axios.get(window.location.origin + `/api/progress/?user_id=${userId}&task_id=${taskId}`, {
+              headers: {
+                'X-CSRFToken': csrftoken
+              },
+              cancelToken: cancelTokenSourceRef.current.token // Pass the cancel token to the request
+            }).then((response) => {
+              if (response.data.length > 0) {
+                // set the pk
+                // let pk = response.data[0].pk;
+
+                if (response.data[0].progress !== progress[index]) {
+                  console.log("Compare progress: ", response.data[0].progress, progress[index]);
+                  k = 0
+                  setProgress(prevProgress => {
+                    const newProgress = [...prevProgress];
+                    newProgress[index] = response.data[0].progress;
+                    return newProgress;
+                  });
+
+                  // update the error list, weights and biases, but only if they changed
+                  if (response.data[0].error_list[0].length !== errorList[index][0].length || response.data[0].error_list[1] !== errorList[index][1]) {
+                    setErrorList(prevErrorList => {
+                      const newErrorList = [...prevErrorList];
+                      newErrorList[index] = JSON.parse(response.data[0].error_list);
+                      return newErrorList;
+                    });
+                  }
+                  if (weights[index].length === 0 || response.data[0].network_weights[0][0] !== weights[index][0][0]) {
+                    setWeights(prevWeights => {
+                      const newWeights = [...prevWeights];
+                      newWeights[index] = JSON.parse(response.data[0].network_weights);
+                      return newWeights;
+                    });
+                  }
+                  if (response.data[0].network_biases.length !== biases[index].length) {
+                    setBiases(prevBiases => {
+                      const newBiases = [...prevBiases];
+                      newBiases[index] = JSON.parse(response.data[0].network_biases);
+                      return newBiases;
+                    });
+                  }
+
+                  // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
+                  if (response.data[0].plots.length > 0 && response.data[0].plots.length !== imgs[index].length) {
+                    setImgs(prevImgs => {
+                      const newImgs = [...prevImgs];
+                      newImgs[index] = JSON.parse(response.data[0].plots).map(base64String => { 
+                        const binaryString = atob(base64String);  // decode from base64 to binary string
+                        const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+                        for (let i = 0; i < binaryString.length; i++) {
+                          bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+                        }
+                        const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+                        const url = URL.createObjectURL(blob);
+                        // now images can be accessed with <img src={url} />
+                        return url;
+                      })
+                      return newImgs;
+                    });
+                  }
+                }
+                // if nothing happens, stop the interval after 10000 milliseconds
+                console.log("k: ", k)
+                if (response.data[0].progress == progress[index]) {
+                  k = k + 1
+                }
+                if (response.data[0].progress == 1 ) {
+                  clearInterval(intervalIdRef.current);
+                  clearTimeout(timeoutId);
+                  setTimeout(() => {
+                    setIsTraining(prevIsTraining => {
+                      const newIsTraining = [...prevIsTraining];
+                      newIsTraining[index] = 2;
+                      return newIsTraining;
+                    });
+                    console.log("Training finished")
+                  }, 1000);
+                }
+              }
+            })
+            .catch(error => {
+              if (axios.isCancel(error)) {
+                console.log('Request canceled', error.message);
+              } else {
+              console.log(error);
+              }
+            });
+          }, intervalTimestep); // do this every n milliseconds
       });
-    }, 5000); // 5000 milliseconds = 5 seconds
-    */
-
-    const trainingData = {
-      action: 1,
-      user_id: userId,
-      task_id: taskId,
-      learning_rate: learningRate,
-      epochs: iterations,
-      normalization: true, // 0 means no normalization, 1 means normalization
-      network_setup: JSON.stringify(cytoLayers),
-      network_weights: JSON.stringify([]),
-      network_biases: JSON.stringify([]),
-      nn_input: JSON.stringify([]),
-      error_list: JSON.stringify([]),
-    };
-    setAccuracy(prevAccuracy => {
-      const newAccuracy = [...prevAccuracy];
-      newAccuracy[index] = null;
-      return newAccuracy;
-    });
-    setIsTraining(prevIsTraining => {
-      const newIsTraining = [...prevIsTraining];
-      newIsTraining[index] = 1;
-      return newIsTraining;
-    });
-    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
-      headers: {
-        'X-CSRFToken': csrftoken
-      }
-    }).then((response) => {
-      if (response.data.length > 0) {
-          // If the record exists, update it
-          let pk = response.data[0].pk;
-          axios.put(window.location.origin + `/api/backend/${pk}`, trainingData, {
-            headers: {
-              'X-CSRFToken': csrftoken
-            }
-          }).then((response) => {
-              console.log(response.status);
-              fetchTrainingData(apiData, setApiData, setAccuracy, setIsTraining, taskId, index);
-          }, (error) => {
-              console.log(error);
-          /*
-          }).finally(() => {
-            // Stop the interval when the PUT/POST request is completed
-            clearInterval(intervalId);
-          */
-          });
-      } else {
-          // If the record doesn't exist, create it
-          console.log(trainingData);
-          axios.post(window.location.origin + "/api/backend/", trainingData, {
-            headers: {
-              'X-CSRFToken': csrftoken
-            }
-          }).then((response) => {
-              console.log(response.status);
-              fetchTrainingData(apiData, setApiData, setAccuracy, setIsTraining, taskId, index);
-          }, (error) => {
-              console.log(error);
-          });
-      }
-    }, (error) => {
-        console.log(error);
     });
   };
 
@@ -611,7 +848,7 @@ function App() {
           <FloatingButton
             variant="outline"
             disabled={(isItPlus && cytoLayers[i] >= 16) | (!isItPlus && cytoLayers[i] < 2)}
-            onClick = {isItPlus ? () => addNode(i, setCytoLayers, taskId, index) : () => removeNode(i, setCytoLayers, taskId, index)}
+            onClick = {isItPlus ? () => addNode(i, setCytoLayers, taskId, index, maxNodes[index]) : () => removeNode(i, setCytoLayers, taskId, index)}
             style={{...style}}
             key={i}
           >
@@ -676,8 +913,9 @@ function App() {
       const values = Array.from(formData.values()).map((value) => Number(value));
       console.log("values");
       console.log(values);
-      networkData.nn_input = JSON.stringify(values);
+      networkData.network_input = JSON.stringify(values);
       networkData.action = 2;
+      networkData.games_data = gamesData;
       console.log("updated network data");
       console.log(networkData);
       axios.put(window.location.origin + `/api/backend/${networkData.pk}`, networkData, {
@@ -717,7 +955,7 @@ function App() {
   // ------- SLIDERS -------
 
   // initialize an array to store the state for each slider
-  const [iterations, setIterations] = useState(Array(taskIds.length).fill(200));
+  const [iterations, setIterations] = useState(Array(taskIds.length).fill(0));
   const [learningRate, setLearningRate] = useState(Array(taskIds.length).fill(0.01));
 
   const handleIterationChange = (index, value) => {
@@ -743,7 +981,7 @@ function App() {
         className="SliderRoot"
         defaultValue={[iterations[index]]}
         onValueChange={(value) => handleIterationChange(index, value)}
-        max={100}
+        max={maxEpochs[index] / 2}
         step={0.5}
         style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
       >
@@ -891,9 +1129,9 @@ function App() {
               path={`/challenge${taskId}`}
               element={
                 <BuildView
-                  nOfInputs={4}
-                  nOfOutputs={3}
-                  maxLayers={10}
+                  nOfInputs={nInputs[index]}
+                  nOfOutputs={nOutputs[index]}
+                  maxLayers={maxLayers[index]}
                   taskId={taskId}
                   index={index}
                   cytoElements={cytoElements[index]}
@@ -925,6 +1163,11 @@ function App() {
                   handleSubmit={handleSubmit}
                   isResponding={isResponding[index]}
                   setIsResponding={setIsResponding}
+                  progress={progress[index]}
+                  featureNames={featureNames[index]}
+                  errorList={errorList[index]}
+                  imgs={imgs[index]}
+                  loadData={loadData}
                 />
               }
             />
