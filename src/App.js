@@ -5,7 +5,7 @@ import * as Slider from '@radix-ui/react-slider';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { PlusIcon, MinusIcon, RocketIcon, QuestionMarkIcon, HomeIcon, FileTextIcon, StackIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, RocketIcon, QuestionMarkIcon, HomeIcon, DrawingPinIcon, DrawingPinFilledIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
@@ -42,29 +42,6 @@ const ChallengeButton = styled(Button, {
   fontWeight: '500',
   boxShadow: '0 1px 3px var(--slate-a11)'
 });
-
-// ------- CSRF TOKEN -------
-/*
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
-
-const csrftoken = getCookie('csrftoken');
-
-axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
-*/
 
 // ------- COOKIE FUNCTION -------
 function getCookie(name) {
@@ -1070,8 +1047,8 @@ function App() {
                 <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                        <label>The Basics</label>
-                        <div><StackIcon width="27" height="27" /></div>
+                        <label>Key Concepts</label>
+                        <div><DrawingPinFilledIcon width="27" height="27" /></div>
                     </Flex>
                     </ChallengeButton>
                 </Link>
@@ -1085,7 +1062,7 @@ function App() {
                       <ChallengeButton size="1" variant="outline">
                       <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                           <label>The Basics</label>
-                          <div><FileTextIcon width="27" height="27" /></div>
+                          <div><DrawingPinIcon width="27" height="27" /></div>
                       </Flex>
                       </ChallengeButton>
                     </Link>
