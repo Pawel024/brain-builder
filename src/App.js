@@ -5,7 +5,7 @@ import * as Slider from '@radix-ui/react-slider';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { PlusIcon, MinusIcon, RocketIcon, QuestionMarkIcon, HomeIcon, DrawingPinIcon, DrawingPinFilledIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, RocketIcon, QuestionMarkIcon, HomeIcon, DrawingPinIcon, PlayIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
@@ -20,6 +20,7 @@ import pako from 'pako';
 import gamesData from './games.json';
 import { use } from 'cytoscape';
 import { clear } from '@testing-library/user-event/dist/clear';
+import { Placeholder } from 'reactstrap';
 
 
 const colorScale = chroma.scale(['#49329b', '#5e5cc2', '#8386d8', '#afb0e1', '#dddddd', '#e3a692', '#d37254', '#b64124', '#8f0500']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
@@ -1048,7 +1049,7 @@ function App() {
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Tutorial</label>
-                        <div><RocketIcon width="27" height="27" /></div>
+                        <div><PlayIcon width="27" height="27" /></div>
                     </Flex>
                     </ChallengeButton>
                 </Link>
