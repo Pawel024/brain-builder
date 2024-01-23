@@ -46,7 +46,7 @@ async def send_data(root_link, data, headers=None, user_id=None, task_id=None, p
             if pk is not None:  # might give issues
                 print(f"Sending PUT to progress/{pk}")
                 async with session.put(root_link + f"api/progress/{pk}", data=data, headers = headers, timeout=2) as r:
-                    print("Response: ", awaut r.text())
+                    print("Response: ", await r.text())
             else:
                 print("Sending POST")
                 async with session.post(root_link + f"api/progress/", data=data, headers = headers, timeout=2) as r:
