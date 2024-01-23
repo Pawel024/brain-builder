@@ -9,7 +9,7 @@ import axios from 'axios';
 
 
 const ScoreScreen = ({ score, userAnswers, handleRetry }) => (
-  <Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", padding: '30px 50px', background:"solid", backgroundColor:"white" }}>
+  <Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", width:window.innerWidth/3, padding: '30px 50px', background:"solid", backgroundColor:"white" }}>
     <Flex gap="1" direction="column" style={{ justifyContent: 'center', alignItems: 'center' }}>
       <Heading size='5' style={{ color: 'var(--slate-12)', marginBottom:20 }}>
           Quiz Finished!
@@ -102,7 +102,7 @@ const Quiz = ({ questions }) => {
   return (
     <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: window.innerHeight-52, fontFamily: 'monospace', backgroundImage: 'linear-gradient(330deg, rgba(7,62,185, 0.15) 0%, rgba(7,185,130, 0.15) 100%)'}}>
     {isQuizFinished ? <ScoreScreen score={score} userAnswers={userAnswers} handleRetry={handleRetry} /> : (
-      <Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", padding: '30px 50px', background:"solid", backgroundColor:"white" }}>
+      <Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", width:window.innerWidth/3, padding: '30px 50px', background:"solid", backgroundColor:"white" }}>
         <Flex gap="1" direction="column" style={{ justifyContent: 'center', alignItems: 'center' }}>
           <Progress.Root className="ProgressRoot" value={progress} style={{ marginBottom:5 }}>
             <Progress.Indicator
@@ -132,7 +132,7 @@ const Quiz = ({ questions }) => {
                 </label>
               </div>
             ))}
-          </RadioGroup.Root>): (<TextArea color="gray" placeholder="Type your answer…" style={{ width:window.innerWidth/3, height:window.innerHeight/5 }} onChange={event => setTextInputValue(event.target.value)} />)}
+          </RadioGroup.Root>): (<TextArea color="gray" placeholder="Type your answer…" style={{ width:window.innerWidth/3.5, height:window.innerHeight/7 }} onChange={event => setTextInputValue(event.target.value)} />)}
           <Button onClick={(event) => handleOptionClick(event)} style={{marginTop:20}}>Next</Button>
           </Flex>
         </form>
