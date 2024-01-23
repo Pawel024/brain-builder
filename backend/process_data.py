@@ -20,6 +20,7 @@ import requests
 import pandas as pd
 import json
 from base64 import b64encode, b64decode
+import aiohttp
 
 """
 def send_data(root_link, data, headers=None, user_id=None, task_id=None, pk=None):
@@ -39,20 +40,23 @@ def send_data(root_link, data, headers=None, user_id=None, task_id=None, pk=None
         r = requests.post(root_link + f"api/progress/", data=data, headers = headers)
 """
 
-def send_data(root_link, data, headers=None, user_id=None, task_id=None, pk=None):
-    try:
-        if pk is not None:  # might give issues
-            print(f"Sending PUT to progress/{pk}")
-            r = requests.put(root_link + f"api/progress/{pk}", data=data, headers = headers, timeout=1)
-        else:
-            print("Sending POST")
-            r = requests.post(root_link + f"api/progress/", data=data, headers = headers, timeout=1)
-        print("Response: ", r)
+async def send_data(root_link, data, headers=None, user_id=None, task_id=None, pk=None):
+    async with aiohttp.ClientSession() as session:
+        try:
+            if pk is not None:  # might give issues
+                print(f"Sending PUT to progress/{pk}")
+                async with session.put(root_link + f"api/progress/{pk}", data=data, headers = headers, timeout=2) as r:
+                    print("Response: ", awaut r.text())
+            else:
+                print("Sending POST")
+                async with session.post(root_link + f"api/progress/", data=data, headers = headers, timeout=2) as r:
+                    print("Response: ", await r.text())
+            print("Response: ", r)
     except requests.exceptions.ReadTimeout as e:
         print(f"Request timed out (error {e}), continuing anyway")
 
 
-def process(req, root_link, pk=None, csrf_token=None):
+async def process(req, root_link, pk=None, csrf_token=None):
     req = dict(req)
     task_id, user_id = req['task_id'], req['user_id']
     pk = req['progress_pk']
@@ -69,30 +73,7 @@ def process(req, root_link, pk=None, csrf_token=None):
         }
 
     # load the games dataframe 
-
-    # this dataframe contains all the game-specific info the backend uses
-    # levels.games = json.loads(gzip.decompress(req['minidata']).decode('utf-8'))  # use in combination with pako
-    
     levels.games = json.loads(req['games_data'])  # use without pako
-    
-    # levels.games = b64decode(req['minidata'])  # use with json->pako->bs
-    # levels.games = zlib.decompress(levels.games, wbits=-zlib.MAX_WBITS)  # use with json->pako->bs
-    # levels.games = json.loads(levels.games)  # use with json->pako->bs
-
-    """
-    levels.games = requests.get(root_link + "api/all_tasks", headers=h, timeout=60).json()
-    d = {
-            'user_id': user_id,
-            'task_id': int(task_id),
-            'progress': 0,
-            'feature_names': json.dumps([levels.games]),
-            'plots': json.dumps([]),
-            'error_list': json.dumps([])
-        }
-    requests.post(root_link + f"api/progress/", data=d, headers = h)
-    assert False, levels.games
-    """
-
     levels.games = pd.DataFrame(levels.games).set_index('task_id')
 
 
@@ -109,7 +90,11 @@ def process(req, root_link, pk=None, csrf_token=None):
         d['plots'] = json.dumps([b64encode(image).decode() for image in levels.data.images])
         print('Plots: ', d['plots'])
 
-        send_data(root_link, d, headers=h, user_id=user_id, task_id=task_id, pk=pk)
+        tasks = asyncio.create_task(send_data(root_link, d, headers=h, user_id=user_id, task_id=task_id, pk=pk))
+        try: 
+            result = await tasks
+        except Exception as e:
+            print("An error occured when sending the data back (process_data.py, action 0): ", e)
 
 
 
@@ -123,7 +108,7 @@ def process(req, root_link, pk=None, csrf_token=None):
         
         d['feature_names'] = json.dumps([x.replace('_', ' ') for x in levels.data.feature_names])  # list of strings representing the feature names
         d['progress'] = 0  # just update the progress
-        send_data(root_link, d, headers=h, user_id=user_id, task_id=task_id, pk=pk)  # send a progress update to the frontend
+        tasks = [asyncio.create_task(send_data(root_link, d, headers=h, user_id=user_id, task_id=task_id, pk=pk))]  # send a progress update to the frontend
         
         for epoch in range(epochs):
             print("Epoch: ", epoch)
@@ -147,7 +132,7 @@ def process(req, root_link, pk=None, csrf_token=None):
                     d['network_biases'] = json.dumps(b)  # list of lists of floats representing the biases
                     print("Epoch: ", epoch, ", Error: ", errors[-1])
 
-                send_data(root_link, d, headers=h, user_id=user_id, task_id=task_id, pk=pk)  # send a progress update to the frontend
+                tasks += [asyncio.create_task(send_data(root_link, d, headers=h, user_id=user_id, task_id=task_id, pk=pk))]  # send a progress update to the frontend
         
         # save the network to a pickle file
         with open('nn.txt', 'wb') as output:
@@ -159,7 +144,12 @@ def process(req, root_link, pk=None, csrf_token=None):
         d['error_list'] = json.dumps(e)  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
         d['network_weights'] = json.dumps(w)  # list of lists of floats representing the weights
         d['network_biases'] = json.dumps(b)  # list of lists of floats representing the biases
-        send_data(root_link, d, headers=h, user_id=user_id, task_id=task_id, pk=pk)  # send a progress update to the frontend
+        tasks += [asyncio.create_task(send_data(root_link, d, headers=h, user_id=user_id, task_id=task_id, pk=pk))]  # send a progress update to the frontend
+
+        try: 
+            result = await tasks
+        except Exception as e:
+            print("An error occured when sending the data back (process_data.py, action 0): ", e)
 
 
 
