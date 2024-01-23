@@ -5,7 +5,7 @@ import * as Slider from '@radix-ui/react-slider';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { PlusIcon, MinusIcon, RocketIcon, QuestionMarkIcon, HomeIcon, MixIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, RocketIcon, QuestionMarkIcon, HomeIcon, DashboardIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
@@ -847,7 +847,7 @@ function App() {
                       <ChallengeButton size="1" variant="outline">
                       <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                           <label>The Basics</label>
-                          <div><MixIcon width="27" height="27" /></div>
+                          <div><DashboardIcon width="27" height="27" /></div>
                       </Flex>
                       </ChallengeButton>
                     </Link>
