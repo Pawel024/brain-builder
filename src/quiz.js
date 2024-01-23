@@ -132,10 +132,9 @@ const Quiz = ({ questions }) => {
                 </label>
               </div>
             ))}
-          </RadioGroup.Root>): (<TextArea color="gray" placeholder="Type your answer…" style={{ width:window.innerWidth/3.5, height:window.innerHeight/7 }} onChange={event => setTextInputValue(event.target.value)} onKeyDown={event => {
+          </RadioGroup.Root>): (<TextArea color="gray" placeholder="Type your answer…" style={{ width:window.innerWidth/3.75, height:window.innerHeight/7 }} onChange={event => setTextInputValue(event.target.value)} onKeyDown={event => {
             if (event.key === 'Enter') {
-              event.preventDefault();
-              handleOptionClick();
+              handleOptionClick(event);
             }}}/>
           )}
           <Button onClick={(event) => handleOptionClick(event)} style={{marginTop:20}}>Next</Button>
