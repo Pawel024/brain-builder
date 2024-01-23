@@ -5,22 +5,14 @@ import * as Slider from '@radix-ui/react-slider';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { PlusIcon, MinusIcon, RocketIcon, LightningBoltIcon, HomeIcon, DrawingPinIcon, PlayIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, RocketIcon, HomeIcon, DrawingPinIcon, QuestionMarkIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
-import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
 import BuildView from './buildView';
-import Tutorial from './tutorial';
 import chroma from 'chroma-js';
 import Readme from './readme';
 import Introduction from './introduction';
 import QuizApp from './quiz';
-import pako from 'pako';
-// import Papa from 'papaparse';
-import gamesData from './games.json';
-import { use } from 'cytoscape';
-import { clear } from '@testing-library/user-event/dist/clear';
-import { Placeholder } from 'reactstrap';
 
 
 const colorScale = chroma.scale(['#49329b', '#5e5cc2', '#8386d8', '#afb0e1', '#dddddd', '#e3a692', '#d37254', '#b64124', '#8f0500']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
@@ -236,7 +228,7 @@ function App() {
       };
     }).catch((error) => {
       console.log(error);
-      if (error.message == 'No Record') {
+      if (error.message === 'No Record') {
         console.log('No record found, creating a new one');
         axios.post(window.location.origin + "/api/backend/", dataData, {
           headers: {
@@ -348,7 +340,7 @@ function App() {
   const [imgs, setImgs] = useState([]);
 
   // ------- CYTOSCAPE EDITING -------
-  let loadedTasks = false
+  const [loadedTasks, setLoadedTasks] = useState(false);
   useEffect(() => {
     axios.get('/api/all_tasks/')
       .then(response => {
@@ -382,7 +374,7 @@ function App() {
         setWeights(taskIds.map(() => []));
         setBiases(taskIds.map(() => []));
         setImgs(taskIds.map(() => []));
-        loadedTasks = true
+        setLoadedTasks(true)
       })
       .catch(error => {
         console.error('Error fetching tasks:', error);
@@ -427,7 +419,7 @@ function App() {
       });
     });
     }
-  }, [cytoLayers, taskIds]);
+  }, [cytoLayers, taskIds, nInputs, nOutputs]);
 
   
   const loadLastCytoLayers = (setCytoLayers, apiData, setApiData, propertyName, taskId, index, nInputs, nOutputs) => {
@@ -580,7 +572,7 @@ function App() {
       nodeInput = cytoLayers[index][column];
     }
     document.getElementById(taskId + "-input" + column).value = nodeInput;
-  }, []);
+  }, [maxNodes]);
 
   // ------- POST REQUEST -------
   const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs) => {
@@ -685,7 +677,7 @@ function App() {
           }
         }).catch((error) => {
             console.log(error);
-            if (axios.isCancel(error) || error.message == 'No Record' || error.code == 'ECONNABORTED') {
+            if (axios.isCancel(error) || error.message === 'No Record' || error.code === 'ECONNABORTED') {
               console.log('No record found, creating a new one');
               axios.post(window.location.origin + "/api/backend/", trainingData, {
                 headers: {
@@ -783,10 +775,10 @@ function App() {
                 }
                 // if nothing happens, stop the interval after 10000 milliseconds
                 console.log("k: ", k)
-                if (response.data[0].progress == progress[index]) {
+                if (response.data[0].progress === progress[index]) {
                   k = k + 1
                 }
-                if (response.data[0].progress == 1 ) {
+                if (response.data[0].progress === 1 ) {
                   clearInterval(intervalIdRef.current);
                   clearTimeout(timeoutId);
                   setTimeout(() => {
@@ -1031,7 +1023,7 @@ function App() {
             <Grid columns='3' mt='1'>
                 <Box/>
                 <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
-                <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily: 'monospace'}}>brAIn builder</Heading>
+                <Heading as='h1' align='center' size='7' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily:'monospace, Courier New, Courier' }}>brAIn builder</Heading>
                 </Link>
                 <Box align='end' mr='3' >
                     <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
@@ -1081,7 +1073,7 @@ function App() {
                       <ChallengeButton size="1" variant="outline">
                         <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                           <label>Quiz</label>
-                          <div><LightningBoltIcon width="27" height="27" /></div>
+                          <div><QuestionMarkIcon width="27" height="27" /></div>
                         </Flex>
                       </ChallengeButton>
                     </Link>
