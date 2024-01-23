@@ -1063,7 +1063,7 @@ function App() {
                       <ChallengeButton size="1" variant="outline">
                       <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                           <label>Key Concepts</label>
-                          <div><DrawingPinIcon width="28" height="28" /></div>
+                          <div><DrawingPinIcon width="30" height="30" /></div>
                       </Flex>
                       </ChallengeButton>
                     </Link>
