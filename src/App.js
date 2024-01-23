@@ -829,14 +829,6 @@ function App() {
               <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Get Started</Heading>
                 <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
-                <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <ChallengeButton size="1" variant="outline">
-                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                        <label>Introduction</label>
-                        <div><RocketIcon width="27" height="27" /></div>
-                    </Flex>
-                    </ChallengeButton>
-                </Link>
                 <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
@@ -851,6 +843,14 @@ function App() {
                 <Box key={level} style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                   <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level {level}</Heading>
                   <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
+                    <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
+                      <ChallengeButton size="1" variant="outline">
+                      <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                          <label>The Basics</label>
+                          <div><RocketIcon width="27" height="27" /></div>
+                      </Flex>
+                      </ChallengeButton>
+                    </Link>
                     {challenges.map((challenge, index) => (
                       <Link key={index} to={`challenge${level}${challenge}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                         <ChallengeButton size="1" variant="outline">
