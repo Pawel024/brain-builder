@@ -1049,7 +1049,7 @@ function App() {
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Tutorial</label>
-                        <div><PlayIcon width="27" height="27" /></div>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                     </ChallengeButton>
                 </Link>
@@ -1063,7 +1063,7 @@ function App() {
                       <ChallengeButton size="1" variant="outline">
                       <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                           <label>Key Concepts</label>
-                          <div><DrawingPinIcon width="27" height="27" /></div>
+                          <div><DrawingPinIcon width="28" height="28" /></div>
                       </Flex>
                       </ChallengeButton>
                     </Link>
