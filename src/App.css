@@ -8,15 +8,6 @@
   overflow: hidden;
 }
 
-.App h1,
-.App h2,
-.App h3,
-.App h4,
-.App h5,
-.App h6 {
-  font-size: inherit;
-}
-
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -93,15 +84,6 @@
 
 .App-link {
   color: #61dafb;
-}
-
-.buildBody h1,
-.buildBody h2,
-.buildBody h3,
-.buildBody h4,
-.buildBody h5,
-.buildBody h6 {
-  font-size: inherit;
 }
 
 @keyframes App-logo-spin {
