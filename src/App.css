@@ -95,6 +95,15 @@
   color: #61dafb;
 }
 
+.buildBody h1,
+.buildBody h2,
+.buildBody h3,
+.buildBody h4,
+.buildBody h5,
+.buildBody h6 {
+  font-size: inherit;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './App.css';
 import { Theme, Flex, Box, Heading, Grid, IconButton, Button } from '@radix-ui/themes';
 import * as Slider from '@radix-ui/react-slider';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { PlusIcon, MinusIcon, RocketIcon, HomeIcon, DrawingPinIcon, CheckboxIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, RocketIcon, HomeIcon, DrawingPinIcon, Pencil2Icon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import axios from 'axios';
 import BuildView from './buildView';
@@ -1073,7 +1073,7 @@ function App() {
                       <ChallengeButton size="1" variant="outline">
                         <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                           <label>Quiz</label>
-                          <div><CheckboxIcon width="27" height="27" /></div>
+                          <div><Pencil2Icon width="27" height="27" /></div>
                         </Flex>
                       </ChallengeButton>
                     </Link>
@@ -1154,7 +1154,7 @@ function App() {
                   </Link>
                 </Box>
                 <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
-                <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
+                <Heading as='h1' align='center' size='7' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily:'monospace, Courier New, Courier' }}>brAIn builder</Heading>
                 </Link>
                 <Box align='end' mr='3' >
                     <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
