@@ -1047,8 +1047,8 @@ function App() {
                 <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                        <label>Key Concepts</label>
-                        <div><DrawingPinFilledIcon width="27" height="27" /></div>
+                        <label>Tutorial</label>
+                        <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                     </ChallengeButton>
                 </Link>
@@ -1061,7 +1061,7 @@ function App() {
                     <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
                       <ChallengeButton size="1" variant="outline">
                       <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                          <label>The Basics</label>
+                          <label>Key Concepts</label>
                           <div><DrawingPinIcon width="27" height="27" /></div>
                       </Flex>
                       </ChallengeButton>
