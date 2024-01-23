@@ -119,7 +119,7 @@ const Quiz = ({ questions }) => {
               </Heading>
           </Box>
         </Flex>
-        <form>
+        <form onSubmit={(event) => handleOptionClick(event)}>
           <Flex gap="2" direction="column" style={{ justifyContent: 'center', alignItems: 'center' }}>
           {questions[currentQuestion].question_type === "multiple choice" ? (<RadioGroup.Root className="RadioGroupRoot" defaultValue="default" aria-label="Multiple choice question" value={selectedOption !== null ? selectedOption.toString() : ''} onValueChange={setSelectedOption}>
             {questions[currentQuestion].options.map((option, index) => (
