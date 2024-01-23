@@ -5,7 +5,7 @@ import * as Slider from '@radix-ui/react-slider';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { PlusIcon, MinusIcon, RocketIcon, QuestionMarkIcon, HomeIcon, FileTextIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, RocketIcon, QuestionMarkIcon, HomeIcon, FileTextIcon, StackIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
@@ -1070,8 +1070,8 @@ function App() {
                 <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                        <label>Tutorial</label>
-                        <div><RocketIcon width="27" height="27" /></div>
+                        <label>The Basics</label>
+                        <div><StackIcon width="27" height="27" /></div>
                     </Flex>
                     </ChallengeButton>
                 </Link>
