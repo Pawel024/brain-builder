@@ -73,7 +73,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_grip.GripMiddleware',
 ]
 
 redis_url = urllib.parse.urlparse(os.environ.get('REDIS_URL', 'redis://localhost:6379'))
