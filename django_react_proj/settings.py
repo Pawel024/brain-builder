@@ -73,7 +73,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_grip.GripMiddleware',
-    'django_eventstream.middleware.EventStreamMiddleware',
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
