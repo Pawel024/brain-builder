@@ -218,6 +218,7 @@ function App() {
     };
   }, []);
 
+  const [webSocket, setWebSocket] = useState(null)
   const loadData = (taskId, index) => {
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
@@ -268,19 +269,28 @@ function App() {
         })
       }
     }).finally(() => {
-      // wait 1 second
-      setTimeout(() => {
-          // Start listening for updates
-          const eventSource = new EventSource(window.location.origin + `/events/${userId}/${taskId}/`);
+          // Create a WebSocket
+          const ws = new WebSocket(`ws://${window.location.host}/ws/${userId}/${taskId}/`);
+          
+          ws.onopen = () => {
+            console.log('WebSocket connection opened');
+          };
+
+          ws.onclose = () => {
+            console.log('WebSocket connection closed');
+          };
+          
+          // Save the WebSocket object in state so you can use it later
+          setWebSocket(ws);
 
           let timeoutId = setTimeout(() => {
-            eventSource.close();
+            ws.close();
             console.log('Failed to load data for challenge ' + taskId);
             alert("Failed to load data for challenge " + taskId + ". Try reloading the page, if the problem persists, please contact us.");
           }, intervalTimeout); // stop after n milliseconds
 
-          eventSource.onmessage = function(event) {
-            if (event.type === 'data') { 
+          ws.onmessage = function(event) {
+            if (event.title === 'data') { 
 
               setFeatureNames(prevFeatureNames => {
                 const newFeatureNames = [...prevFeatureNames];
@@ -309,14 +319,13 @@ function App() {
                 return newInitPlots;
               });
               console.log(`Data for challenge ${taskId} loaded`)
-              eventSource.close();
+              ws.close();
             }
           };
 
-          eventSource.onerror = function(event) {
+          ws.onerror = function(event) {
             console.error('Error:', event);
           };
-        }, 1000);
       });
     };
 

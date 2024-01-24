@@ -12,7 +12,6 @@ Messages:
 """
 
 # Improvements:
-# Idea: a lot of files use the same imports, check if this can be done more efficiently
 # Idea: make the normalization an integer value so it's easier to expand
 
 from . import building 
@@ -24,10 +23,12 @@ import requests
 import pandas as pd
 import json
 from base64 import b64encode, b64decode
-from django_eventstream import send_event
+from django_react_proj.consumers import Coach
+#from django_eventstream import send_event
 #import aiohttp
 
-def process(req, root_link, pk=None, csrf_token=None):
+async def process(req, root_link, pk=None, csrf_token=None, callback=None):
+
     req = dict(req)
     task_id, user_id = req['task_id'], req['user_id']
 
@@ -40,11 +41,17 @@ def process(req, root_link, pk=None, csrf_token=None):
         d = {}
         tag = int(req['task_id'])
         levels.get_data(tag)
+        d['title'] = json.dumps('data')
         d['feature_names'] = json.dumps([x.replace('_', ' ') for x in levels.data.feature_names])
         d['plots'] = json.dumps([b64encode(image).decode() for image in levels.data.images])
 
-        print(f'Sending data to events/{user_id}/{task_id}')
-        send_event(f'{user_id}/{task_id}', 'data', d)
+        coach = Coach.connections.get((user_id, task_id))
+        if coach is not None:
+            print('Sending data to coach')
+            await coach.send_data(d)
+        
+        if callback is not None:
+            callback(d)
 
 
     elif req['action'] == 1:  # create and train a network
@@ -55,9 +62,14 @@ def process(req, root_link, pk=None, csrf_token=None):
 
         network, training_set, test_set = building.build_nn(input_list, tag, pk=pk, task_id=task_id, user_id=user_id, root_link=root_link)
         print("Network initiated, starting training")
-        
+        d['title'] = json.dumps('progress')
         d['progress'] = 0  # just update the progress
-        send_event(f'{user_id}/{task_id}', 'progress', d)
+        coach = Coach.connections.get((user_id, task_id))
+        if coach is not None:
+            await coach.send_data(d)
+        if callback is not None:
+            callback(d)
+        u['title'] = json.dumps('update')
         
         for epoch in range(epochs):
             print("Epoch: ", epoch)
@@ -81,9 +93,22 @@ def process(req, root_link, pk=None, csrf_token=None):
                     u['network_biases'] = json.dumps(b)  # list of lists of floats representing the biases
 
                     print("Epoch: ", epoch, ", Error: ", errors[-1])
-                    send_event(f'{user_id}/{task_id}', 'update', u)
 
-                send_event(f'{user_id}/{task_id}', 'progress', d)
+                    coach = Coach.connections.get((user_id, task_id))
+                    if coach is not None:
+                        print('Sending data to coach')
+                        await coach.send_data(u)
+                    
+                    if callback is not None:
+                        callback(u)
+
+                coach = Coach.connections.get((user_id, task_id))
+                if coach is not None:
+                    print('Sending data to coach')
+                    await coach.send_data(d)
+                
+                if callback is not None:
+                    callback(d)
         
         # save the network to a pickle file
         with open('nn.txt', 'wb') as output:
@@ -96,8 +121,15 @@ def process(req, root_link, pk=None, csrf_token=None):
         u['network_weights'] = json.dumps(w)  # list of lists of floats representing the weights
         u['network_biases'] = json.dumps(b)  # list of lists of floats representing the biases
         
-        send_event(f'{user_id}/{task_id}', 'progress', d)
-        send_event(f'{user_id}/{task_id}', 'update', u)
+        coach = Coach.connections.get((user_id, task_id))
+        if coach is not None:
+            print('Sending double data to coach')
+            await coach.send_data(d)
+            await coach.send_data(u)
+        
+        if callback is not None:
+            callback(d)
+            callback(u)
 
 
 

@@ -3,6 +3,25 @@ ASGI entrypoint. Configures Django and then runs the application
 defined in the ASGI_APPLICATION setting.
 """
 
+
+from channels.routing import ProtocolTypeRouter, URLRouter
+from django.urls import path, re_path
+from . import consumers
+
+websocket_urlpatterns = [
+    re_path(r'ws/(?P<userId>\w+)/(?P<taskId>\w+)/$', consumers.Coach.as_asgi()),
+    # Add more WebSocket endpoints here if needed
+]
+
+application = ProtocolTypeRouter({
+    # http->django views is added by default
+    'websocket': URLRouter(websocket_urlpatterns)
+})
+
+
+
+
+"""
 import os
 import django
 from django.core.asgi import get_asgi_application
@@ -20,23 +39,5 @@ application = ProtocolTypeRouter({
         )),
         re_path(r'', get_asgi_application()),
     ]),
-})
-
-
-
-
-"""
-from channels.routing import ProtocolTypeRouter, URLRouter
-from django.urls import path
-from . import consumers
-
-websocket_urlpatterns = [
-    path('ws/update/', consumers.SomeConsumer.as_asgi()),
-    # Add more WebSocket endpoints here if needed
-]
-
-application = ProtocolTypeRouter({
-    # http->django views is added by default
-    'websocket': URLRouter(websocket_urlpatterns)
 })
 """

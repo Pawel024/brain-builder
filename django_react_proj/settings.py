@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     'backend',
     'webpack_loader',
     'channels',
-    'django_eventstream',
+#    'django_eventstream',
 ]
 
 MIDDLEWARE = [
