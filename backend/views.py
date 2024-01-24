@@ -71,7 +71,7 @@ def query_list(request):
 
 @csrf_protect
 @api_view(['PUT', 'DELETE'])
-async def query_detail(request, pk):
+def query_detail(request, pk):
     try:
         query = Row.objects.get(pk=pk)
     except Row.DoesNotExist:
