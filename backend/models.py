@@ -27,6 +27,8 @@ class TaskDescription(models.Model):
     max_layers = models.IntegerField()
     max_nodes = models.IntegerField()
     normalization = models.BooleanField()
+    iterations_slider_visibility = models.BooleanField()
+    lr_slider_visibility = models.BooleanField()
 
     def __str__(self):
         return str(self.task_id)

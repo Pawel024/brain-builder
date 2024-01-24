@@ -326,6 +326,9 @@ function App() {
   const [maxEpochs, setMaxEpochs] = useState([]);
   const [maxLayers, setMaxLayers] = useState([]);
   const [maxNodes, setMaxNodes] = useState([]);
+  const [normalization, setNormalization] = useState([true]);
+  const [iterationsSliderVisibility, setIterationsSliderVisibility] = useState(false);
+  const [lrSliderVisibility, setLRSliderVisibility] = useState(false);
   const [cytoLayers, setCytoLayers] = useState([]);
   const [isTraining, setIsTraining] = useState([]);
   const [apiData, setApiData] = useState([]);
@@ -349,20 +352,22 @@ function App() {
         taskIds.sort((a, b) => a - b); // sort the taskIds
         console.log("first task id: ", taskIds[0]);
 
-        setTaskData(taskIds);
-        const gamesData = JSON.stringify(response.data)
+        setTaskData(response.data);
         const nInputs = response.data.map(entry => entry.n_inputs);
         const nOutputs = response.data.map(entry => entry.n_outputs);
         const maxEpochs = response.data.map(entry => entry.max_epochs);
         const maxLayers = response.data.map(entry => entry.max_layers);
         const maxNodes = response.data.map(entry => entry.max_nodes);
         setTaskIds(taskIds);
-        setGamesData(gamesData);
+        setGamesData(JSON.stringify(response.data.map(entry => entry.games_data)));
         setNInputs(nInputs);
         setNOutputs(nOutputs);
         setMaxEpochs(maxEpochs);
         setMaxLayers(maxLayers);
         setMaxNodes(maxNodes);
+        setNormalization(response.data.map(entry => entry.normalization));
+        setIterationsSliderVisibility(response.data.map(entry => entry.iterationsSliderVisibility));
+        setLRSliderVisibility(response.data.map(entry => entry.lrSliderVisibility));
         setCytoLayers(taskIds.map(() => []));
         setIsTraining(taskIds.map(() => false));
         setApiData(taskIds.map(() => null));
@@ -1011,7 +1016,7 @@ function App() {
   }, {});
 
 
-  const [levelNames, setLevelNames] = useState(["Linear Regression", "Classification Networks", "Advanced Topics"]);
+  const [levelNames, setLevelNames] = useState(["Linear Regression", "Classification Networks", "Learning Rate and Activation Functions", "Feature Selection and Extraction"]);
 
 
   // ------- RETURN THE APP CONTENT -------
