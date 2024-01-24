@@ -78,6 +78,8 @@ def query_detail(request, pk):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'PUT':
+        user_id = request.data.get('user_id')
+        task_id = request.data.get('task_id')
         absolute_uri = request.build_absolute_uri('/')
         parsed_uri = urlparse(absolute_uri)
         root_url = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
