@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'backend',
     'webpack_loader',
-#    'channels',
+    'channels',
+    'django_eventstream',
 ]
 
 MIDDLEWARE = [
@@ -71,6 +72,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_grip.GripMiddleware',
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -95,7 +97,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'django_react_proj.wsgi.application'
 
-#ASGI_APPLICATION = "django_react_proj.routing.application"
+ASGI_APPLICATION = "django_react_proj.routing.application"
 
 
 # Database
