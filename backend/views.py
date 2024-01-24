@@ -14,9 +14,6 @@ from django.views.decorators.csrf import csrf_protect
 
 from urllib.parse import urlparse
 
-from django.contrib.sites.shortcuts import get_current_site
-from django_eventstream import get_event_stream
-
 
 def index(request, path=''):
     user_id = request.GET.get('user_id')
@@ -165,13 +162,6 @@ def all_quizzes(request):
         quizzes = Quiz.objects.all()
         serializer = QuizSerializer(quizzes, many=True, context={'request': request})
         return Response(serializer.data)
-
-
-
-def user_event_stream(request, user_id, task_id):
-    site = get_current_site(request)  # get the current site
-    stream = site.get_event_stream(f'{user_id}/{task_id}')  # get the event stream for the user
-    return stream
 
 
 @csrf_protect
