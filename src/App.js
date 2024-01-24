@@ -318,7 +318,7 @@ function App() {
 
   let accuracyColor = 'var(--slate-11)';
   const [taskData, setTaskData] = useState([]);
-
+  const [taskNames, setTaskNames] = useState([])
   const [taskIds, setTaskIds] = useState([]);
   const [gamesData, setGamesData] = useState([[]]);
   const [nInputs, setNInputs] = useState([]);
@@ -348,27 +348,26 @@ function App() {
   useEffect(() => {
     axios.get('/api/all_tasks/')
       .then(response => {
-        let taskIds = response.data.map(entry => entry.task_id);
-        taskIds = taskIds.filter(taskId => taskId !== 0); // filter out taskId 0
-        taskIds.sort((a, b) => a - b); // sort the taskIds
+        setTaskData(response.data)
+        setTaskData(taskData => taskData.sort((a, b) => a.task_id - b.task_id)); // sort the taskData by taskIds
         console.log("first task id: ", taskIds[0]);
 
         setTaskData(response.data);
-        const nInputs = response.data.map(entry => entry.n_inputs);
-        const nOutputs = response.data.map(entry => entry.n_outputs);
-        const maxEpochs = response.data.map(entry => entry.max_epochs);
-        const maxLayers = response.data.map(entry => entry.max_layers);
-        const maxNodes = response.data.map(entry => entry.max_nodes);
-        setTaskIds(taskIds);
-        setGamesData(JSON.stringify(response.data.map(entry => entry.games_data)));
+        const nInputs = taskData.map(entry => entry.n_inputs);
+        const nOutputs = taskData.map(entry => entry.n_outputs);
+        const maxEpochs = taskData.map(entry => entry.max_epochs);
+        const maxLayers = taskData.map(entry => entry.max_layers);
+        const maxNodes = taskData.map(entry => entry.max_nodes);
+        setTaskIds(taskData.map(entry => entry.task_id));
+        setGamesData(JSON.stringify(taskData.map(entry => entry.games_data)));
         setNInputs(nInputs);
         setNOutputs(nOutputs);
         setMaxEpochs(maxEpochs);
         setMaxLayers(maxLayers);
         setMaxNodes(maxNodes);
-        setNormalizationVisibility(response.data.map(entry => entry.normalization_visibility));
-        setIterationsSliderVisibility(response.data.map(entry => entry.iterationsSliderVisibility));
-        setLRSliderVisibility(response.data.map(entry => entry.lrSliderVisibility));
+        setNormalizationVisibility(taskData.map(entry => entry.normalization_visibility));
+        setIterationsSliderVisibility(taskData.map(entry => entry.iterationsSliderVisibility));
+        setLRSliderVisibility(taskData.map(entry => entry.lrSliderVisibility));
         setCytoLayers(taskIds.map(() => []));
         setIsTraining(taskIds.map(() => false));
         setApiData(taskIds.map(() => null));
@@ -1018,7 +1017,7 @@ function App() {
 
 
   const [levelNames, setLevelNames] = useState(["Linear Regression", "Classification", "Hyperparameters", "Preprocessing"]);
-
+  const [tutorialDescription, setTutorialDescription] = useState("This would normally be a task description, but we are in a tutorial, so instead you can read a few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries.");
 
   // ------- RETURN THE APP CONTENT -------
   return (
@@ -1104,6 +1103,75 @@ function App() {
           <Route path="/introduction" element={
             <Introduction/>
           } />
+          <Route path="/tutorial" element={
+            <div className="App">
+              <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
+              <Grid columns='3' mt='1'>
+                <Box ml='3' style={{display:"flex"}}>  
+                  <Link to="/">
+                    <IconButton aria-label="navigate to home" width='auto' height='21' style={{ marginLeft: 'auto', color: 'inherit', textDecoration: 'none' }}>
+                      <HomeIcon color="white" width='auto' height='18' style={{ marginTop: 2 }} />
+                    </IconButton>
+                  </Link>
+                </Box>
+                <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
+                <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily:'monospace, Courier New, Courier' }}>brAIn builder</Heading>
+                </Link>
+                <Box align='end' mr='3' >
+                    <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
+                    <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
+                    </Link>
+                </Box>
+              </Grid>
+              </Box>
+            </div>}
+          />
+          {/*
+            <Tutorial
+            nOfInputs={4}
+            nOfOutputs={3}
+            maxLayers={10}
+            taskId={0}
+            index={-1}
+            cytoElements={cytoElements[index]}
+            cytoStyle={cytoStyle[index]}
+            generateFloatingButtons={generateFloatingButtons}
+            cytoLayers={cytoLayers[index]}
+            setCytoLayers={setCytoLayers}
+            updateCytoLayers={updateCytoLayers}
+            loadLastCytoLayers={loadLastCytoLayers}
+            FloatingButton={FloatingButton}
+            addLayer={addLayer}
+            removeLayer={removeLayer}
+            iterationsSlider={iterationsSliders[index]}
+            iterations={iterations[index]}
+            setIterations={setIterations}
+            learningRateSlider={learningRateSliders[index]}
+            learningRate={learningRate[index]}
+            setLearningRate={setLearningRate}
+            isTraining={isTraining[index]}
+            setIsTraining={setIsTraining}
+            apiData={apiData[index]}
+            setApiData={setApiData}
+            taskData={taskData}
+            setTaskData={setTaskData}
+            putRequest={putRequest}
+            accuracy={accuracy[index]}
+            setAccuracy={setAccuracy}
+            accuracyColor={accuracyColor}
+            handleSubmit={handleSubmit}
+            isResponding={isResponding[index]}
+            setIsResponding={setIsResponding}
+            progress={progress[index]}
+            featureNames={featureNames[index]}
+            errorList={errorList[index]}
+            imgs={imgs[index]}
+            loadData={loadData}
+            normalization={normalization[index]}
+            normalizationVisibility={normalizationVisibility[index]}
+            iterationsSliderVisibility={iterationsSliderVisibility[index]}
+            lrSliderVisibility={lrSliderVisibility[index]}
+        />*/}
           {taskIds.map((taskId, index) => (
             <Route
               key={taskId}
