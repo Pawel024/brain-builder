@@ -1011,6 +1011,9 @@ function App() {
   }, {});
 
 
+  const [levelNames, setLevelNames] = useState(["Linear Regression", "Classification Networks", "Advanced Topics"]);
+
+
   // ------- RETURN THE APP CONTENT -------
   return (
     <body class='light-theme' >
@@ -1049,7 +1052,7 @@ function App() {
               </Box>
               {Object.entries(tasksByLevel).map(([level, challenges]) => (
                 <Box key={level} style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-                  <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level {level}</Heading>
+                  <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level {level} - {levelNames[level]}</Heading>
                   <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                     <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
                       <ChallengeButton size="1" variant="outline">
