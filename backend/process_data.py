@@ -140,7 +140,6 @@ async def send_data(root_link, data, headers=None, user_id=None, task_id=None, p
             print("Response: ", r)
     except requests.exceptions.ReadTimeout as e:
         print(f"Request timed out (error {e}), continuing anyway")
-"""
 
 
 async def process(req, root_link, pk=None, csrf_token=None):

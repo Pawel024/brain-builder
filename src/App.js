@@ -233,9 +233,7 @@ function App() {
       network_input: JSON.stringify([]),
       games_data: gamesData,
     };
-    let dataFeatureNames = [];
-    let dataImages = [];
-    
+
     // first, check if there is an entry in /api/backend:
     axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
       headers: {
@@ -259,7 +257,8 @@ function App() {
     }).catch((error) => {
       console.log(error);
       if (error.message == 'No Record') {
-        console.log('No record found, creating a new one');
+        // If the above results in an error, post a new record
+        console.log('No record found, creating a new one'); 
         axios.post(window.location.origin + "/api/backend/", dataData, {
           headers: {
             'X-CSRFToken': csrftoken
