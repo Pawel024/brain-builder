@@ -268,8 +268,10 @@ function App() {
         })
       }
     }).finally(() => {
+      // wait 1 second
+      setTimeout(() => {
           // Start listening for updates
-          const eventSource = new EventSource(window.location.origin + `/events/${userId}/${taskId}`);
+          const eventSource = new EventSource(window.location.origin + `/events/${userId}/${taskId}/`);
 
           let timeoutId = setTimeout(() => {
             eventSource.close();
@@ -314,7 +316,8 @@ function App() {
           eventSource.onerror = function(event) {
             console.error('Error:', event);
           };
-        });
+        }, 1000);
+      });
     };
 
   const fetchQueryResponse = (setApiData, setIsResponding, taskId, index) => {  // updates the apiData state with the response from the backend
@@ -727,7 +730,7 @@ function App() {
 
 
             // Start listening for updates
-            const eventSource = new EventSource(window.location.origin + `/events/${userId}/${taskId}`);
+            const eventSource = new EventSource(window.location.origin + `/events/${userId}/${taskId}/`);
 
             let timeoutId = setTimeout(() => {
               eventSource.close();
