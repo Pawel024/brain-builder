@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_protect
 
 from urllib.parse import urlparse
 
-from django_eventstream import get_current_site
+from django_eventstream import get_current_site, get_event_stream
 
 
 def index(request, path=''):
