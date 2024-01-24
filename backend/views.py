@@ -39,7 +39,7 @@ def index(request, path=''):
 
 @csrf_protect
 @api_view(['GET', 'POST'])
-def query_list(request):
+async def query_list(request):
     if request.method == 'GET':
         user_id = request.GET.get('user_id')
         task_id = request.GET.get('task_id')
@@ -53,7 +53,7 @@ def query_list(request):
         absolute_uri = request.build_absolute_uri('/')
         parsed_uri = urlparse(absolute_uri)
         root_url = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
-        processed_data = process(request.data, root_url, csrf_token=request.META.get('HTTP_X_CSRFTOKEN'))
+        processed_data = await process(request.data, root_url, csrf_token=request.META.get('HTTP_X_CSRFTOKEN'))
         processed_data['user_id'] = user_id
         processed_data['task_id'] = task_id
         serializer = RowSerializer(data=processed_data)
@@ -66,7 +66,7 @@ def query_list(request):
 
 @csrf_protect
 @api_view(['PUT', 'DELETE'])
-def query_detail(request, pk):
+async def query_detail(request, pk):
     try:
         query = Row.objects.get(pk=pk)
     except Row.DoesNotExist:
@@ -76,9 +76,9 @@ def query_detail(request, pk):
         absolute_uri = request.build_absolute_uri('/')
         parsed_uri = urlparse(absolute_uri)
         root_url = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
-        processed_data = process(request.data, root_url, pk, csrf_token=request.META.get('HTTP_X_CSRFTOKEN'))
-        processed_data['user_id'] = request.data.get('user_id')
-        processed_data['task_id'] = request.data.get('task_id')
+        processed_data = await process(request.data, root_url, pk, csrf_token=request.META.get('HTTP_X_CSRFTOKEN'))
+        processed_data['user_id'] = user_id
+        processed_data['task_id'] = task_id
         serializer = RowSerializer(query, data=processed_data,context={'request': request})
         if serializer.is_valid():
             serializer.save()
