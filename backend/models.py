@@ -18,6 +18,7 @@ class Row(models.Model):
 
 class TaskDescription(models.Model):
     task_id = models.IntegerField(unique=True)
+    name = models.CharField(max_length=200)
     description = models.TextField()
     dataset = models.TextField()
     type = models.IntegerField()
@@ -26,7 +27,7 @@ class TaskDescription(models.Model):
     max_epochs = models.IntegerField()
     max_layers = models.IntegerField()
     max_nodes = models.IntegerField()
-    normalization = models.BooleanField()
+    normalization_visibility = models.BooleanField()
     iterations_slider_visibility = models.BooleanField()
     lr_slider_visibility = models.BooleanField()
 

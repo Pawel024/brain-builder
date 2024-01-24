@@ -188,7 +188,7 @@ function App() {
     };
   }, []);
 
-  const loadData = (taskId, index) => {
+  const loadData = (taskId, index, normalization) => {
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
 
@@ -199,7 +199,7 @@ function App() {
       progress_pk: null,
       learning_rate: 0,
       epochs: 0,
-      normalization: true, // 0 means no normalization, 1 means normalization
+      normalization: true, // TODO: replace this with the actual normalization value
       network_input: JSON.stringify([]),
       games_data: gamesData,
     };
@@ -327,8 +327,9 @@ function App() {
   const [maxLayers, setMaxLayers] = useState([]);
   const [maxNodes, setMaxNodes] = useState([]);
   const [normalization, setNormalization] = useState([true]);
-  const [iterationsSliderVisibility, setIterationsSliderVisibility] = useState(false);
-  const [lrSliderVisibility, setLRSliderVisibility] = useState(false);
+  const [normalizationVisibility, setNormalizationVisibility] = useState([false]);
+  const [iterationsSliderVisibility, setIterationsSliderVisibility] = useState([false]);
+  const [lrSliderVisibility, setLRSliderVisibility] = useState([false]);
   const [cytoLayers, setCytoLayers] = useState([]);
   const [isTraining, setIsTraining] = useState([]);
   const [apiData, setApiData] = useState([]);
@@ -365,7 +366,7 @@ function App() {
         setMaxEpochs(maxEpochs);
         setMaxLayers(maxLayers);
         setMaxNodes(maxNodes);
-        setNormalization(response.data.map(entry => entry.normalization));
+        setNormalizationVisibility(response.data.map(entry => entry.normalization_visibility));
         setIterationsSliderVisibility(response.data.map(entry => entry.iterationsSliderVisibility));
         setLRSliderVisibility(response.data.map(entry => entry.lrSliderVisibility));
         setCytoLayers(taskIds.map(() => []));
@@ -580,7 +581,7 @@ function App() {
   }, [maxNodes]);
 
   // ------- POST REQUEST -------
-  const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs) => {
+  const putRequest = (e, cytoLayers, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs, normalization) => {
     e.preventDefault();
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
@@ -639,7 +640,7 @@ function App() {
           progress_pk: pk,
           learning_rate: learningRate,
           epochs: iterations,
-          normalization: true, // 0 means no normalization, 1 means normalization
+          normalization: true, // todo: replace with normalization when ready for it
           network_input: JSON.stringify(cytoLayers),
           games_data: gamesData,  
         };
@@ -1016,7 +1017,7 @@ function App() {
   }, {});
 
 
-  const [levelNames, setLevelNames] = useState(["Linear Regression", "Classification Networks", "Learning Rate and Activation Functions", "Feature Selection and Extraction"]);
+  const [levelNames, setLevelNames] = useState(["Linear Regression", "Classification", "Hyperparameters", "Preprocessing"]);
 
 
   // ------- RETURN THE APP CONTENT -------
@@ -1148,6 +1149,10 @@ function App() {
                   errorList={errorList[index]}
                   imgs={imgs[index]}
                   loadData={loadData}
+                  normalization={normalization[index]}
+                  normalizationVisibility={normalizationVisibility[index]}
+                  iterationsSliderVisibility={iterationsSliderVisibility[index]}
+                  lrSliderVisibility={lrSliderVisibility[index]}
                 />
               }
             />

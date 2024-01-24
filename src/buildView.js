@@ -314,24 +314,24 @@ class Building extends React.Component {
           
           <Separator orientation='vertical' style = {{ position:"absolute", top: Math.round(0.03 * (window.innerHeight-140)), left: Math.round(0.8 * (window.innerWidth * 0.97)), height: 0.96 * (window.innerHeight-140) }}/>
 
-          <Box style={{ position:"absolute", top: 0.14 * (window.innerHeight-140), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontFamily:'monospace'  }}>
+          {this.props.iterationsSliderVisibility ? (<Box style={{ position:"absolute", top: 0.14 * (window.innerHeight-140), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontFamily:'monospace'  }}>
             <div className="iterationsSlider">
               {this.props.iterationsSlider}
             </div>
             <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Epochs: {this.props.iterations}</div>
-          </Box>
+          </Box>) : (<div></div>)}
 
-          <Box style={{ position:"absolute", top: Math.round(0.26 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontFamily:'monospace'  }}>
+          {this.props.lrSliderVisibility ? (<Box style={{ position:"absolute", top: Math.round(0.26 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontFamily:'monospace'  }}>
             <div className="learningRateSlider">
               {this.props.learningRateSlider}
             </div>
             <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Learning rate: {this.props.learningRate}</div>
-          </Box>
+          </Box>) : (<div></div>)}
           
-          {this.props.taskData[this.props.index]['normalization'] ? (<Checkbox style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97))}}>Normalize training data</Checkbox>):(<div></div>)}
+          {this.props.normalizationVisibility ? (<Checkbox style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97))}}>Normalize training data</Checkbox>):(<div></div>)}
 
           {/* make the position of the box shift down if normalization is true */}
-          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)) + (this.props.taskData[this.props.index]['normalization'] ? 50 : 0), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
+          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)) + (this.props.normalizationVisibility ? 50 : 0), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
             <div id="/api-data">
               {this.props.isTraining===2 ? (
                 <Flex direction='column' >
