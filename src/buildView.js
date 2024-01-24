@@ -231,7 +231,7 @@ class Building extends React.Component {
             </Link>
           </Box>
           <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
-          <Heading as='h1' align='center' size='7' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily:'monospace, Courier New, Courier' }}>brAIn builder</Heading>
+          <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily:'monospace, Courier New, Courier' }}>brAIn builder</Heading>
           </Link>
           <Box align='end' mr='3' >
             <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
