@@ -255,6 +255,11 @@ class Building extends React.Component {
           <Box style={{ padding: '20px 300px', fontFamily:'monospace' }}>
           <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Task Description </Heading>
           <div style={{ textAlign:'justify' }}>{this.state.printedDescription}</div>
+          {/* a little below this, plot the dataset */}
+          <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginTop: 20, marginBottom:7 }}>&gt;_The Dataset</Heading>	
+          <div style={{ textAlign:'justify' }}>This dataset contains {this.props.nOfObjects}, each with {this.props.nOfInputs} features. There are {this.props.nOfOutputs} targets. The features are: {this.props.featureNames.join(', ')}. </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}></div>
+          <img src={this.props.initPlot} alt='Dataset plot' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }}/>
           </Box>
         </Tabs.Content>
         <Tabs.Content value="building">

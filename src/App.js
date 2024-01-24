@@ -269,54 +269,54 @@ function App() {
         })
       }
     }).finally(() => {
-      //  wait 1 second and then check the progress API
-      setTimeout(() => {
-        axios.get(window.location.origin + `/api/progress/?user_id=${userId}&task_id=${taskId}`, {
-          headers: {
-            'X-CSRFToken': csrftoken
-          }
-        }).then((response) => {
-          if (response.data.length > 0) {
-            dataFeatureNames = response.data[0].feature_names;
-            dataImages = response.data[0].plots;
+          // Start listening for updates
+          const eventSource = new EventSource(window.location.origin + `/events/${userId}/${taskId}`);
 
-            if (dataFeatureNames.length > 0 && dataFeatureNames !== featureNames[index]) {  // if the feature names have changed, update them
+          let timeoutId = setTimeout(() => {
+            eventSource.close();
+            console.log('Failed to load data for challenge ' + taskId);
+            alert("Failed to load data for challenge " + taskId + ". Try reloading the page, if the problem persists, please contact us.");
+          }, intervalTimeout); // stop after n milliseconds
+
+          eventSource.onmessage = function(event) {
+            if (event.type === 'data') { 
+
               setFeatureNames(prevFeatureNames => {
                 const newFeatureNames = [...prevFeatureNames];
-                newFeatureNames[index] = JSON.parse(dataFeatureNames);
+                newFeatureNames[index] = JSON.parse(event.data.feature_names);
                 return newFeatureNames;
               });
-            }
 
-            // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
-            if (dataImages.length > 0 && dataImages.length !== imgs[index].length) {
-              setImgs(prevImgs => {
-                const newImgs = [...prevImgs];
-                newImgs[index] = JSON.parse(dataImages).map(base64String => { 
-                  const binaryString = atob(base64String);  // decode from base64 to binary string
-                  const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
-                  for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
-                  }
-                  const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
-                  const url = URL.createObjectURL(blob);
-                  // now images can be accessed with <img src={url} />
-                  return url;
-                })
-                return newImgs;
+              setNObjects(prevNObjects => {
+                const newNObjects = [...prevNObjects];
+                newNObjects[index] = JSON.parse(event.data.n_objects);
+                return newNObjects;
               });
+
+              // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
+              setInitPlots(prevInitPlots => {
+                const newInitPlots = [...prevInitPlots];
+                const binaryString = atob(JSON.parse(event.data.plots)[0]);  // decode from base64 to binary string
+                const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+                for (let i = 0; i < binaryString.length; i++) {
+                  bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+                }
+                const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+                const url = URL.createObjectURL(blob);
+                // now images can be accessed with <img src={url} />
+                newInitPlots[index] = url;
+                return newInitPlots;
+              });
+              console.log(`Data for challenge ${taskId} loaded`)
+              eventSource.close();
             }
-            console.log(`Data for challenge ${taskId} loaded`)
-          } else {
-            throw new Error('No Record in /api/progress');
-          }
-        }).catch((error) => {
-          console.log('Failed to load data for challenge ' + taskId);
-          console.log(error);
+          };
+
+          eventSource.onerror = function(event) {
+            console.error('Error:', event);
+          };
         });
-      }, 1000);  // wait 1 second before checking the progress API
-    });
-  };
+    };
 
   const fetchQueryResponse = (setApiData, setIsResponding, taskId, index) => {  // updates the apiData state with the response from the backend
     var userId = getCookie('user_id');
@@ -351,8 +351,10 @@ function App() {
 
   const [taskIds, setTaskIds] = useState([]);
   const [gamesData, setGamesData] = useState([[]]);
+  const [initPlots, setInitPlots] = useState([[]]);
   const [nInputs, setNInputs] = useState([]);
   const [nOutputs, setNOutputs] = useState([]);
+  const [nObjects, setNObjects] = useState([]);
   const [maxEpochs, setMaxEpochs] = useState([]);
   const [maxLayers, setMaxLayers] = useState([]);
   const [maxNodes, setMaxNodes] = useState([]);
@@ -390,6 +392,7 @@ function App() {
         setGamesData(gamesData);
         setNInputs(nInputs);
         setNOutputs(nOutputs);
+        setNObjects(taskIds.map(() => 0));
         setMaxEpochs(maxEpochs);
         setMaxLayers(maxLayers);
         setMaxNodes(maxNodes);
@@ -404,6 +407,7 @@ function App() {
         setWeights(taskIds.map(() => []));
         setBiases(taskIds.map(() => []));
         setImgs(taskIds.map(() => []));
+        setInitPlots(taskIds.map(() => []));
         loadedTasks = true
       })
       .catch(error => {
@@ -413,6 +417,7 @@ function App() {
         setGamesData(JSON.stringify([{task_id: 11, n_inputs: 4, n_outputs: 3, type: 1, dataset: 'Clas2.csv'}, {task_id: 12, n_inputs: 4, n_outputs: 3, type: 1, dataset: 'load_iris()'}]));
         setNInputs(defaultTaskIds.map(() => 4));  // TODO: set a default value for this
         setNOutputs(defaultTaskIds.map(() => 3));  // TODO: set a default value for this
+        setNObjects(defaultTaskIds.map(() => 0));
         setMaxEpochs(defaultTaskIds.map(() => 200));
         setMaxLayers(defaultTaskIds.map(() => 10));
         setMaxNodes(defaultTaskIds.map(() => 16));
@@ -427,6 +432,7 @@ function App() {
         setWeights(defaultTaskIds.map(() => []));
         setBiases(defaultTaskIds.map(() => []));
         setImgs(defaultTaskIds.map(() => []));
+        setInitPlots(defaultTaskIds.map(() => []));
         console.log("Setting default states instead.")
       });
   }, []);
@@ -719,119 +725,100 @@ function App() {
               })
             }
         }).finally(() => {
-          // SET UP AN INTERVAL - this will poll the progress API every n milliseconds and stop when the progress is 1 or when intervalTimeout is reached
-          let k = 0
-          let timeoutId = setTimeout(() => {
-            clearInterval(intervalIdRef.current);
-            setIsTraining(prevIsTraining => {
-              const newIsTraining = [...prevIsTraining];
-              newIsTraining[index] = 0;
-              return newIsTraining;
-            });
-            console.log("Training failed")
-            alert("Training failed. Please try again. If the problem persists, please contact us.");
-          }, intervalTimeout); // stop after n milliseconds
-          // Start the interval
-          intervalIdRef.current = setInterval(() => {
 
-            // Cancel the previous request if it exists
-            if (cancelTokenSourceRef.current) {
-              cancelTokenSourceRef.current.cancel('Operation canceled due to new request.');
-            }
 
-            // Create a new cancel token
-            cancelTokenSourceRef.current = axios.CancelToken.source();
+            // Start listening for updates
+            const eventSource = new EventSource(window.location.origin + `/events/${userId}/${taskId}`);
 
-            axios.get(window.location.origin + `/api/progress/?user_id=${userId}&task_id=${taskId}`, {
-              headers: {
-                'X-CSRFToken': csrftoken
-              },
-              cancelToken: cancelTokenSourceRef.current.token // Pass the cancel token to the request
-            }).then((response) => {
-              if (response.data.length > 0) {
-                // set the pk
-                // let pk = response.data[0].pk;
+            let timeoutId = setTimeout(() => {
+              eventSource.close();
+              setIsTraining(prevIsTraining => {
+                const newIsTraining = [...prevIsTraining];
+                newIsTraining[index] = 0;
+                return newIsTraining;
+              });
+              console.log("Training failed")
+              alert("Training failed. Please try again. If the problem persists, please contact us.");
+            }, intervalTimeout); // stop after n milliseconds
 
-                if (response.data[0].progress !== progress[index]) {
-                  console.log("Compare progress: ", response.data[0].progress, progress[index]);
-                  k = 0
+            eventSource.onmessage = function(event) {
+              if (event.type === 'progress') {  // every 1%; only includes progress
+
+                if (event.data.progress !== progress[index]) {
                   setProgress(prevProgress => {
                     const newProgress = [...prevProgress];
-                    newProgress[index] = response.data[0].progress;
+                    newProgress[index] = event.data.progress;
                     return newProgress;
                   });
 
-                  // update the error list, weights and biases, but only if they changed
-                  if (response.data[0].error_list[0].length !== errorList[index][0].length || response.data[0].error_list[1] !== errorList[index][1]) {
-                    setErrorList(prevErrorList => {
-                      const newErrorList = [...prevErrorList];
-                      newErrorList[index] = JSON.parse(response.data[0].error_list);
-                      return newErrorList;
-                    });
-                  }
-                  if (weights[index].length === 0 || response.data[0].network_weights[0][0] !== weights[index][0][0]) {
-                    setWeights(prevWeights => {
-                      const newWeights = [...prevWeights];
-                      newWeights[index] = JSON.parse(response.data[0].network_weights);
-                      return newWeights;
-                    });
-                  }
-                  if (response.data[0].network_biases.length !== biases[index].length) {
-                    setBiases(prevBiases => {
-                      const newBiases = [...prevBiases];
-                      newBiases[index] = JSON.parse(response.data[0].network_biases);
-                      return newBiases;
-                    });
-                  }
+                  // move more parts here in the future
 
-                  // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
-                  if (response.data[0].plots.length > 0 && response.data[0].plots.length !== imgs[index].length) {
-                    setImgs(prevImgs => {
-                      const newImgs = [...prevImgs];
-                      newImgs[index] = JSON.parse(response.data[0].plots).map(base64String => { 
-                        const binaryString = atob(base64String);  // decode from base64 to binary string
-                        const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
-                        for (let i = 0; i < binaryString.length; i++) {
-                          bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
-                        }
-                        const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
-                        const url = URL.createObjectURL(blob);
-                        // now images can be accessed with <img src={url} />
-                        return url;
-                      })
-                      return newImgs;
-                    });
+                  if (event.data.progress == 1 ) {
+                    eventSource.close();
+                    clearTimeout(timeoutId);
+                    setTimeout(() => {
+                      setIsTraining(prevIsTraining => {
+                        const newIsTraining = [...prevIsTraining];
+                        newIsTraining[index] = 2;
+                        return newIsTraining;
+                      });
+                      console.log("Training finished")
+                    }, 1000);
                   }
                 }
-                // if nothing happens, stop the interval after 10000 milliseconds
-                console.log("k: ", k)
-                if (response.data[0].progress == progress[index]) {
-                  k = k + 1
+              } else if (event.type === 'update') {  // every 10%; includes progress, error_list, network_weights, network_biases
+
+                    // update the error list, weights and biases, but only if they changed
+                    if (JSON.parse(event.data.error_list)[0].length !== errorList[index][0].length || JSON.parse(event.data.error_list)[1] !== errorList[index][1]) {
+                      setErrorList(prevErrorList => {
+                        const newErrorList = [...prevErrorList];
+                        newErrorList[index] = JSON.parse(event.data.error_list);
+                        return newErrorList;
+                      });
+                    }
+
+                    if (weights[index].length === 0 || JSON.parse(event.data.network_weights)[0][0] !== weights[index][0][0]) {
+                      setWeights(prevWeights => {
+                        const newWeights = [...prevWeights];
+                        newWeights[index] = JSON.parse(event.data.network_weights);
+                        return newWeights;
+                      });
+                    }
+
+                    if (JSON.parse(event.data.network_biases).length !== biases[index].length) {
+                      setBiases(prevBiases => {
+                        const newBiases = [...prevBiases];
+                        newBiases[index] = JSON.parse(event.data.network_biases);
+                        return newBiases;
+                      });
+                    }
+
+                    // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
+                    if (JSON.parse(event.data.plots).length > 0 && JSON.parse(event.data.plots).length !== imgs[index].length) {
+                      setImgs(prevImgs => {
+                        const newImgs = [...prevImgs];
+                        newImgs[index] = JSON.parse(event.data.plots).map(base64String => { 
+                          const binaryString = atob(base64String);  // decode from base64 to binary string
+                          const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+                          for (let i = 0; i < binaryString.length; i++) {
+                            bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+                          }
+                          const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+                          const url = URL.createObjectURL(blob);
+                          // now images can be accessed with <img src={url} />
+                          return url;
+                        })
+                        return newImgs;
+                      });
+                    }
                 }
-                if (response.data[0].progress == 1 ) {
-                  clearInterval(intervalIdRef.current);
-                  clearTimeout(timeoutId);
-                  setTimeout(() => {
-                    setIsTraining(prevIsTraining => {
-                      const newIsTraining = [...prevIsTraining];
-                      newIsTraining[index] = 2;
-                      return newIsTraining;
-                    });
-                    console.log("Training finished")
-                  }, 1000);
-                }
-              }
-            })
-            .catch(error => {
-              if (axios.isCancel(error)) {
-                console.log('Request canceled', error.message);
-              } else {
-              console.log(error);
-              }
-            });
-          }, intervalTimestep); // do this every n milliseconds
+              };
+
+            eventSource.onerror = function(event) {
+              console.error('Error:', event);
+            };
+          });
       });
-    });
   };
 
 
@@ -1131,6 +1118,7 @@ function App() {
                 <BuildView
                   nOfInputs={nInputs[index]}
                   nOfOutputs={nOutputs[index]}
+                  nOfObjects={nObjects[index]}
                   maxLayers={maxLayers[index]}
                   taskId={taskId}
                   index={index}
@@ -1167,6 +1155,7 @@ function App() {
                   featureNames={featureNames[index]}
                   errorList={errorList[index]}
                   imgs={imgs[index]}
+                  initPlot={initPlots[index]}
                   loadData={loadData}
                 />
               }

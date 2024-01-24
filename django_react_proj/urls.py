@@ -17,10 +17,12 @@ from django.contrib import admin
 from django.urls import path, re_path
 from backend import views
 from django.views.generic import TemplateView
+from django_eventstream import get_current_site, send_event
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index),
+    path('events/<int:user_id>/', views.user_event_stream, name='events'),
     re_path(r'^api/backend$', views.query_list),
     re_path(r'^api/backend/$', views.query_list),
     re_path(r'^api/backend/(?P<pk>[0-9]+)$', views.query_detail),
