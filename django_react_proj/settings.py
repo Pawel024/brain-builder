@@ -73,7 +73,19 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_grip.GripMiddleware',
+    'channels.middleware.PersistConnectionMiddleware',
 ]
+
+redis_url = urllib.parse.urlparse(os.environ.get('REDIS_URL', 'redis://localhost:6379'))
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [(redis_url.hostname, redis_url.port)],
+        },
+    },
+}
 
 CORS_ORIGIN_ALLOW_ALL = True
 
