@@ -1024,20 +1024,20 @@ function App() {
           <div>
             <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
             <Grid columns='3' mt='1'>
-                <Box/>
-                <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
+                <Box style={{ flex:1 }}/>
+                <Link to={window.location.origin} style={{ flex:1, textDecoration: 'none' }}>
                 <Heading as='h1' align='center' size='7' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily:'monospace, Courier New, Courier' }}>brAIn builder</Heading>
                 </Link>
-                <Box align='end' mr='3' >
+                <Box align='end' mr='3' style={{ flex:1 }}>
                     <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
                     <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
                     </Link>
                 </Box>
             </Grid>
             </Box>
-            <Flex direction='row' gap='3' style={{padding:'10px 10px', alignItems: 'flex-start'}}>
-            <Flex direction='column' gap='3' style={{ flex: 1 }}>
-              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+            <Flex direction='row' gap='3' style={{padding:'10px 10px', alignItems: 'flex-start', boxSizing: 'border-box'}}>
+            <Flex direction='column' gap='3' style={{ flex: 1, flexBasis: 0, minWidth: 0, boxSizing: 'border-box' }}>
+              <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px', boxSizing: 'border-box' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Get Started</Heading>
                 <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
@@ -1051,7 +1051,7 @@ function App() {
                 </Box>
               </Box>
               {Object.entries(tasksByLevel).map(([level, challenges]) => (
-                <Box key={level} style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+                <Box key={level} style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px',boxSizing: 'border-box' }}>
                   <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level {level} - {levelNames[level-1]}</Heading>
                   <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                     <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
@@ -1084,12 +1084,14 @@ function App() {
                 </Box>
               ))} 
             </Flex>
-            <Box style={{ flex: 1, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-            <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Readme</Heading>
-            <Box>
-                <Readme />
-            </Box>
-            </Box>
+            <Flex direction='column' gap='3' style={{ flex: 1, flexBasis: 0, minWidth: 0, boxSizing: 'border-box' }}>
+              <Box style={{ flex: 1, flexBasis: 0, minWidth: 0, border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px', boxSizing: 'border-box' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Readme</Heading>
+                <Box style={{ boxSizing: 'border-box', minWidth: 0 }}>
+                    <Readme />
+                </Box>
+              </Box>
+            </Flex>
             </Flex>
           </div>
           } />
@@ -1218,7 +1220,7 @@ export default App;
 
 
 /*
-            <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+            <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Get Started</Heading>
                 <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
@@ -1239,7 +1241,7 @@ export default App;
                 </Link>
                 </Box>
               </Box>
-              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+              <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 1</Heading>
                 <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="challenge11" style={{ color: 'inherit', textDecoration: 'none' }}>
@@ -1268,7 +1270,7 @@ export default App;
                 </Link>
                 </Box>
               </Box>
-              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+              <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 2</Heading>
                 <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="challenge11" style={{ color: 'inherit', textDecoration: 'none' }}>
@@ -1297,7 +1299,7 @@ export default App;
                 </Link>
                 </Box>
               </Box>
-              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+              <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 3</Heading>
                 <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
                 <Link to="challenge11" style={{ color: 'inherit', textDecoration: 'none' }}>
