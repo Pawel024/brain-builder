@@ -11,7 +11,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 import django_eventstream
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_react_proj.settings")
 
 application = ProtocolTypeRouter({
     'http': URLRouter([
