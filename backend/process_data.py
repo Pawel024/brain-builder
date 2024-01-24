@@ -43,6 +43,7 @@ def process(req, root_link, pk=None, csrf_token=None):
         d['feature_names'] = json.dumps([x.replace('_', ' ') for x in levels.data.feature_names])
         d['plots'] = json.dumps([b64encode(image).decode() for image in levels.data.images])
 
+        print(f'Sending data to events/{user_id}/{task_id}')
         send_event(f'{user_id}/{task_id}', 'data', d)
 
 
