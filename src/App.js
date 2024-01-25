@@ -360,6 +360,7 @@ function App() {
         const currentMaxNodes = [];
         const currentTaskIds = [];
         const currentWeights = [];
+        const currentTaskNames = [];
 
         currentTaskData.forEach(entry => {
           currentNInputs.push(entry.n_inputs);
@@ -369,6 +370,7 @@ function App() {
           currentMaxNodes.push(entry.max_nodes);
           currentTaskIds.push(entry.task_id);
           currentWeights.push([]);
+          currentTaskNames.push(entry.name);
         });
 
         setTaskIds(currentTaskIds);
@@ -379,7 +381,7 @@ function App() {
         setMaxLayers(currentMaxLayers);
         setMaxNodes(currentMaxNodes);
         setWeights(currentWeights);
-        console.log("weights: ", currentWeights);
+        setTaskNames(currentTaskNames);
         setNormalizationVisibility(currentTaskData.map(entry => entry.normalization_visibility));
         setIterationsSliderVisibility(currentTaskData.map(entry => entry.iterationsSliderVisibility));
         setLRSliderVisibility(currentTaskData.map(entry => entry.lrSliderVisibility));
@@ -1085,7 +1087,7 @@ function App() {
                       <Link key={index} to={`challenge${level}${challenge}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                         <ChallengeButton size="1" variant="outline">
                           <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                            <label>Challenge {challenge}</label>
+                            <label>{taskNames[index]}</label>
                             <div><RocketIcon width="27" height="27" /></div>
                           </Flex>
                         </ChallengeButton>
@@ -1236,6 +1238,10 @@ function App() {
                   normalizationVisibility={normalizationVisibility[index]}
                   iterationsSliderVisibility={iterationsSliderVisibility[index]}
                   lrSliderVisibility={lrSliderVisibility[index]}
+                  setProgress={setProgress}
+                  setErrorList={setErrorList}
+                  setWeights={setWeights}
+                  setBiases={setBiases}
                 />
                 </div>
               }
