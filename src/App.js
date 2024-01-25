@@ -596,7 +596,7 @@ function App() {
   }, [maxNodes]);
 
   // ------- POST REQUEST -------
-  const putRequest = (e, cytoLayers, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs, normalization, setProgress, setErrorList, setWeights, setBiases) => {
+  const putRequest = (e, cytoLayers, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs, normalization) => {
     e.preventDefault();
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
