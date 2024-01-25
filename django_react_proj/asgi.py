@@ -8,9 +8,10 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/asgi/
 """
 
 import os
-
+import channels.asgi
 from django.core.asgi import get_asgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_react_proj.settings')
+channel_layer = channels.asgi.get_channel_layer()
 
 application = get_asgi_application()

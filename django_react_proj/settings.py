@@ -61,7 +61,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'backend',
     'webpack_loader',
-    'channels',
+    'channels': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
 #    'django_eventstream',
 ]
 
@@ -85,6 +88,7 @@ CHANNEL_LAYERS = {
         'CONFIG': {
             "hosts": [(redis_url.hostname, redis_url.port)],
         },
+        "ROUTING": "django_react_proj.routing",
     },
 }
 

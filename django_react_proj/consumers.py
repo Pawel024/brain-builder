@@ -1,14 +1,17 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
+import logging
+logger = logging.getLogger(__name__)
 
 class Coach(AsyncWebsocketConsumer):
     connections = {}
 
     async def connect(self):
+        logger.debug(f'Connection scope: {self.scope}')
         self.user_id = self.scope['url_route']['kwargs']['userId']
         self.task_id = self.scope['url_route']['kwargs']['taskId']
         self.connections[(self.user_id, self.task_id)] = self
-        print("coach connected")
+        logger.debug("coach connected")
         await self.accept()
 
     async def disconnect(self, close_code):
