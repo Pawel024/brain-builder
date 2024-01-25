@@ -61,10 +61,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'backend',
     'webpack_loader',
-    'channels': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
-    },
+    'channels',
 #    'django_eventstream',
 ]
 
@@ -89,6 +86,26 @@ CHANNEL_LAYERS = {
             "hosts": [(redis_url.hostname, redis_url.port)],
         },
         "ROUTING": "django_react_proj.routing",
+    },
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'channels': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
     },
 }
 
