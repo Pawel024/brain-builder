@@ -348,37 +348,51 @@ function App() {
   useEffect(() => {
     axios.get('/api/all_tasks/')
       .then(response => {
-        setTaskData(response.data)
-        setTaskData(taskData => taskData.sort((a, b) => a.task_id - b.task_id)); // sort the taskData by taskIds
-        console.log(taskData);
+        const currentTaskData = response.data;
+        currentTaskData.sort((a, b) => a.task_id - b.task_id)// sort the taskData by taskIds
+        setTaskData(currentTaskData);
+        console.log(currentTaskData);
+        
+        const currentNInputs = [];
+        const currentNOutputs = [];
+        const currentMaxEpochs = [];
+        const currentMaxLayers = [];
+        const currentMaxNodes = [];
+        const currentTaskIds = [];
+        const currentWeights = [];
 
-        setTaskData(response.data);
-        const nInputs = taskData.map(entry => entry.n_inputs);
-        const nOutputs = taskData.map(entry => entry.n_outputs);
-        const maxEpochs = taskData.map(entry => entry.max_epochs);
-        const maxLayers = taskData.map(entry => entry.max_layers);
-        const maxNodes = taskData.map(entry => entry.max_nodes);
-        setTaskIds(taskData.map(entry => entry.task_id));
-        setGamesData(JSON.stringify(taskData.map(entry => entry.games_data)));
-        setNInputs(nInputs);
-        setNOutputs(nOutputs);
-        setMaxEpochs(maxEpochs);
-        setMaxLayers(maxLayers);
-        setMaxNodes(maxNodes);
-        setNormalizationVisibility(taskData.map(entry => entry.normalization_visibility));
-        setIterationsSliderVisibility(taskData.map(entry => entry.iterationsSliderVisibility));
-        setLRSliderVisibility(taskData.map(entry => entry.lrSliderVisibility));
-        setCytoLayers(taskIds.map(() => []));
-        setIsTraining(taskIds.map(() => false));
-        setApiData(taskIds.map(() => null));
-        setAccuracy(taskIds.map(() => 0));
-        setIsResponding(taskIds.map(() => false));
-        setProgress(taskIds.map(() => 0));
-        setErrorList(taskIds.map(() => [[], null]));
-        setFeatureNames(taskIds.map(() => []));  // TODO: load these somewhere else
-        setWeights(taskIds.map(() => []));
-        setBiases(taskIds.map(() => []));
-        setImgs(taskIds.map(() => []));
+        currentTaskData.forEach(entry => {
+          currentNInputs.push(entry.n_inputs);
+          currentNOutputs.push(entry.n_outputs);
+          currentMaxEpochs.push(entry.max_epochs);
+          currentMaxLayers.push(entry.max_layers);
+          currentMaxNodes.push(entry.max_nodes);
+          currentTaskIds.push(entry.task_id);
+          currentWeights.push(entry.weights);
+        });
+
+        setTaskIds(currentTaskIds);
+        setGamesData(JSON.stringify(currentTaskData.map(entry => entry.games_data)));
+        setNInputs(currentNInputs);
+        setNOutputs(currentNOutputs);
+        setMaxEpochs(currentMaxEpochs);
+        setMaxLayers(currentMaxLayers);
+        setMaxNodes(currentMaxNodes);
+        setWeights(currentWeights);
+        console.log("weights: ", currentWeights);
+        setNormalizationVisibility(currentTaskData.map(entry => entry.normalization_visibility));
+        setIterationsSliderVisibility(currentTaskData.map(entry => entry.iterationsSliderVisibility));
+        setLRSliderVisibility(currentTaskData.map(entry => entry.lrSliderVisibility));
+        setCytoLayers(currentTaskIds.map(() => []));
+        setIsTraining(currentTaskIds.map(() => false));
+        setApiData(currentTaskIds.map(() => null));
+        setAccuracy(currentTaskIds.map(() => 0));
+        setIsResponding(currentTaskIds.map(() => false));
+        setProgress(currentTaskIds.map(() => 0));
+        setErrorList(currentTaskIds.map(() => [[], null]));
+        setFeatureNames(currentTaskIds.map(() => []));  // TODO: load these somewhere else
+        setBiases(currentTaskIds.map(() => []));
+        setImgs(currentTaskIds.map(() => []));
         setLoadedTasks(true)
       })
       .catch(error => {
@@ -404,7 +418,7 @@ function App() {
         setImgs(defaultTaskIds.map(() => []));
         console.log("Setting default states instead.")
       });
-  }, [taskData, taskIds]);
+  }, []);
   
   useEffect(() => {  // TODO: figure out what this is doing and if it's necessary
     if (cytoLayers.every(subArray => subArray.length === 0)) {
@@ -580,7 +594,7 @@ function App() {
   }, [maxNodes]);
 
   // ------- POST REQUEST -------
-  const putRequest = (e, cytoLayers, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs, normalization) => {
+  const putRequest = (e, cytoLayers, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs, normalization, setProgress, setErrorList, setWeights, setBiases) => {
     e.preventDefault();
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
@@ -1177,7 +1191,7 @@ function App() {
               key={taskId}
               path={`/challenge${taskId}`}
               element={
-                <div>{console.log(`taskId: {taskId}`)}
+                <div>{console.log(`taskId: ${taskId}`)}
                 <BuildView
                   nOfInputs={nInputs[index]}
                   nOfOutputs={nOutputs[index]}
