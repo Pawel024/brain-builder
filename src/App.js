@@ -318,7 +318,7 @@ function App() {
 
   let accuracyColor = 'var(--slate-11)';
   const [taskData, setTaskData] = useState([]);
-  const [taskNames, setTaskNames] = useState([])
+  const [taskNames, setTaskNames] = useState({})
   const [taskIds, setTaskIds] = useState([]);
   const [gamesData, setGamesData] = useState([[]]);
   const [nInputs, setNInputs] = useState([]);
@@ -360,7 +360,7 @@ function App() {
         const currentMaxNodes = [];
         const currentTaskIds = [];
         const currentWeights = [];
-        const currentTaskNames = [];
+        const currentTaskNames = {};
 
         currentTaskData.forEach(entry => {
           currentNInputs.push(entry.n_inputs);
@@ -370,7 +370,7 @@ function App() {
           currentMaxNodes.push(entry.max_nodes);
           currentTaskIds.push(entry.task_id);
           currentWeights.push([]);
-          currentTaskNames.push(entry.name);
+          currentTaskNames[entry.task_id] = entry.name;
         });
 
         setTaskIds(currentTaskIds);
@@ -1087,7 +1087,7 @@ function App() {
                       <Link key={index} to={`challenge${level}${challenge}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                         <ChallengeButton size="1" variant="outline">
                           <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                            <label>{taskNames[index]}</label>
+                            <label>{taskNames[`${level}${challenge}`]}</label>
                             <div><RocketIcon width="27" height="27" /></div>
                           </Flex>
                         </ChallengeButton>
