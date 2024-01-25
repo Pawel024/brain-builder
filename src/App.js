@@ -29,8 +29,8 @@ const FloatingButton = styled(IconButton, {
 });
 
 const ChallengeButton = styled(Button, {
-  width: 140,   
-  height: 80,
+  width: 160,   
+  height: 100,
   fontSize: 'var(--font-size-2)',
   fontWeight: '500',
   boxShadow: '0 1px 3px var(--slate-a11)'
@@ -1060,7 +1060,7 @@ function App() {
             <Flex direction='column' gap='3' style={{ flex: 1 }}>
               <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Get Started</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 140px))', gap: '15px', alignItems: 'start', justifyContent: 'start'}}>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 160px))', gap: '15px', alignItems: 'start', justifyContent: 'start'}}>
                 <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
@@ -1074,7 +1074,7 @@ function App() {
               {Object.entries(tasksByLevel).map(([level, challenges]) => (
                 <Box key={level} style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                   <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level {level} - {levelNames[level-1]}</Heading>
-                  <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 140px))', gap: '15px', alignItems: 'start', justifyContent: 'start'}}>
+                  <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 160px))', gap: '15px', alignItems: 'start', justifyContent: 'start'}}>
                     <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
                       <ChallengeButton size="1" variant="outline">
                       <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
