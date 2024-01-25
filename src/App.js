@@ -30,7 +30,7 @@ const FloatingButton = styled(IconButton, {
 
 const ChallengeButton = styled(Button, {
   width: 160,   
-  height: 100,
+  height: 80,
   fontSize: 'var(--font-size-2)',
   fontWeight: '500',
   boxShadow: '0 1px 3px var(--slate-a11)'
