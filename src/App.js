@@ -350,7 +350,7 @@ function App() {
       .then(response => {
         setTaskData(response.data)
         setTaskData(taskData => taskData.sort((a, b) => a.task_id - b.task_id)); // sort the taskData by taskIds
-        console.log("first task id: ", taskIds[0]);
+        console.log(taskData);
 
         setTaskData(response.data);
         const nInputs = taskData.map(entry => entry.n_inputs);
@@ -404,7 +404,7 @@ function App() {
         setImgs(defaultTaskIds.map(() => []));
         console.log("Setting default states instead.")
       });
-  }, []);
+  }, [taskData, taskIds]);
   
   useEffect(() => {  // TODO: figure out what this is doing and if it's necessary
     if (cytoLayers.every(subArray => subArray.length === 0)) {
