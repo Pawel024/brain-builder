@@ -4,7 +4,7 @@ defined in the ASGI_APPLICATION setting.
 """
 
 
-from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.routing import ProtocolTypeRouter, URLRouter, ChannelLayerMiddlewareStack
 from django.urls import path, re_path
 from . import consumers
 
@@ -15,7 +15,7 @@ websocket_urlpatterns = [
 
 application = ProtocolTypeRouter({
     # http->django views is added by default
-    'websocket': URLRouter(websocket_urlpatterns)
+    'websocket': ChannelLayerMiddlewareStack(URLRouter(websocket_urlpatterns))
 })
 
 
