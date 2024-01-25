@@ -368,7 +368,7 @@ function App() {
           currentMaxLayers.push(entry.max_layers);
           currentMaxNodes.push(entry.max_nodes);
           currentTaskIds.push(entry.task_id);
-          currentWeights.push(entry.weights);
+          currentWeights.push([]);
         });
 
         setTaskIds(currentTaskIds);
