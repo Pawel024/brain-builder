@@ -270,7 +270,7 @@ function App() {
       }
     }).finally(() => {
           // Create a WebSocket
-          const ws = new WebSocket(`ws://${window.location.host}/ws/${userId}/${taskId}/`);
+          const ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
           
           ws.onopen = () => {
             console.log('WebSocket connection opened');
