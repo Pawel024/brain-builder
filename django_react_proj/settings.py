@@ -34,6 +34,8 @@ SESSION_COOKIE_SECURE = True
 
 IS_HEROKU_APP = "DYNO" in os.environ and not "CI" in os.environ
 
+# Redirect all HTTP traffic to HTTPS -> not sure if this is necessary
+SECURE_SSL_REDIRECT = True
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
