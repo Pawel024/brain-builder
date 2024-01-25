@@ -234,8 +234,21 @@ function App() {
       network_input: JSON.stringify([]),
       games_data: gamesData,
     };
+    // first, set up the websocket
+    const ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
 
-    // first, check if there is an entry in /api/backend:
+    ws.onopen = () => {
+      console.log('WebSocket connection opened');
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+    
+    // Save the WebSocket object in state so you can use it later
+    setWebSocket(ws);
+
+    // now, check if there is an entry in /api/backend:
     axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
       headers: {
         'X-CSRFToken': csrftoken
@@ -247,7 +260,8 @@ function App() {
         axios.put(window.location.origin + `/api/backend/${pk}`, dataData, {
           headers: {
             'X-CSRFToken': csrftoken
-          }
+          }, 
+          timeout: pendingTime
         }).catch((error) => {
           console.log(error);
         });
@@ -263,26 +277,13 @@ function App() {
         axios.post(window.location.origin + "/api/backend/", dataData, {
           headers: {
             'X-CSRFToken': csrftoken
-          }
+          }, 
+          timeout: pendingTime
         }).catch((error) => {
           console.log(error);
         })
       }
     }).finally(() => {
-          // Create a WebSocket
-          const ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
-          
-          ws.onopen = () => {
-            console.log('WebSocket connection opened');
-          };
-
-          ws.onclose = () => {
-            console.log('WebSocket connection closed');
-          };
-          
-          // Save the WebSocket object in state so you can use it later
-          setWebSocket(ws);
-
           let timeoutId = setTimeout(() => {
             ws.close();
             console.log('Failed to load data for challenge ' + taskId);

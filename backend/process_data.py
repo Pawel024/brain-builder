@@ -47,9 +47,11 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
         d['plots'] = json.dumps([b64encode(image).decode() for image in levels.data.images])
 
         coach = Coach.connections.get((user_id, task_id))
-        while coach is None:
+        t = 0
+        while coach is None and t < 10:
             time.sleep(0.1)
             print("Waiting for coach")
+            t += 0.1
         if coach is not None:
             print('Sending data to coach')
             await coach.send_data(d)
