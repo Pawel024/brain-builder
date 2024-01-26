@@ -85,7 +85,6 @@ CHANNEL_LAYERS = {
         'CONFIG': {
             "hosts": [(redis_url.hostname, redis_url.port)],
         },
-        "ROUTING": "django_react_proj.routing",
     },
 }
 
