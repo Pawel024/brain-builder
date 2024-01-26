@@ -947,7 +947,7 @@ function App() {
   // ------- SLIDERS -------
 
   // initialize an array to store the state for each slider
-  const [iterations, setIterations] = useState(Array(taskIds.length).fill(0));
+  const [iterations, setIterations] = useState(Array(taskIds.length).fill(100));
   const [learningRate, setLearningRate] = useState(Array(taskIds.length).fill(0.01));
 
   const handleIterationChange = (index, value) => {
@@ -971,7 +971,7 @@ function App() {
       <Slider.Root
         key={index}
         className="SliderRoot"
-        defaultValue={[iterations[index]]}
+        defaultValue={iterations[index]/2}
         onValueChange={(value) => handleIterationChange(index, value)}
         max={maxEpochs[index] / 2}
         step={0.5}

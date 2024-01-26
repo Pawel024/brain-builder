@@ -137,7 +137,7 @@ const Quiz = ({ questions }) => {
               handleOptionClick(event);
             }}}/>
           ) : (<>
-            <SyntaxHighlighter language="python" style={a11yDark}>
+            <SyntaxHighlighter language="python" style={a11yDark} wrapLongLines={true} showLineNumbers={true}>
               {questions[currentQuestion].missingCode.trim()}
             </SyntaxHighlighter>
             <TextArea 
