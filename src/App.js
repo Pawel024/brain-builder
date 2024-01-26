@@ -383,8 +383,8 @@ function App() {
         setWeights(currentWeights);
         setTaskNames(currentTaskNames);
         setNormalizationVisibility(currentTaskData.map(entry => entry.normalization_visibility));
-        setIterationsSliderVisibility(currentTaskData.map(entry => entry.iterationsSliderVisibility));
-        setLRSliderVisibility(currentTaskData.map(entry => entry.lrSliderVisibility));
+        setIterationsSliderVisibility(currentTaskData.map(entry => entry.iterations_slider_visibility));
+        setLRSliderVisibility(currentTaskData.map(entry => entry.lr_slider_visibility));
         setCytoLayers(currentTaskIds.map(() => []));
         setIsTraining(currentTaskIds.map(() => false));
         setApiData(currentTaskIds.map(() => null));
@@ -1234,7 +1234,7 @@ function App() {
                   errorList={errorList[index]}
                   imgs={imgs[index]}
                   loadData={loadData}
-                  normalization={normalization[index]}
+                  normalization={true}
                   normalizationVisibility={normalizationVisibility[index]}
                   iterationsSliderVisibility={iterationsSliderVisibility[index]}
                   lrSliderVisibility={lrSliderVisibility[index]}

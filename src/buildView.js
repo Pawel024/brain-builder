@@ -331,7 +331,7 @@ class Building extends React.Component {
           </Box>) : (<div></div>)}
           
           {this.props.normalizationVisibility ? (<Checkbox style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97))}}>
-            {console.log(`this.props.normalization: ${this.props.normalization}`)}
+            {console.log(`this.props.normalizationVisibility: ${this.props.normalizationVisibility}`)}
             Normalize training data
             </Checkbox>):(<div></div>)}
 
