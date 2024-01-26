@@ -109,7 +109,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'django_react_proj.wsgi.application'
+# WSGI_APPLICATION = 'django_react_proj.wsgi.application'
 
 ASGI_APPLICATION = "django_react_proj.routing.application"
 
