@@ -330,10 +330,10 @@ class Building extends React.Component {
             <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Learning rate: {this.props.learningRate}</div>
           </Box>) : (<div></div>)}
           
-          {this.props.normalizationVisibility ? (<Checkbox style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97))}}>
+          {this.props.normalizationVisibility ? (<><Checkbox style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97))}}/>
             {console.log(`this.props.normalizationVisibility: ${this.props.normalizationVisibility}`)}
             Normalize training data
-            </Checkbox>):(<div></div>)}
+            </>):(<div></div>)}
 
           {/* make the position of the box shift down if normalization is true */}
           <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)) + (this.props.normalizationVisibility ? 50 : 0), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
