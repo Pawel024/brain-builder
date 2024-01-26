@@ -138,7 +138,7 @@ const Quiz = ({ questions }) => {
             }}}/>
           ) : (<>
             <SyntaxHighlighter language="python" style={a11yDark} wrapLongLines={true} showLineNumbers={true}>
-              {questions[currentQuestion].missingCode.trim()}
+              {questions[currentQuestion].code.trim()}
             </SyntaxHighlighter>
             <TextArea 
               color="gray" 
@@ -225,8 +225,8 @@ function QuizApp() {
     },
     {
       question: 'Fill in the missing code:',
-      missingCode: 'print(_____)',
-      correctAnswer: '"Hello, world!"',
+      code: 'print(_____)',
+      options: [ {optionText: 'Hello, world!', isCorrect: true }, ],
       question_type: "coding",
     },
   ]);
