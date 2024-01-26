@@ -13,11 +13,6 @@ websocket_urlpatterns = [
     # Add more WebSocket endpoints here if needed
 ]
 
-application = ProtocolTypeRouter({
-    # http->django views is added by default
-    'websocket': ChannelLayerMiddlewareStack(URLRouter(websocket_urlpatterns))
-})
-
 
 
 

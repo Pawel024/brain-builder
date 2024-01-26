@@ -89,26 +89,6 @@ CHANNEL_LAYERS = {
     },
 }
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'WARNING',
-    },
-    'loggers': {
-        'channels': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        },
-    },
-}
-
 CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'django_react_proj.urls'
