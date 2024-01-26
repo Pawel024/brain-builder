@@ -971,7 +971,7 @@ function App() {
       <Slider.Root
         key={index}
         className="SliderRoot"
-        defaultValue={iterations[index]/2}
+        defaultValue={[iterations[index]/2]}
         onValueChange={(value) => handleIterationChange(index, value)}
         max={maxEpochs[index] / 2}
         step={0.5}
@@ -990,7 +990,7 @@ function App() {
       <Slider.Root
         key={index}
         className="SliderRoot"
-        defaultValue={learningRate[index]}
+        defaultValue={[learningRate[index]]}
         onValueChange={(value) => handleLearningRateChange(index, value)}
         max={70}
         step={10}
