@@ -77,7 +77,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-redis_url = urllib.parse.urlparse(os.environ.get('REDISCLOUD', 'redis://localhost:6379'))
+redis_url = urllib.parse.urlparse(os.environ.get('REDISCLOUD_URL', 'redis://localhost:6379'))
 
 CHANNEL_LAYERS = {
     'default': {
