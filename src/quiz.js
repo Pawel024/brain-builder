@@ -6,9 +6,8 @@ import * as RadioGroup from '@radix-ui/react-radio-group';
 import * as Progress from '@radix-ui/react-progress';
 import './App.css';
 import axios from 'axios';
-import { Code } from "bright";
-
-Code.theme = "dark-plus"
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { solarizedlight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const ScoreScreen = ({ score, userAnswers, handleRetry }) => (
   <Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", width:window.innerWidth/3, padding: '30px 50px', background:"solid", backgroundColor:"white" }}>
@@ -138,7 +137,9 @@ const Quiz = ({ questions }) => {
               handleOptionClick(event);
             }}}/>
           ) : (<>
-            <Code lang="py" lineNumbers>{questions[currentQuestion].missingCode.trim()}</Code>
+            <SyntaxHighlighter language="python" style={solarizedlight}>
+              {questions[currentQuestion].missingCode.trim()}
+            </SyntaxHighlighter>
             <TextArea 
               color="gray" 
               placeholder="Type your answer…" 
