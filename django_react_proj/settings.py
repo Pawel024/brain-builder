@@ -68,7 +68,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-#    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -109,7 +109,7 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'django_react_proj.wsgi.application'
+WSGI_APPLICATION = 'django_react_proj.wsgi.application'
 
 ASGI_APPLICATION = "django_react_proj.routing.application"
 
