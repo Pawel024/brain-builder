@@ -131,10 +131,12 @@ def quiz_description_detail(request):
                 for option in possible_options
             ]
 
-            if getattr(quiz, f"answer_{i}") in possible_options:
+            if (question_data['question_type'] == 'multiple choice' and getattr(quiz, f"answer_{i}") in possible_options): # this could be suboptimal, what if the question is open but the answer is for example "a"?
                 answer = getattr(quiz, f'option_{i}_{getattr(quiz, f"answer_{i}")}')
             else:
                 answer = getattr(quiz, f"answer_{i}")
+
+            code = getattr(quiz, f'code_{i}')
 
             question_data = {
                 'question': question_text,
@@ -143,9 +145,10 @@ def quiz_description_detail(request):
                     for option in options
                 ],
                 'question_type': 'text' if all(not option for option in options) else 'multiple choice',
+                'code' : code,
             }
 
-            if question_data['question_type'] == 'text':
+            if (question_data['question_type'] == 'text' or question_data['question_type'] == 'coding'):
                 question_data['options'] = [{'optionText': answer, 'isCorrect': True}]
 
             data['questions'].append(question_data)

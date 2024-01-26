@@ -57,13 +57,12 @@ const Quiz = ({ questions }) => {
     event.preventDefault();
     
     let isCorrect = false;
-    if (questions[currentQuestion].question_type === "text") {
+    if (questions[currentQuestion].question_type === "text" || questions[currentQuestion].question_type === "coding") {
       isCorrect = questions[currentQuestion].options[0].optionText === textInputValue;        
     }
     else {
       isCorrect = questions[currentQuestion].options[selectedOption].isCorrect;
     }
-
     if (isCorrect) {
       setScore((prevScore) => prevScore + 1);
     }
@@ -132,11 +131,24 @@ const Quiz = ({ questions }) => {
                 </label>
               </div>
             ))}
-          </RadioGroup.Root>): (<TextArea color="gray" placeholder="Type your answer…" style={{ width:window.innerWidth/3.75, height:window.innerHeight/7 }} onChange={event => setTextInputValue(event.target.value)} onKeyDown={event => {
+          </RadioGroup.Root>): questions[currentQuestion].question_type === "text" ? (<TextArea color="gray" placeholder="Type your answer…" style={{ width:window.innerWidth/3.75, height:window.innerHeight/7 }} onChange={event => setTextInputValue(event.target.value)} onKeyDown={event => {
             if (event.key === 'Enter') {
               handleOptionClick(event);
             }}}/>
-          )}
+          ) : (<>
+            <pre>{questions[currentQuestion].missingCode}</pre>
+            <TextArea 
+              color="gray" 
+              placeholder="Type your answer…" 
+              style={{ width:window.innerWidth/3.75, height:window.innerHeight/7 }} 
+              onChange={event => setTextInputValue(event.target.value)} 
+              onKeyDown={event => {
+                if (event.key === 'Enter') {
+                  handleOptionClick(event);
+                }
+              }}
+            />
+          </>)}
           <Button onClick={(event) => handleOptionClick(event)} style={{marginTop:20}}>Next</Button>
           </Flex>
         </form>
@@ -207,6 +219,12 @@ function QuizApp() {
       question: 'How many Harry Potter books are there?',
       options: [ {optionText: '7', isCorrect: true }, ],
       question_type: "text",
+    },
+    {
+      question: 'Fill in the missing code: console.log(_____)',
+      missingCode: 'console.log(_____)',
+      correctAnswer: '"Hello, world!"',
+      question_type: "coding",
     },
   ]);
 

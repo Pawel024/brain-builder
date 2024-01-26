@@ -32,7 +32,7 @@ class TaskDescription(models.Model):
     lr_slider_visibility = models.BooleanField()
 
     def __str__(self):
-        return str(self.name)
+        return str(self.task_id) + "_-_" + str(self.name)
 
 class Progress(models.Model):
     user_id = models.CharField(max_length=100)
@@ -52,6 +52,7 @@ class Quiz(models.Model):
     quiz_id = models.IntegerField(unique=True)
     
     question_1 = models.TextField(null=True, blank=True)
+    code_1 = models.TextField(null=True, blank=True)
     option_1_a = models.CharField(max_length=200, null=True, blank=True)
     option_1_b = models.CharField(max_length=200, null=True, blank=True)
     option_1_c = models.CharField(max_length=200, null=True, blank=True)
@@ -59,6 +60,7 @@ class Quiz(models.Model):
     answer_1 = models.CharField(max_length=200, null=True, blank=True)
 
     question_2 = models.TextField(null=True, blank=True)
+    code_1 = models.TextField(null=True, blank=True)
     option_2_a = models.CharField(max_length=200, null=True, blank=True)
     option_2_b = models.CharField(max_length=200, null=True, blank=True)
     option_2_c = models.CharField(max_length=200, null=True, blank=True)
@@ -66,6 +68,7 @@ class Quiz(models.Model):
     answer_2 = models.CharField(max_length=200, null=True, blank=True)
 
     question_3 = models.TextField(null=True, blank=True)
+    code_3 = models.TextField(null=True, blank=True)
     option_3_a = models.CharField(max_length=200, null=True, blank=True)
     option_3_b = models.CharField(max_length=200, null=True, blank=True)
     option_3_c = models.CharField(max_length=200, null=True, blank=True)
@@ -73,6 +76,7 @@ class Quiz(models.Model):
     answer_3 = models.CharField(max_length=200, null=True, blank=True)
 
     question_4 = models.TextField(null=True, blank=True)
+    code_4 = models.TextField(null=True, blank=True)
     option_4_a = models.CharField(max_length=200, null=True, blank=True)
     option_4_b = models.CharField(max_length=200, null=True, blank=True)
     option_4_c = models.CharField(max_length=200, null=True, blank=True)
@@ -80,6 +84,7 @@ class Quiz(models.Model):
     answer_4 = models.CharField(max_length=200, null=True, blank=True)
 
     question_5 = models.TextField(null=True, blank=True)
+    code_5 = models.TextField(null=True, blank=True)
     option_5_a = models.CharField(max_length=200, null=True, blank=True)
     option_5_b = models.CharField(max_length=200, null=True, blank=True)
     option_5_c = models.CharField(max_length=200, null=True, blank=True)
