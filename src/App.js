@@ -1,3 +1,4 @@
+/* eslint-disable no-lone-blocks */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './App.css';
 import { Theme, Flex, Box, Heading, Grid, IconButton, Button } from '@radix-ui/themes';

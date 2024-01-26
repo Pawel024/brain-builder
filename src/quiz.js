@@ -6,7 +6,9 @@ import * as RadioGroup from '@radix-ui/react-radio-group';
 import * as Progress from '@radix-ui/react-progress';
 import './App.css';
 import axios from 'axios';
+import { Code } from "bright";
 
+Code.theme = "dark-plus"
 
 const ScoreScreen = ({ score, userAnswers, handleRetry }) => (
   <Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", width:window.innerWidth/3, padding: '30px 50px', background:"solid", backgroundColor:"white" }}>
@@ -136,7 +138,7 @@ const Quiz = ({ questions }) => {
               handleOptionClick(event);
             }}}/>
           ) : (<>
-            <pre>{questions[currentQuestion].missingCode}</pre>
+            <Code lang="py" lineNumbers>{questions[currentQuestion].missingCode.trim()}</Code>
             <TextArea 
               color="gray" 
               placeholder="Type your answer…" 
@@ -221,8 +223,8 @@ function QuizApp() {
       question_type: "text",
     },
     {
-      question: 'Fill in the missing code: console.log(_____)',
-      missingCode: 'console.log(_____)',
+      question: 'Fill in the missing code:',
+      missingCode: 'print(_____)',
       correctAnswer: '"Hello, world!"',
       question_type: "coding",
     },

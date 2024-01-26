@@ -334,7 +334,6 @@ class Building extends React.Component {
           <Text as="label" size="2">
             <Flex gap="2">          
               <Checkbox style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97))}}/>
-              {console.log(`this.props.normalizationVisibility: ${this.props.normalizationVisibility}`)}
               Normalize training data
             </Flex>
           </Text>):(<div></div>)}
