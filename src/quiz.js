@@ -7,7 +7,7 @@ import * as Progress from '@radix-ui/react-progress';
 import './App.css';
 import axios from 'axios';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { a11yDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const ScoreScreen = ({ score, userAnswers, handleRetry }) => (
   <Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", width:window.innerWidth/3, padding: '30px 50px', background:"solid", backgroundColor:"white" }}>
@@ -137,7 +137,7 @@ const Quiz = ({ questions }) => {
               handleOptionClick(event);
             }}}/>
           ) : (<>
-            <SyntaxHighlighter language="python" style={atomDark}>
+            <SyntaxHighlighter language="python" style={a11yDark}>
               {questions[currentQuestion].missingCode.trim()}
             </SyntaxHighlighter>
             <TextArea 
