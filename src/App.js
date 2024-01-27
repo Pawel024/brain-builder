@@ -290,7 +290,7 @@ function App() {
 
     ws.onmessage = function(event) {
       const data = JSON.parse(event.data);
-      if (data.title === 'data') { 
+      if (data.title === "data") { 
 
         setFeatureNames(prevFeatureNames => {
           const newFeatureNames = [...prevFeatureNames];
@@ -322,7 +322,7 @@ function App() {
         ws.close();
         clearTimeout(timeoutId);
       }
-    console.log("Data received: ", event);	
+    console.log("Data received: ", data);	
     };
 
     ws.onerror = function(event) {
