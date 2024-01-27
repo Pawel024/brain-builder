@@ -316,6 +316,11 @@ function App() {
           const url = URL.createObjectURL(blob);
           // now images can be accessed with <img src={url} />
           newInitPlots[index] = url;
+          console.log("binaryString: ", binaryString);  // for debugging
+          console.log("bytes: ", bytes);  // for debugging
+          console.log("blob: ", blob);  // for debugging
+          console.log("url: ", url);  // for debugging
+          console.log("newInitPlots: ", newInitPlots);  // for debugging
           return newInitPlots;
         });
         console.log(`Data for challenge ${taskId} loaded`)
