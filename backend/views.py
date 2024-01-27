@@ -141,7 +141,7 @@ def quiz_description_detail(request):
             else:
                 question_type = 'multiple choice'
 
-            if (question_data['question_type'] == 'multiple choice' and getattr(quiz, f"answer_{i}") in possible_options): # this could be suboptimal, what if the question is open but the answer is for example "a"?
+            if (question_type == 'multiple choice' and getattr(quiz, f"answer_{i}") in possible_options): # this could be suboptimal, what if the question is open but the answer is for example "a"?
                 answer = getattr(quiz, f'option_{i}_{getattr(quiz, f"answer_{i}")}')
             else:
                 answer = getattr(quiz, f"answer_{i}")
