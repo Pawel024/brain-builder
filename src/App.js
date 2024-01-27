@@ -322,7 +322,9 @@ function App() {
         ws.close();
         clearTimeout(timeoutId);
       }
-    console.log("Data received, this is the plot: ", initPlots[index]);	
+    console.log("Data received, this is the plot: ", initPlots[index]);	 // for debugging
+    console.log("data.plots: ", data.plots);  // for debugging
+    console.log("data.plots[0]: ", data.plots[0]);  // for debugging
     };
 
     ws.onerror = function(event) {
