@@ -1114,7 +1114,7 @@ function App() {
             </Grid>
             </Box>
             <Flex direction='row' gap='3' style={{padding:'10px 10px', alignItems: 'flex-start' }}>
-            <Flex direction='column' gap='3' style={{ flex: 2 }}>
+            <Flex direction='column' gap='3' style={{ flex:1 }}>
               <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Get Started</Heading>
                 <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(136px, 136px))', gap: '15px', alignItems: 'start', justifyContent: 'start'}}>
