@@ -219,6 +219,7 @@ function App() {
   }, []);
 
   const [webSocket, setWebSocket] = useState(null)
+  
   const loadData = (taskId, index) => {
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
@@ -280,7 +281,7 @@ function App() {
           console.log(error);
         })
       }
-    }).finally(() => {
+    });
           let timeoutId = setTimeout(() => {
             ws.close();
             console.log('Failed to load data for challenge ' + taskId);
@@ -326,7 +327,6 @@ function App() {
           ws.onerror = function(event) {
             console.error('Error:', event);
           };
-      });
     };
 
   const fetchQueryResponse = (setApiData, setIsResponding, taskId, index) => {  // updates the apiData state with the response from the backend

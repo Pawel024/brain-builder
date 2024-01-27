@@ -45,6 +45,7 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
         d['title'] = json.dumps('data')
         d['feature_names'] = json.dumps([x.replace('_', ' ') for x in levels.data.feature_names])
         d['plots'] = json.dumps([b64encode(image).decode() for image in levels.data.images])
+        d['n_objects'] = levels.data.n_objects
 
         print("Coach.connections = ", Coach.connections)
         coach = Coach.connections.get((str(user_id), str(task_id)))
