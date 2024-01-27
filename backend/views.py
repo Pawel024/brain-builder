@@ -156,7 +156,7 @@ def quiz_description_detail(request):
                 'code' : code,
             }
 
-            if (question_data['question_type'] == 'text' or question_data['question_type'] == 'coding'):
+            if (question_type == 'text' or question_type == 'coding'):
                 question_data['options'] = [{'optionText': answer, 'isCorrect': True}]
 
             data['questions'].append(question_data)
