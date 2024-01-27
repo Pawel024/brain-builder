@@ -990,7 +990,7 @@ function App() {
       <Slider.Root
         key={index}
         className="SliderRoot"
-        defaultValue={[learningRate[index]]}
+        defaultValue={[Math.round((-20 * (Math.log10(learningRate) + 0.33)) / 10) * 10]}
         onValueChange={(value) => handleLearningRateChange(index, value)}
         max={70}
         step={10}
