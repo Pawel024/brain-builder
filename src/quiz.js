@@ -138,7 +138,7 @@ const Quiz = ({ questions }) => {
             }}}/>
             </TextField.Root>
           ) : (<>
-            <SyntaxHighlighter language="python" style={a11yDark} wrapLongLines={true} showLineNumbers={true}>
+            <SyntaxHighlighter language="python" style={a11yDark} customStyle={{ width:window.innerWidth/3.75 }} wrapLongLines={true} showLineNumbers={true}>
               {questions[currentQuestion].code.trim()}
             </SyntaxHighlighter>
             <TextField.Root style={{ marginTop:20 }} > <TextField.Input 
