@@ -397,7 +397,7 @@ function App() {
         setGamesData(JSON.stringify(currentTaskData.map(entry => entry.games_data)));
         setNInputs(currentNInputs);
         setNOutputs(currentNOutputs);
-        setNObjects(taskIds.map(() => 0));
+        setNObjects(currentTaskIds.map(() => 0));
         setMaxEpochs(currentMaxEpochs);
         setMaxLayers(currentMaxLayers);
         setMaxNodes(currentMaxNodes);
@@ -416,7 +416,7 @@ function App() {
         setFeatureNames(currentTaskIds.map(() => []));  // TODO: load these somewhere else
         setBiases(currentTaskIds.map(() => []));
         setImgs(currentTaskIds.map(() => []));
-        setInitPlots(taskIds.map(() => []));
+        setInitPlots(currentTaskIds.map(() => []));
         setLoadedTasks(true)
       })
       .catch(error => {
@@ -465,6 +465,7 @@ function App() {
         console.log("Setting default states instead.")
       });
 
+    /*
     axios.get('/api/all_intros/')
       .then(response => {
         const currentQuizData = response.data;
@@ -485,6 +486,7 @@ function App() {
         setQuizIds(defaultQuizIds);
         console.log("Setting default states instead.")
       });
+    */
   }, []);
   
   useEffect(() => {  // TODO: figure out what this is doing and if it's necessary
