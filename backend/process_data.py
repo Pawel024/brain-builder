@@ -59,8 +59,10 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
             print('Sending data to coach')
             await coach.send_data(d)
         
-        if callback is not None:
+        """
+        if callback is not None:  # in case we wanna use websockets for receiving instructions
             callback(d)
+        """
 
 
     elif req['action'] == 1:  # create and train a network
@@ -73,11 +75,14 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
         print("Network initiated, starting training")
         d['title'] = 'progress'
         d['progress'] = 0  # just update the progress
-        coach = Coach.connections.get((user_id, task_id))
+        coach = Coach.connections.get((str(user_id), str(task_id)))
         if coach is not None:
             await coach.send_data(d)
-        if callback is not None:
+        
+        """
+        if callback is not None:  # in case we wanna use websockets for receiving instructions
             callback(d)
+        """
         u['title'] = 'update'
         
         for epoch in range(epochs):
@@ -103,21 +108,25 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
 
                     print("Epoch: ", epoch, ", Error: ", errors[-1])
 
-                    coach = Coach.connections.get((user_id, task_id))
+                    coach = Coach.connections.get((str(user_id), str(task_id)))
                     if coach is not None:
                         print('Sending data to coach')
                         await coach.send_data(u)
                     
-                    if callback is not None:
+                    """
+                    if callback is not None:  # in case we wanna use websockets for receiving instructions
                         callback(u)
+                    """
 
-                coach = Coach.connections.get((user_id, task_id))
+                coach = Coach.connections.get((str(user_id), str(task_id)))
                 if coach is not None:
                     print('Sending data to coach')
                     await coach.send_data(d)
                 
-                if callback is not None:
+                """
+                if callback is not None:  # in case we wanna use websockets for receiving instructions
                     callback(d)
+                """
         
         # save the network to a pickle file
         with open('nn.txt', 'wb') as output:
@@ -130,15 +139,17 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
         u['network_weights'] = w  # list of lists of floats representing the weights
         u['network_biases'] = b  # list of lists of floats representing the biases
         
-        coach = Coach.connections.get((user_id, task_id))
+        coach = Coach.connections.get((str(user_id), str(task_id)))
         if coach is not None:
             print('Sending double data to coach')
             await coach.send_data(d)
             await coach.send_data(u)
         
-        if callback is not None:
+        """
+        if callback is not None:  # in case we wanna use websockets for receiving instructions
             callback(d)
             callback(u)
+        """
 
 
 
