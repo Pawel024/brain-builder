@@ -263,6 +263,7 @@ class Building extends React.Component {
                 This dataset contains {this.props.nOfObjects}, each with {this.props.nOfInputs} features. There are {this.props.nOfOutputs} targets. The features are: {this.props.featureNames.join(', ')}.
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}></div>
+              {console.log("this.props.initPlot", this.props.initPlot)}
               <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }}/>
             </>
           )}
