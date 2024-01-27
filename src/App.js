@@ -322,6 +322,7 @@ function App() {
         ws.close();
         clearTimeout(timeoutId);
       }
+    console.log("Data received: ", event);	
     };
 
     ws.onerror = function(event) {
