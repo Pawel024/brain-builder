@@ -307,7 +307,7 @@ function App() {
         // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
         setInitPlots(prevInitPlots => {
           const newInitPlots = [...prevInitPlots];
-          const binaryString = atob(data.plots)[0];  // decode from base64 to binary string
+          const binaryString = atob(data.plots[0]);  // decode from base64 to binary string
           const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
           for (let i = 0; i < binaryString.length; i++) {
             bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
