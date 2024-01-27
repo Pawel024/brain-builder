@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Flex, Box, Button, Heading, TextArea } from '@radix-ui/themes';
+import { Flex, Box, Button, Heading, TextField } from '@radix-ui/themes';
 import { CheckCircledIcon, CrossCircledIcon } from '@radix-ui/react-icons';
 import '@radix-ui/themes/styles.css';
 import * as RadioGroup from '@radix-ui/react-radio-group';
@@ -132,7 +132,7 @@ const Quiz = ({ questions }) => {
                 </label>
               </div>
             ))}
-          </RadioGroup.Root>): questions[currentQuestion].question_type === "text" ? (<TextArea color="gray" placeholder="Type your answer…" style={{ width:window.innerWidth/3.75, height:window.innerHeight/7 }} onChange={event => setTextInputValue(event.target.value)} onKeyDown={event => {
+          </RadioGroup.Root>): questions[currentQuestion].question_type === "text" ? (<TextField color="gray" placeholder="Type your answer…" style={{ width:window.innerWidth/3.75 }} onChange={event => setTextInputValue(event.target.value)} onKeyDown={event => {
             if (event.key === 'Enter') {
               handleOptionClick(event);
             }}}/>
@@ -140,10 +140,10 @@ const Quiz = ({ questions }) => {
             <SyntaxHighlighter language="python" style={a11yDark} wrapLongLines={true} showLineNumbers={true}>
               {questions[currentQuestion].code.trim()}
             </SyntaxHighlighter>
-            <TextArea 
+            <TextField 
               color="gray" 
               placeholder="Type your answer…" 
-              style={{ width:window.innerWidth/3.75, height:window.innerHeight/7 }} 
+              style={{ width:window.innerWidth/3.75, marginTop:10 }} 
               onChange={event => setTextInputValue(event.target.value)} 
               onKeyDown={event => {
                 if (event.key === 'Enter') {
