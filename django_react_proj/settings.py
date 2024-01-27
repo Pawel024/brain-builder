@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 import django_heroku
 import random
+import urllib
 
 def get_random_secret_key():
     chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
@@ -33,6 +34,8 @@ SESSION_COOKIE_SECURE = True
 
 IS_HEROKU_APP = "DYNO" in os.environ and not "CI" in os.environ
 
+# Redirect all HTTP traffic to HTTPS -> not sure if this is necessary
+SECURE_SSL_REDIRECT = True
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -58,6 +61,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'backend',
     'webpack_loader',
+    'channels',
+#    'django_eventstream',
 ]
 
 MIDDLEWARE = [
@@ -71,6 +76,18 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+redis_url = urllib.parse.urlparse(os.environ.get('REDIS_URL', 'redis://localhost:6379'))
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [(redis_url.hostname, redis_url.port)],
+        },
+        "ROUTING": "django_react_proj.routing",
+    },
+}
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -93,6 +110,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'django_react_proj.wsgi.application'
+
+ASGI_APPLICATION = "django_react_proj.routing.application"
 
 
 # Database

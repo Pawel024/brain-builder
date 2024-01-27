@@ -33,11 +33,13 @@
     "react-scripts": "^5.0.1",
     "react-spectrum": "^1.2.6",
     "react-syntax-highlighter": "^15.5.0",
+    "react-websocket": "^2.1.0",
     "reactstrap": "^9.2.0",
     "retry": "^0.13.1",
     "stitches": "^1.2.11",
     "styled-components": "^6.1.8",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "ws": "^8.16.0"
   },
   "scripts": {
     "start": "react-scripts start",
