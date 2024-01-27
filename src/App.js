@@ -244,9 +244,6 @@ function App() {
     ws.onclose = () => {
       console.log('WebSocket connection closed');
     };
-    
-    // Save the WebSocket object in state so you can use it later
-    setWebSocket(ws);
 
     // now, check if there is an entry in /api/backend:
     axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
@@ -291,24 +288,25 @@ function App() {
           }, intervalTimeout); // stop after n milliseconds
 
           ws.onmessage = function(event) {
-            if (event.title === 'data') { 
+            const data = JSON.parse(event.data);
+            if (data.title === 'data') { 
 
               setFeatureNames(prevFeatureNames => {
                 const newFeatureNames = [...prevFeatureNames];
-                newFeatureNames[index] = JSON.parse(event.data.feature_names);
+                newFeatureNames[index] = JSON.parse(data.feature_names);
                 return newFeatureNames;
               });
 
               setNObjects(prevNObjects => {
                 const newNObjects = [...prevNObjects];
-                newNObjects[index] = JSON.parse(event.data.n_objects);
+                newNObjects[index] = JSON.parse(data.n_objects);
                 return newNObjects;
               });
 
               // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
               setInitPlots(prevInitPlots => {
                 const newInitPlots = [...prevInitPlots];
-                const binaryString = atob(JSON.parse(event.data.plots)[0]);  // decode from base64 to binary string
+                const binaryString = atob(JSON.parse(data.plots)[0]);  // decode from base64 to binary string
                 const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
                 for (let i = 0; i < binaryString.length; i++) {
                   bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
@@ -321,6 +319,7 @@ function App() {
               });
               console.log(`Data for challenge ${taskId} loaded`)
               ws.close();
+              clearTimeout(timeoutId);
             }
           };
 
