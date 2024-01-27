@@ -322,7 +322,7 @@ function App() {
         ws.close();
         clearTimeout(timeoutId);
       }
-    console.log("Data received: ", data);	
+    console.log("Data received, this is the plot: ", initPlots[index]);	
     };
 
     ws.onerror = function(event) {
