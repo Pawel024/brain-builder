@@ -294,20 +294,20 @@ function App() {
 
         setFeatureNames(prevFeatureNames => {
           const newFeatureNames = [...prevFeatureNames];
-          newFeatureNames[index] = JSON.parse(data.feature_names);
+          newFeatureNames[index] = data.feature_names;
           return newFeatureNames;
         });
 
         setNObjects(prevNObjects => {
           const newNObjects = [...prevNObjects];
-          newNObjects[index] = JSON.parse(data.n_objects);
+          newNObjects[index] = data.n_objects;
           return newNObjects;
         });
 
         // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
         setInitPlots(prevInitPlots => {
           const newInitPlots = [...prevInitPlots];
-          const binaryString = atob(JSON.parse(data.plots)[0]);  // decode from base64 to binary string
+          const binaryString = atob(data.plots)[0];  // decode from base64 to binary string
           const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
           for (let i = 0; i < binaryString.length; i++) {
             bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
