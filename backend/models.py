@@ -60,7 +60,7 @@ class Quiz(models.Model):
     answer_1 = models.CharField(max_length=200, null=True, blank=True)
 
     question_2 = models.TextField(null=True, blank=True)
-    code_1 = models.TextField(null=True, blank=True)
+    code_2 = models.TextField(null=True, blank=True)
     option_2_a = models.CharField(max_length=200, null=True, blank=True)
     option_2_b = models.CharField(max_length=200, null=True, blank=True)
     option_2_c = models.CharField(max_length=200, null=True, blank=True)
