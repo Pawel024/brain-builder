@@ -446,6 +446,27 @@ function App() {
         setQuizIds(defaultQuizIds);
         console.log("Setting default states instead.")
       });
+
+    axios.get('/api/all_intros/')
+      .then(response => {
+        const currentQuizData = response.data;
+        currentQuizData.sort((a, b) => a.quiz_id - b.quiz_id)// sort the quizData by quizIds
+        setQuizData(currentQuizData);
+        console.log(currentQuizData);
+        
+        const currentQuizIds = [];
+
+        currentQuizData.forEach(entry => {
+          currentQuizIds.push(entry.quiz_id);
+        });
+        setQuizIds(currentQuizIds);
+      })
+      .catch(error => {
+        console.error('Error fetching quizzes:', error);
+        const defaultQuizIds = [];
+        setQuizIds(defaultQuizIds);
+        console.log("Setting default states instead.")
+      });
   }, []);
   
   useEffect(() => {  // TODO: figure out what this is doing and if it's necessary
@@ -1311,7 +1332,7 @@ function App() {
                   </Box>
                 </Grid>
                 </Box>
-                <QuizApp />
+                <QuizApp quizId={quizId} />
               </div>
             }/>
           ))}

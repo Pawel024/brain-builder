@@ -163,7 +163,7 @@ const Quiz = ({ questions }) => {
   );
 };
   
-function QuizApp() {
+function QuizApp( quizId=11 ) {
 
   // ------- WINDOW RESIZING -------
 
@@ -187,7 +187,7 @@ function QuizApp() {
     };
   }, []);
 
-  
+
   // ------- ACTUAL QUIZ -------
 
   const [questions, setQuestions] = useState([
@@ -235,7 +235,7 @@ function QuizApp() {
   ]);
 
   useEffect(() => {
-    axios.get(window.location.origin + '/api/quizzes/?quiz_id=11')
+    axios.get(window.location.origin + '/api/quizzes/?quiz_id=' + quizId)
     .then(response => {
       setQuestions(response.data.questions);
   })
