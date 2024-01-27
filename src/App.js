@@ -344,6 +344,10 @@ function App() {
   const [biases, setBiases] = useState([]);
   const [imgs, setImgs] = useState([]);
 
+  // this is for the quizzes
+  const [quizIds, setQuizIds] = useState([]);
+  const [quizData, setQuizData] = useState([]);
+
   // ------- CYTOSCAPE EDITING -------
   const [loadedTasks, setLoadedTasks] = useState(false);
   useEffect(() => {
@@ -419,6 +423,27 @@ function App() {
         setWeights(defaultTaskIds.map(() => []));
         setBiases(defaultTaskIds.map(() => []));
         setImgs(defaultTaskIds.map(() => []));
+        console.log("Setting default states instead.")
+      });
+
+    axios.get('/api/all_quizzes/')
+      .then(response => {
+        const currentQuizData = response.data;
+        currentQuizData.sort((a, b) => a.quiz_id - b.quiz_id)// sort the quizData by quizIds
+        setQuizData(currentQuizData);
+        console.log(currentQuizData);
+        
+        const currentQuizIds = [];
+
+        currentQuizData.forEach(entry => {
+          currentQuizIds.push(entry.quiz_id);
+        });
+        setQuizIds(currentQuizIds);
+      })
+      .catch(error => {
+        console.error('Error fetching quizzes:', error);
+        const defaultQuizIds = [];
+        setQuizIds(defaultQuizIds);
         console.log("Setting default states instead.")
       });
   }, []);
@@ -1032,6 +1057,16 @@ function App() {
     return acc;
   }, {});
 
+  const quizzesByLevel = quizIds.reduce((acc, quizId) => {
+    const level = Math.floor(quizId / 10);
+    const challenge = quizId % 10;
+    if (!acc[level]) {
+      acc[level] = [];
+    }
+    acc[level].push(challenge);
+    return acc;
+  }, {});
+
 
   const [levelNames, setLevelNames] = useState(["Linear Regression", "Classification", "Hyperparameters", "Preprocessing"]);
   const [tutorialDescription, setTutorialDescription] = useState("This would normally be a task description, but we are in a tutorial, so instead you can read a few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries.");
@@ -1094,14 +1129,17 @@ function App() {
                         </ChallengeButton>
                       </Link>
                     ))}
-                    <Link to={`quiz1`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                      <ChallengeButton size="1" variant="outline">
-                        <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                          <label>Quiz</label>
-                          <div><Pencil2Icon width="27" height="27" /></div>
-                        </Flex>
-                      </ChallengeButton>
-                    </Link>
+
+                    {quizzesByLevel[level] && quizzesByLevel[level].map((quiz, index) => (
+                      <Link key={index} to={`quiz${level}${quiz}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                        <ChallengeButton size="1" variant="outline">
+                          <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                            <label>Quiz</label>
+                            <div><Pencil2Icon width="27" height="27" /></div>
+                          </Flex>
+                        </ChallengeButton>
+                      </Link>
+                    ))}
                   </Box>
                 </Box>
               ))} 
@@ -1248,31 +1286,38 @@ function App() {
               }
             />
           ))}
-          <Route path="/quiz1" element={
-            <div className="App">
-              <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
-              <Grid columns='3' mt='1'>
-                <Box ml='3' style={{display:"flex"}}>  
-                  <Link to="/">
-                    <IconButton aria-label="navigate to home" width='auto' height='21' style={{ marginLeft: 'auto', color: 'inherit', textDecoration: 'none' }}>
-                      <HomeIcon color="white" width='auto' height='18' style={{ marginTop: 2 }} />
-                    </IconButton>
-                  </Link>
-                </Box>
-                <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
-                <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily:'monospace, Courier New, Courier' }}>brAIn builder</Heading>
-                </Link>
-                <Box align='end' mr='3' >
-                    <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
-                    <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
+          {quizIds.map((quizId, index) => (
+            <Route
+            key={quizId}
+            path={`/quiz${quizId}`}
+            element={
+              <div className="App">
+                <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
+                <Grid columns='3' mt='1'>
+                  <Box ml='3' style={{display:"flex"}}>  
+                    <Link to="/">
+                      <IconButton aria-label="navigate to home" width='auto' height='21' style={{ marginLeft: 'auto', color: 'inherit', textDecoration: 'none' }}>
+                        <HomeIcon color="white" width='auto' height='18' style={{ marginTop: 2 }} />
+                      </IconButton>
                     </Link>
+                  </Box>
+                  <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
+                  <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily:'monospace, Courier New, Courier' }}>brAIn builder</Heading>
+                  </Link>
+                  <Box align='end' mr='3' >
+                      <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
+                      <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
+                      </Link>
+                  </Box>
+                </Grid>
                 </Box>
-              </Grid>
-              </Box>
-              <QuizApp />
-            </div>
-          } />
+                <QuizApp />
+              </div>
+            }/>
+          ))}
+            
           <Route path="*" element={<NotFound />} />
+          
         </Routes>
       </Router>
       </Theme>

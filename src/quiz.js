@@ -187,6 +187,7 @@ function QuizApp() {
     };
   }, []);
 
+  
   // ------- ACTUAL QUIZ -------
 
   const [questions, setQuestions] = useState([
