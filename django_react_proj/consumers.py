@@ -32,4 +32,4 @@ class Coach(AsyncWebsocketConsumer):
     async def send_data(self, data):
         task_type = data['title']
         print("sending data for task ", task_type)
-        await self.send(data=json.dumps(data))
+        await self.send(json.dumps(data))
