@@ -8,12 +8,12 @@ class Coach(AsyncWebsocketConsumer):
         print(f'Connection scope: {self.scope}')
         self.user_id = self.scope['url_route']['kwargs']['userId']
         self.task_id = self.scope['url_route']['kwargs']['taskId']
-        self.connections[(self.user_id, self.task_id)] = self
+        Coach.connections[(self.user_id, self.task_id)] = self
         print("coach connected")
         await self.accept()
 
     async def disconnect(self, close_code):
-        del self.connections[(self.user_id, self.task_id)]
+        del Coach.connections[(self.user_id, self.task_id)]
         print("coach disconnected")
         
     # Receive message from WebSocket
