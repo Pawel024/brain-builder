@@ -42,9 +42,9 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
         d = {}
         tag = int(req['task_id'])
         levels.get_data(tag)
-        d['title'] = json.dumps('data')
-        d['feature_names'] = json.dumps([x.replace('_', ' ') for x in levels.data.feature_names])
-        d['plots'] = json.dumps([b64encode(image).decode() for image in levels.data.images])
+        d['title'] = 'data'
+        d['feature_names'] = [x.replace('_', ' ') for x in levels.data.feature_names]
+        d['plots'] = [b64encode(image).decode() for image in levels.data.images]
         d['n_objects'] = levels.data.n_objects
 
         print("Coach.connections = ", Coach.connections)
