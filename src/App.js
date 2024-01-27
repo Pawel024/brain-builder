@@ -190,6 +190,7 @@ function App() {
   }, []);
 
   const [webSocket, setWebSocket] = useState(null)
+
   const loadData = (taskId, index, normalization) => {
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
@@ -208,97 +209,97 @@ function App() {
     // first, set up the websocket
     const ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
 
-    ws.onopen = () => {
-      console.log('WebSocket connection opened');
-    };
-
     ws.onclose = () => {
       console.log('WebSocket connection closed');
     };
-    
-    // Save the WebSocket object in state so you can use it later
-    setWebSocket(ws);
 
-    // now, check if there is an entry in /api/backend:
-    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
-      headers: {
-        'X-CSRFToken': csrftoken
-      }
-    }).then((response) => {
-      if (response.data.length > 0) {
-        // If the record exists, update it
-        let pk = response.data[0].pk;
-        axios.put(window.location.origin + `/api/backend/${pk}`, dataData, {
-          headers: {
-            'X-CSRFToken': csrftoken
-          }, 
-          timeout: pendingTime
-        }).catch((error) => {
-          console.log(error);
-        });
-      } else {
-        // If the record does not exist, throw an error
-        throw new Error('No Record in /api/backend');
-      };
-    }).catch((error) => {
-      console.log(error);
-      if (error.message === 'No Record') {
-        // If the above results in an error, post a new record
-        console.log('No record found, creating a new one'); 
-        axios.post(window.location.origin + "/api/backend/", dataData, {
-          headers: {
-            'X-CSRFToken': csrftoken
-          }, 
-          timeout: pendingTime
-        }).catch((error) => {
-          console.log(error);
-        })
-      }
-    }).finally(() => {
-          let timeoutId = setTimeout(() => {
-            ws.close();
-            console.log('Failed to load data for challenge ' + taskId);
-            alert("Failed to load data for challenge " + taskId + ". Try reloading the page, if the problem persists, please contact us.");
-          }, intervalTimeout); // stop after n milliseconds
+    ws.onopen = () => {
+      console.log('WebSocket connection opened');
 
-          ws.onmessage = function(event) {
-            if (event.title === 'data') { 
-
-              setFeatureNames(prevFeatureNames => {
-                const newFeatureNames = [...prevFeatureNames];
-                newFeatureNames[index] = JSON.parse(event.data.feature_names);
-                return newFeatureNames;
-              });
-
-              setNObjects(prevNObjects => {
-                const newNObjects = [...prevNObjects];
-                newNObjects[index] = JSON.parse(event.data.n_objects);
-                return newNObjects;
-              });
-
-              // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
-              setInitPlots(prevInitPlots => {
-                const newInitPlots = [...prevInitPlots];
-                const binaryString = atob(JSON.parse(event.data.plots)[0]);  // decode from base64 to binary string
-                const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
-                for (let i = 0; i < binaryString.length; i++) {
-                  bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
-                }
-                const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
-                const url = URL.createObjectURL(blob);
-                // now images can be accessed with <img src={url} />
-                newInitPlots[index] = url;
-                return newInitPlots;
-              });
-              console.log(`Data for challenge ${taskId} loaded`)
-              ws.close();
-            }
-          };
-
-          ws.onerror = function(event) {
-            console.error('Error:', event);
-          };
+      // now, check if there is an entry in /api/backend:
+      axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
+      }).then((response) => {
+        if (response.data.length > 0) {
+          // If the record exists, update it
+          let pk = response.data[0].pk;
+          axios.put(window.location.origin + `/api/backend/${pk}`, dataData, {
+            headers: {
+              'X-CSRFToken': csrftoken
+            }, 
+            timeout: pendingTime
+          }).catch((error) => {
+            console.log(error);
+          });
+        } else {
+          // If the record does not exist, throw an error
+          throw new Error('No Record in /api/backend');
+        };
+      }).catch((error) => {
+        console.log(error);
+        if (error.message === 'No Record in /api/backend' || error.code === 'ECONNABORTED') {
+          // If the record doesn't exist or the GET times out, post a new record
+          console.log('No record found, creating a new one'); 
+          axios.post(window.location.origin + "/api/backend/", dataData, {
+            headers: {
+              'X-CSRFToken': csrftoken
+            }, 
+            timeout: pendingTime
+          }).catch((error) => {
+            console.log(error);
+          })
+        }
       });
+    };
+    let timeoutId = setTimeout(() => {
+      ws.close();
+      console.log('Failed to load data for challenge ' + taskId);
+      alert("Failed to load data for challenge " + taskId + ". Try reloading the page, if the problem persists, please contact us.");
+    }, intervalTimeout); // stop after n milliseconds
+
+    ws.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      if (data.title === "data") { 
+
+        setFeatureNames(prevFeatureNames => {
+          const newFeatureNames = [...prevFeatureNames];
+          newFeatureNames[index] = data.feature_names;
+          return newFeatureNames;
+        });
+
+        setNObjects(prevNObjects => {
+          const newNObjects = [...prevNObjects];
+          newNObjects[index] = data.n_objects;
+          return newNObjects;
+        });
+
+        // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
+        setInitPlots(prevInitPlots => {
+          const newInitPlots = [...prevInitPlots];
+          const binaryString = atob(data.plots[0]);  // decode from base64 to binary string
+          const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+          for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+          }
+          const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+          const url = URL.createObjectURL(blob);
+          // now images can be accessed with <img src={url} />
+          newInitPlots[index] = url;
+          return newInitPlots;
+        });
+        console.log(`Data for challenge ${taskId} loaded`)
+        ws.close();
+        clearTimeout(timeoutId);
+      } else {
+        console.log("Received unexpected message from backend: ", data);
+      }
+    };
+
+    ws.onerror = function(event) {
+      console.error('Error:', event);
+    };
     };
 
   const fetchQueryResponse = (setApiData, setIsResponding, taskId, index) => {  // updates the apiData state with the response from the backend
@@ -739,134 +740,142 @@ function App() {
           newIsTraining[index] = 1;
           return newIsTraining;
         });
-        axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
-          headers: {
-            'X-CSRFToken': csrftoken
-          },
-          timeout: pendingTime
-        }).then((response) => {
-          if (response.data.length > 0) {
-              // If the record exists, update it
-              let pk = response.data[0].pk;
-              axios.put(window.location.origin + `/api/backend/${pk}`, trainingData, {
-                headers: {
-                  'X-CSRFToken': csrftoken
-                }, 
-                timeout: pendingTime
-              }).catch((error) => {
-                  console.log(error);
-            });
-          } else {
-              // If the record does not exist, throw an error
-              throw new Error('No Record');
-          }
-        }).catch((error) => {
-            console.log(error);
-            if (axios.isCancel(error) || error.message === 'No Record' || error.code === 'ECONNABORTED') {
-              console.log('No record found, creating a new one');
-              axios.post(window.location.origin + "/api/backend/", trainingData, {
-                headers: {
-                  'X-CSRFToken': csrftoken
-                }, 
-                timeout: pendingTime
-              }).catch((error) => {
-                  console.log(error);
-              })
-            }
-        }).finally(() => {
 
+        // first, set up the websocket
+        const ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
 
-            // Start listening for updates
-            const eventSource = new EventSource(window.location.origin + `/events/${userId}/${taskId}/`);
+        ws.onclose = () => {
+          console.log('WebSocket connection closed');
+        };
 
-            let timeoutId = setTimeout(() => {
-              eventSource.close();
-              setIsTraining(prevIsTraining => {
-                const newIsTraining = [...prevIsTraining];
-                newIsTraining[index] = 0;
-                return newIsTraining;
+        ws.onopen = () => {
+          console.log('WebSocket connection opened');
+
+          axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+            headers: {
+              'X-CSRFToken': csrftoken
+            },
+            timeout: pendingTime
+          }).then((response) => {
+            if (response.data.length > 0) {
+                // If the record exists, update it
+                let pk = response.data[0].pk;
+                axios.put(window.location.origin + `/api/backend/${pk}`, trainingData, {
+                  headers: {
+                    'X-CSRFToken': csrftoken
+                  }, 
+                  timeout: pendingTime
+                }).catch((error) => {
+                    console.log(error);
               });
-              console.log("Training failed")
-              alert("Training failed. Please try again. If the problem persists, please contact us.");
-            }, intervalTimeout); // stop after n milliseconds
+            } else {
+                // If the record does not exist, throw an error
+                throw new Error('No Record');
+            }
+          }).catch((error) => {
+              console.log(error);
+              if (axios.isCancel(error) || error.message === 'No Record' || error.code === 'ECONNABORTED') {
+                console.log('No record found, creating a new one');
+                axios.post(window.location.origin + "/api/backend/", trainingData, {
+                  headers: {
+                    'X-CSRFToken': csrftoken
+                  }, 
+                  timeout: pendingTime
+                }).catch((error) => {
+                    console.log(error);
+                })
+              }
+          })
 
-            eventSource.onmessage = function(event) {
-              if (event.type === 'progress') {  // every 1%; only includes progress
+          let timeoutId = setTimeout(() => {
+            ws.close();
+            setIsTraining(prevIsTraining => {
+              const newIsTraining = [...prevIsTraining];
+              newIsTraining[index] = 0;
+              return newIsTraining;
+            });
+            console.log("Training failed")
+            alert("Training failed. Please try again. If the problem persists, please contact us.");
+          }, intervalTimeout); // stop after n milliseconds
 
-                if (event.data.progress !== progress[index]) {
-                  setProgress(prevProgress => {
-                    const newProgress = [...prevProgress];
-                    newProgress[index] = event.data.progress;
-                    return newProgress;
-                  });
+          ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.title === 'progress') {  // every 1%; only includes progress
 
-                  // move more parts here in the future
+              if (data.progress !== progress[index]) {
+                setProgress(prevProgress => {
+                  const newProgress = [...prevProgress];
+                  newProgress[index] = data.progress;
+                  return newProgress;
+                });
 
-                  if (event.data.progress == 1 ) {
-                    eventSource.close();
-                    clearTimeout(timeoutId);
-                    setTimeout(() => {
-                      setIsTraining(prevIsTraining => {
-                        const newIsTraining = [...prevIsTraining];
-                        newIsTraining[index] = 2;
-                        return newIsTraining;
-                      });
-                      console.log("Training finished")
-                    }, 1000);
+                // move more parts here in the future
+
+                if (data.progress == 1 ) {
+                  ws.close();
+                  clearTimeout(timeoutId);
+                  setTimeout(() => {
+                    setIsTraining(prevIsTraining => {
+                      const newIsTraining = [...prevIsTraining];
+                      newIsTraining[index] = 2;
+                      return newIsTraining;
+                    });
+                    console.log("Training finished")
+                  }, 1000);
+                }
+              }
+            } else if (data.title === 'update') {  // every 10%; includes progress, error_list, network_weights, network_biases
+
+                  // update the error list, weights and biases, but only if they changed
+                  if (data.error_list[0].length !== errorList[index][0].length || data.error_list[1] !== errorList[index][1]) {
+                    setErrorList(prevErrorList => {
+                      const newErrorList = [...prevErrorList];
+                      newErrorList[index] = data.error_list;
+                      return newErrorList;
+                    });
                   }
-                }
-              } else if (event.type === 'update') {  // every 10%; includes progress, error_list, network_weights, network_biases
 
-                    // update the error list, weights and biases, but only if they changed
-                    if (JSON.parse(event.data.error_list)[0].length !== errorList[index][0].length || JSON.parse(event.data.error_list)[1] !== errorList[index][1]) {
-                      setErrorList(prevErrorList => {
-                        const newErrorList = [...prevErrorList];
-                        newErrorList[index] = JSON.parse(event.data.error_list);
-                        return newErrorList;
-                      });
-                    }
+                  if (weights[index].length === 0 || data.network_weights[0][0] !== weights[index][0][0]) {
+                    setWeights(prevWeights => {
+                      const newWeights = [...prevWeights];
+                      newWeights[index] = data.network_weights;
+                      return newWeights;
+                    });
+                  }
 
-                    if (weights[index].length === 0 || JSON.parse(event.data.network_weights)[0][0] !== weights[index][0][0]) {
-                      setWeights(prevWeights => {
-                        const newWeights = [...prevWeights];
-                        newWeights[index] = JSON.parse(event.data.network_weights);
-                        return newWeights;
-                      });
-                    }
+                  if (data.network_biases.length !== biases[index].length) {
+                    setBiases(prevBiases => {
+                      const newBiases = [...prevBiases];
+                      newBiases[index] = data.network_biases;
+                      return newBiases;
+                    });
+                  }
 
-                    if (JSON.parse(event.data.network_biases).length !== biases[index].length) {
-                      setBiases(prevBiases => {
-                        const newBiases = [...prevBiases];
-                        newBiases[index] = JSON.parse(event.data.network_biases);
-                        return newBiases;
-                      });
-                    }
+                  // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
+                  if (data.plots.length > 0 && data.plots.length !== imgs[index].length) {
+                    setImgs(prevImgs => {
+                      const newImgs = [...prevImgs];
+                      newImgs[index] = data.plots.map(base64String => { 
+                        const binaryString = atob(base64String);  // decode from base64 to binary string
+                        const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+                        for (let i = 0; i < binaryString.length; i++) {
+                          bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+                        }
+                        const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+                        const url = URL.createObjectURL(blob);
+                        // now images can be accessed with <img src={url} />
+                        return url;
+                      })
+                      return newImgs;
+                    });
+                  }
+            }
+          };
 
-                    // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
-                    if (JSON.parse(event.data.plots).length > 0 && JSON.parse(event.data.plots).length !== imgs[index].length) {
-                      setImgs(prevImgs => {
-                        const newImgs = [...prevImgs];
-                        newImgs[index] = JSON.parse(event.data.plots).map(base64String => { 
-                          const binaryString = atob(base64String);  // decode from base64 to binary string
-                          const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
-                          for (let i = 0; i < binaryString.length; i++) {
-                            bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
-                          }
-                          const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
-                          const url = URL.createObjectURL(blob);
-                          // now images can be accessed with <img src={url} />
-                          return url;
-                        })
-                        return newImgs;
-                      });
-                    }
-                }
-              };
-
-            eventSource.onerror = function(event) {
-              console.error('Error:', event);
-            };
-          });
+          ws.onerror = function(event) {
+            console.error('Error:', event);
+          };
+        };
       });
   };
 

@@ -42,11 +42,14 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
         d = {}
         tag = int(req['task_id'])
         levels.get_data(tag)
-        d['title'] = json.dumps('data')
-        d['feature_names'] = json.dumps([x.replace('_', ' ') for x in levels.data.feature_names])
-        d['plots'] = json.dumps([b64encode(image).decode() for image in levels.data.images])
+        d['title'] = 'data'
+        d['feature_names'] = [x.replace('_', ' ') for x in levels.data.feature_names]
+        d['plots'] = [b64encode(image).decode() for image in levels.data.images]
+        d['n_objects'] = levels.data.n_objects
 
-        coach = Coach.connections.get((user_id, task_id))
+        print("Coach.connections = ", Coach.connections)
+        coach = Coach.connections.get((str(user_id), str(task_id)))
+        print("Looking for coach with id ", (str(user_id), str(task_id)))
         t = 0
         while coach is None and t < 10:
             time.sleep(0.1)
@@ -56,8 +59,10 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
             print('Sending data to coach')
             await coach.send_data(d)
         
-        if callback is not None:
+        """
+        if callback is not None:  # in case we wanna use websockets for receiving instructions
             callback(d)
+        """
 
 
     elif req['action'] == 1:  # create and train a network
@@ -68,14 +73,17 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
 
         network, training_set, test_set = building.build_nn(input_list, tag, pk=pk, task_id=task_id, user_id=user_id, root_link=root_link)
         print("Network initiated, starting training")
-        d['title'] = json.dumps('progress')
+        d['title'] = 'progress'
         d['progress'] = 0  # just update the progress
-        coach = Coach.connections.get((user_id, task_id))
+        coach = Coach.connections.get((str(user_id), str(task_id)))
         if coach is not None:
             await coach.send_data(d)
-        if callback is not None:
+        
+        """
+        if callback is not None:  # in case we wanna use websockets for receiving instructions
             callback(d)
-        u['title'] = json.dumps('update')
+        """
+        u['title'] = 'update'
         
         for epoch in range(epochs):
             print("Epoch: ", epoch)
@@ -93,28 +101,32 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
                 if epoch % (epochs // 10 if epochs >= 10 else 1) == 0:  # every 10% of the total epochs:
                     print("Updating all the stuff")
                     levels.data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
-                    u['plots'] = json.dumps([b64encode(image).decode() for image in levels.data.images])  # list of base64 encoded images, showing pyplots of the data (potentially with decision boundary)
-                    u['error_list'] = json.dumps(e)  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
-                    u['network_weights'] = json.dumps(w)  # list of lists of floats representing the weights
-                    u['network_biases'] = json.dumps(b)  # list of lists of floats representing the biases
+                    u['plots'] = [b64encode(image).decode() for image in levels.data.images]  # list of base64 encoded images, showing pyplots of the data (potentially with decision boundary)
+                    u['error_list'] = e  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
+                    u['network_weights'] = w  # list of lists of floats representing the weights
+                    u['network_biases'] = b  # list of lists of floats representing the biases
 
                     print("Epoch: ", epoch, ", Error: ", errors[-1])
 
-                    coach = Coach.connections.get((user_id, task_id))
+                    coach = Coach.connections.get((str(user_id), str(task_id)))
                     if coach is not None:
                         print('Sending data to coach')
                         await coach.send_data(u)
                     
-                    if callback is not None:
+                    """
+                    if callback is not None:  # in case we wanna use websockets for receiving instructions
                         callback(u)
+                    """
 
-                coach = Coach.connections.get((user_id, task_id))
+                coach = Coach.connections.get((str(user_id), str(task_id)))
                 if coach is not None:
                     print('Sending data to coach')
                     await coach.send_data(d)
                 
-                if callback is not None:
+                """
+                if callback is not None:  # in case we wanna use websockets for receiving instructions
                     callback(d)
+                """
         
         # save the network to a pickle file
         with open('nn.txt', 'wb') as output:
@@ -122,20 +134,22 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
         
         d['progress'] = 1
         levels.data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
-        u['plots'] = json.dumps([b64encode(image).decode() for image in levels.data.images])  # list of base64 encoded images, showing pyplots of the data (potentially with decision boundary)
-        u['error_list'] = json.dumps(e)  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
-        u['network_weights'] = json.dumps(w)  # list of lists of floats representing the weights
-        u['network_biases'] = json.dumps(b)  # list of lists of floats representing the biases
+        u['plots'] = [b64encode(image).decode() for image in levels.data.images]  # list of base64 encoded images, showing pyplots of the data (potentially with decision boundary)
+        u['error_list'] = e  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
+        u['network_weights'] = w  # list of lists of floats representing the weights
+        u['network_biases'] = b  # list of lists of floats representing the biases
         
-        coach = Coach.connections.get((user_id, task_id))
+        coach = Coach.connections.get((str(user_id), str(task_id)))
         if coach is not None:
             print('Sending double data to coach')
             await coach.send_data(d)
             await coach.send_data(u)
         
-        if callback is not None:
+        """
+        if callback is not None:  # in case we wanna use websockets for receiving instructions
             callback(d)
             callback(u)
+        """
 
 
 
