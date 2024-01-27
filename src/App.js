@@ -219,7 +219,7 @@ function App() {
   }, []);
 
   const [webSocket, setWebSocket] = useState(null)
-  
+
   const loadData = (taskId, index) => {
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
@@ -238,95 +238,95 @@ function App() {
     // first, set up the websocket
     const ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
 
-    ws.onopen = () => {
-      console.log('WebSocket connection opened');
-    };
-
     ws.onclose = () => {
       console.log('WebSocket connection closed');
     };
 
-    // now, check if there is an entry in /api/backend:
-    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
-      headers: {
-        'X-CSRFToken': csrftoken
-      }
-    }).then((response) => {
-      if (response.data.length > 0) {
-        // If the record exists, update it
-        let pk = response.data[0].pk;
-        axios.put(window.location.origin + `/api/backend/${pk}`, dataData, {
-          headers: {
-            'X-CSRFToken': csrftoken
-          }, 
-          timeout: pendingTime
-        }).catch((error) => {
-          console.log(error);
+    ws.onopen = () => {
+      console.log('WebSocket connection opened');
+
+      // now, check if there is an entry in /api/backend:
+      axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
+      }).then((response) => {
+        if (response.data.length > 0) {
+          // If the record exists, update it
+          let pk = response.data[0].pk;
+          axios.put(window.location.origin + `/api/backend/${pk}`, dataData, {
+            headers: {
+              'X-CSRFToken': csrftoken
+            }, 
+            timeout: pendingTime
+          }).catch((error) => {
+            console.log(error);
+          });
+        } else {
+          // If the record does not exist, throw an error
+          throw new Error('No Record in /api/backend');
+        };
+      }).catch((error) => {
+        console.log(error);
+        if (error.message == 'No Record in /api/backend' || error.code == 'ECONNABORTED') {
+          // If the record doesn't exist or the GET times out, post a new record
+          console.log('No record found, creating a new one'); 
+          axios.post(window.location.origin + "/api/backend/", dataData, {
+            headers: {
+              'X-CSRFToken': csrftoken
+            }, 
+            timeout: pendingTime
+          }).catch((error) => {
+            console.log(error);
+          })
+        }
+      });
+    };
+    let timeoutId = setTimeout(() => {
+      ws.close();
+      console.log('Failed to load data for challenge ' + taskId);
+      alert("Failed to load data for challenge " + taskId + ". Try reloading the page, if the problem persists, please contact us.");
+    }, intervalTimeout); // stop after n milliseconds
+
+    ws.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      if (data.title === 'data') { 
+
+        setFeatureNames(prevFeatureNames => {
+          const newFeatureNames = [...prevFeatureNames];
+          newFeatureNames[index] = JSON.parse(data.feature_names);
+          return newFeatureNames;
         });
-      } else {
-        // If the record does not exist, throw an error
-        throw new Error('No Record in /api/backend');
-      };
-    }).catch((error) => {
-      console.log(error);
-      if (error.message == 'No Record in /api/backend' || error.code == 'ECONNABORTED') {
-        // If the record doesn't exist or the GET times out, post a new record
-        console.log('No record found, creating a new one'); 
-        axios.post(window.location.origin + "/api/backend/", dataData, {
-          headers: {
-            'X-CSRFToken': csrftoken
-          }, 
-          timeout: pendingTime
-        }).catch((error) => {
-          console.log(error);
-        })
+
+        setNObjects(prevNObjects => {
+          const newNObjects = [...prevNObjects];
+          newNObjects[index] = JSON.parse(data.n_objects);
+          return newNObjects;
+        });
+
+        // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
+        setInitPlots(prevInitPlots => {
+          const newInitPlots = [...prevInitPlots];
+          const binaryString = atob(JSON.parse(data.plots)[0]);  // decode from base64 to binary string
+          const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+          for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+          }
+          const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+          const url = URL.createObjectURL(blob);
+          // now images can be accessed with <img src={url} />
+          newInitPlots[index] = url;
+          return newInitPlots;
+        });
+        console.log(`Data for challenge ${taskId} loaded`)
+        ws.close();
+        clearTimeout(timeoutId);
       }
-    });
-          let timeoutId = setTimeout(() => {
-            ws.close();
-            console.log('Failed to load data for challenge ' + taskId);
-            alert("Failed to load data for challenge " + taskId + ". Try reloading the page, if the problem persists, please contact us.");
-          }, intervalTimeout); // stop after n milliseconds
+    };
 
-          ws.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            if (data.title === 'data') { 
-
-              setFeatureNames(prevFeatureNames => {
-                const newFeatureNames = [...prevFeatureNames];
-                newFeatureNames[index] = JSON.parse(data.feature_names);
-                return newFeatureNames;
-              });
-
-              setNObjects(prevNObjects => {
-                const newNObjects = [...prevNObjects];
-                newNObjects[index] = JSON.parse(data.n_objects);
-                return newNObjects;
-              });
-
-              // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
-              setInitPlots(prevInitPlots => {
-                const newInitPlots = [...prevInitPlots];
-                const binaryString = atob(JSON.parse(data.plots)[0]);  // decode from base64 to binary string
-                const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
-                for (let i = 0; i < binaryString.length; i++) {
-                  bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
-                }
-                const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
-                const url = URL.createObjectURL(blob);
-                // now images can be accessed with <img src={url} />
-                newInitPlots[index] = url;
-                return newInitPlots;
-              });
-              console.log(`Data for challenge ${taskId} loaded`)
-              ws.close();
-              clearTimeout(timeoutId);
-            }
-          };
-
-          ws.onerror = function(event) {
-            console.error('Error:', event);
-          };
+    ws.onerror = function(event) {
+      console.error('Error:', event);
+    };
     };
 
   const fetchQueryResponse = (setApiData, setIsResponding, taskId, index) => {  // updates the apiData state with the response from the backend
