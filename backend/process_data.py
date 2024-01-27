@@ -48,7 +48,7 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
 
         print("Coach.connections = ", Coach.connections)
         coach = Coach.connections.get((str(user_id), str(task_id)))
-        print("Looking for coach with id ", (str(user_id), str(task_id))
+        print("Looking for coach with id ", (str(user_id), str(task_id)))
         t = 0
         while coach is None and t < 10:
             time.sleep(0.1)
