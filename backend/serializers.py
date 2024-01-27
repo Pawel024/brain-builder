@@ -1,24 +1,25 @@
 from rest_framework import serializers
-from .models import Row, TaskDescription, Progress, Quiz
+from .models import Row, TaskDescription, Progress, Quiz, Intro
 
 class RowSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Row
         fields = ('pk', 'action', 'task_id', 'user_id', 'progress_pk', 'learning_rate', 'epochs', 'normalization', 'network_input', 'games_data','timestamp')
 
 class TaskDescriptionSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = TaskDescription
         fields = ('pk', 'task_id', 'name', 'description', 'type', 'dataset', 'n_inputs', 'n_outputs', 'max_epochs', 'max_layers', 'max_nodes', 'normalization_visibility', 'iterations_slider_visibility', 'lr_slider_visibility')
 
 class ProgressSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Progress
         fields = ('pk', 'task_id', 'user_id', 'progress', 'error_list', 'network_weights', 'network_biases', 'plots', 'feature_names', 'timestamp')
 
+class IntroSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Intro
+        fields = ('intro_id', 'name', 'content')
 
 class QuizSerializer(serializers.ModelSerializer):
     class Meta:

@@ -32,7 +32,15 @@ class TaskDescription(models.Model):
     lr_slider_visibility = models.BooleanField()
 
     def __str__(self):
-        return str(self.task_id) + "_-_" + str(self.name)
+        return str(self.task_id) + " - " + str(self.name)
+    
+class Intro(models.Model):
+    intro_id = models.IntegerField(unique=True)
+    name = models.CharField(max_length=200)
+    content = models.TextField()
+
+    def __str__(self):
+        return str(self.intro_id) + " - " + str(self.name)
 
 class Progress(models.Model):
     user_id = models.CharField(max_length=100)
