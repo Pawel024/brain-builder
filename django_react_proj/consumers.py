@@ -13,7 +13,7 @@ class Coach(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
-        del self.connections[self.user_id]
+        del self.connections[(self.user_id, self.task_id)]
         print("coach disconnected")
         
     # Receive message from WebSocket

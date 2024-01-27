@@ -271,8 +271,8 @@ function App() {
       };
     }).catch((error) => {
       console.log(error);
-      if (error.message == 'No Record') {
-        // If the above results in an error, post a new record
+      if (error.message == 'No Record in /api/backend' || error.code == 'ECONNABORTED') {
+        // If the record doesn't exist or the GET times out, post a new record
         console.log('No record found, creating a new one'); 
         axios.post(window.location.origin + "/api/backend/", dataData, {
           headers: {
