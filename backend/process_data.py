@@ -71,14 +71,14 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
 
         network, training_set, test_set = building.build_nn(input_list, tag, pk=pk, task_id=task_id, user_id=user_id, root_link=root_link)
         print("Network initiated, starting training")
-        d['title'] = json.dumps('progress')
+        d['title'] = 'progress'
         d['progress'] = 0  # just update the progress
         coach = Coach.connections.get((user_id, task_id))
         if coach is not None:
             await coach.send_data(d)
         if callback is not None:
             callback(d)
-        u['title'] = json.dumps('update')
+        u['title'] = 'update'
         
         for epoch in range(epochs):
             print("Epoch: ", epoch)
@@ -96,10 +96,10 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
                 if epoch % (epochs // 10 if epochs >= 10 else 1) == 0:  # every 10% of the total epochs:
                     print("Updating all the stuff")
                     levels.data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
-                    u['plots'] = json.dumps([b64encode(image).decode() for image in levels.data.images])  # list of base64 encoded images, showing pyplots of the data (potentially with decision boundary)
-                    u['error_list'] = json.dumps(e)  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
-                    u['network_weights'] = json.dumps(w)  # list of lists of floats representing the weights
-                    u['network_biases'] = json.dumps(b)  # list of lists of floats representing the biases
+                    u['plots'] = [b64encode(image).decode() for image in levels.data.images]  # list of base64 encoded images, showing pyplots of the data (potentially with decision boundary)
+                    u['error_list'] = e  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
+                    u['network_weights'] = w  # list of lists of floats representing the weights
+                    u['network_biases'] = b  # list of lists of floats representing the biases
 
                     print("Epoch: ", epoch, ", Error: ", errors[-1])
 
@@ -125,10 +125,10 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
         
         d['progress'] = 1
         levels.data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
-        u['plots'] = json.dumps([b64encode(image).decode() for image in levels.data.images])  # list of base64 encoded images, showing pyplots of the data (potentially with decision boundary)
-        u['error_list'] = json.dumps(e)  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
-        u['network_weights'] = json.dumps(w)  # list of lists of floats representing the weights
-        u['network_biases'] = json.dumps(b)  # list of lists of floats representing the biases
+        u['plots'] = [b64encode(image).decode() for image in levels.data.images]  # list of base64 encoded images, showing pyplots of the data (potentially with decision boundary)
+        u['error_list'] = e  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
+        u['network_weights'] = w  # list of lists of floats representing the weights
+        u['network_biases'] = b  # list of lists of floats representing the biases
         
         coach = Coach.connections.get((user_id, task_id))
         if coach is not None:
