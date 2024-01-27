@@ -57,7 +57,7 @@ def query_list(request):
         root_url = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
 
         loop = asyncio.new_event_loop()
-        loop = asyncio.set_event_loop(loop)
+        asyncio.set_event_loop(loop)
         processed_data = loop.run_until_complete(process(request.data, root_url, csrf_token=request.META.get('HTTP_X_CSRFTOKEN')))
 
         processed_data['user_id'] = user_id
@@ -86,7 +86,7 @@ def query_detail(request, pk):
         root_url = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
 
         loop = asyncio.new_event_loop()
-        loop = asyncio.set_event_loop(loop)
+        asyncio.set_event_loop(loop)
         processed_data = loop.run_until_complete(process(request.data, root_url, pk, csrf_token=request.META.get('HTTP_X_CSRFTOKEN')))
 
         processed_data['user_id'] = user_id
