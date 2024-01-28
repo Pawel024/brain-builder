@@ -97,13 +97,13 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
             if epoch % (epochs // 100 if epochs >= 100 else 1) == 0:  # every 1% of the total epochs:
                 print("Updating progress")
                 d['progress'] = round(epoch / epochs, 2)  # update the progress
+                d['error_list'] = e  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
+                d['network_weights'] = w  # list of lists of floats representing the weights
 
                 if epoch % (epochs // 10 if epochs >= 10 else 1) == 0:  # every 10% of the total epochs:
                     print("Updating all the stuff")
                     levels.data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
                     u['plots'] = [b64encode(image).decode() for image in levels.data.images]  # list of base64 encoded images, showing pyplots of the data (potentially with decision boundary)
-                    u['error_list'] = e  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
-                    u['network_weights'] = w  # list of lists of floats representing the weights
                     u['network_biases'] = b  # list of lists of floats representing the biases
 
                     print("Epoch: ", epoch, ", Error: ", errors[-1])
@@ -134,10 +134,11 @@ async def process(req, root_link, pk=None, csrf_token=None, callback=None):
         
         d['progress'] = 1
         levels.data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
-        u['plots'] = [b64encode(image).decode() for image in levels.data.images]  # list of base64 encoded images, showing pyplots of the data (potentially with decision boundary)
-        u['error_list'] = e  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
-        u['network_weights'] = w  # list of lists of floats representing the weights
+        d['error_list'] = e  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
+        d['network_weights'] = w  # list of lists of floats representing the weights
+        
         u['network_biases'] = b  # list of lists of floats representing the biases
+        u['plots'] = [b64encode(image).decode() for image in levels.data.images]  # list of base64 encoded images, showing pyplots of the data (potentially with decision boundary)
         
         coach = Coach.connections.get((str(user_id), str(task_id)))
         if coach is not None:

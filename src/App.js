@@ -812,8 +812,6 @@ function App() {
                   return newProgress;
                 });
 
-                // move more parts here in the future
-
                 if (data.progress === 1 ) {
                   ws.close();
                   clearTimeout(timeoutId);
@@ -826,26 +824,28 @@ function App() {
                     console.log("Training finished")
                   }, 1000);
                 }
+
+                // update the error list if it changed
+                if (data.error_list[0].length !== errorList[index][0].length || data.error_list[1] !== errorList[index][1]) {
+                  console.log("updating error list");  // for debugging
+                  setErrorList(prevErrorList => {
+                    const newErrorList = [...prevErrorList];
+                    newErrorList[index] = data.error_list;
+                    return newErrorList;
+                  });
+                }
+                
+                // update the weights if they changed 
+                if (weights[index].length === 0 || data.network_weights[0][0] !== weights[index][0][0]) {
+                  setWeights(prevWeights => {
+                    const newWeights = [...prevWeights];
+                    newWeights[index] = data.network_weights;
+                    return newWeights;
+                  });
+                }
               }
             } else if (data.title === 'update') {  // every 10%; includes progress, error_list, network_weights, network_biases
-
-                  // update the error list, weights and biases, but only if they changed
-                  if (data.error_list[0].length !== errorList[index][0].length || data.error_list[1] !== errorList[index][1]) {
-                    setErrorList(prevErrorList => {
-                      const newErrorList = [...prevErrorList];
-                      newErrorList[index] = data.error_list;
-                      return newErrorList;
-                    });
-                  }
-
-                  if (weights[index].length === 0 || data.network_weights[0][0] !== weights[index][0][0]) {
-                    setWeights(prevWeights => {
-                      const newWeights = [...prevWeights];
-                      newWeights[index] = data.network_weights;
-                      return newWeights;
-                    });
-                  }
-
+                  // update the biases if it changed
                   if (data.network_biases.length !== biases[index].length) {
                     setBiases(prevBiases => {
                       const newBiases = [...prevBiases];

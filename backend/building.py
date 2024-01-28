@@ -85,8 +85,6 @@ def train_nn_epoch(nn, training_set, test_set, current_epoch, epochs, learning_r
     if current_epoch % (epochs // 100 if epochs >= 100 else 1) == 0:
         error, accuracy = nn.test(test_set, typ, acc=False)  # TODO: should this be training_set or test_set?
         errors += [error]
-
-    if current_epoch % (epochs // 10 if epochs >= 10 else 1) == 0:
         weights, biases = get_parameters(nn)
         
     if current_epoch == epochs - 1:
