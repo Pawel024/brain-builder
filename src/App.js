@@ -394,7 +394,7 @@ function App() {
         });
 
         setTaskIds(currentTaskIds);
-        setGamesData(JSON.stringify(currentTaskData.map(entry => entry.games_data)));
+        setGamesData(JSON.stringify(currentTaskData));
         setNInputs(currentNInputs);
         setNOutputs(currentNOutputs);
         setNObjects(currentTaskIds.map(() => 0));
