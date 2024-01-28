@@ -665,6 +665,7 @@ function App() {
   // ------- POST REQUEST -------
   const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs, normalization) => {
     e.preventDefault();
+    if (!learningRate) {learningRate = 0.01};  // set learning rate to default if it's undefined
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
 
