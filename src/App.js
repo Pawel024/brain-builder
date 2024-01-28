@@ -813,7 +813,7 @@ function App() {
 
                 // move more parts here in the future
 
-                if (data.progress == 1 ) {
+                if (data.progress === 1 ) {
                   ws.close();
                   clearTimeout(timeoutId);
                   setTimeout(() => {

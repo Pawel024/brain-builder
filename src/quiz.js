@@ -59,7 +59,7 @@ const Quiz = ({ questions }) => {
     
     let isCorrect = false;
     if (questions[currentQuestion].question_type === "text" || questions[currentQuestion].question_type === "coding") {
-      isCorrect = questions[currentQuestion].options[0].optionText.replace(/ /g, '') === textInputValue;        
+      isCorrect = questions[currentQuestion].options[0].optionText.replace(/ /g, '') === textInputValue.replace(/ /g, '');        
     }
     else {
       isCorrect = questions[currentQuestion].options[selectedOption].isCorrect;

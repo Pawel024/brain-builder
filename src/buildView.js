@@ -263,7 +263,6 @@ class Building extends React.Component {
                 This dataset contains {this.props.nOfObjects}, each with {this.props.nOfInputs} features. There are {this.props.nOfOutputs} targets. The features are: {this.props.featureNames.join(', ')}.
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}></div>
-              {console.log("this.props.initPlot", this.props.initPlot)}
               <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }}/>
             </>
           )}
@@ -327,7 +326,6 @@ class Building extends React.Component {
           <Separator orientation='vertical' style = {{ position:"absolute", top: Math.round(0.03 * (window.innerHeight-140)), left: Math.round(0.8 * (window.innerWidth * 0.97)), height: 0.96 * (window.innerHeight-140) }}/>
 
           {this.props.iterationsSliderVisibility ? (<Box style={{ position:"absolute", top: 0.14 * (window.innerHeight-140), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontFamily:'monospace'  }}>
-            {console.log(`this.props.iterationsSliderVisibility: ${this.props.iterationsSliderVisibility}`)}
             <div className="iterationsSlider">
               {this.props.iterationsSlider}
             </div>
@@ -335,7 +333,6 @@ class Building extends React.Component {
           </Box>) : (<div></div>)}
 
           {this.props.lrSliderVisibility ? (<Box style={{ position:"absolute", top: Math.round(0.26 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontFamily:'monospace'  }}>
-            {console.log(`this.props.lrSliderVisibility: ${this.props.lrSliderVisibility}`)}
             <div className="learningRateSlider">
               {this.props.learningRateSlider}
             </div>
