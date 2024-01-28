@@ -235,7 +235,7 @@ function QuizApp( quizId=11 ) {
   ]);
 
   useEffect(() => {
-    axios.get(window.location.origin + '/api/quizzes/?quiz_id=' + quizId)
+    axios.get(window.location.origin + '/api/quizzes/?quiz_id=' + quizId.toString())
     .then(response => {
       setQuestions(response.data.questions);
   })
