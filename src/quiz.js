@@ -163,7 +163,7 @@ const Quiz = ({ questions }) => {
   );
 };
   
-function QuizApp( quizId=11 ) {
+function QuizApp({ quizId=11 }) {
 
   // ------- WINDOW RESIZING -------
 

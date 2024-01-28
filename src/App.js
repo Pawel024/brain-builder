@@ -1262,7 +1262,7 @@ function App() {
               key={taskId}
               path={`/challenge${taskId}`}
               element={
-                <div>{console.log(`taskId: ${taskId}`)}
+                <>
                 <BuildView
                   nOfInputs={nInputs[index]}
                   nOfOutputs={nOutputs[index]}
@@ -1314,7 +1314,7 @@ function App() {
                   setWeights={setWeights}
                   setBiases={setBiases}
                 />
-                </div>
+                </>
               }
             />
           ))}
