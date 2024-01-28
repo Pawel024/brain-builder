@@ -803,9 +803,10 @@ function App() {
 
           ws.onmessage = function(event) {
             const data = JSON.parse(event.data);
-            if (data.title === 'progress') {  // every 1%; only includes progress
+            if (data.title === 'progress') {  // every 1%; includes progress, error_list, and network_weights
 
-              if (data.progress !== progress[index]) {
+              console.log("data.progress: ", data.progress);  // for debugging
+              if (JSON.stringify(data.progress) !== JSON.stringify(progress[index])) {
                 setProgress(prevProgress => {
                   const newProgress = [...prevProgress];
                   newProgress[index] = data.progress;
@@ -844,7 +845,7 @@ function App() {
                   });
                 }
               }
-            } else if (data.title === 'update') {  // every 10%; includes progress, error_list, network_weights, network_biases
+            } else if (data.title === 'update') {  // every 10%; includes network_biases and plots
                   // update the biases if it changed
                   if (data.network_biases.length !== biases[index].length) {
                     setBiases(prevBiases => {

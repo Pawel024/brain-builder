@@ -160,7 +160,7 @@ class Building extends React.Component {
     if (this.chartRef.current) {
       const ctx = this.chartRef.current.getContext('2d');
 
-      if (this.chartInstance && (this.props.errorList[0].slice(0, prevProps.errorList[0].length) === prevProps.errorList[0] && this.props.errorList[0].length > prevProps.errorList[0].length)) {
+      if (this.chartInstance && (JSON.stringify(this.props.errorList[0].slice(0, prevProps.errorList[0].length)) === JSON.stringify(prevProps.errorList[0]) && this.props.errorList[0].length > prevProps.errorList[0].length)) {
         // Update the chart if the error list has changed and is longer than before
         console.log("Updating chart")
         this.chartInstance.data.labels = this.props.errorList[0].map((_, i) => i + 1);
@@ -168,11 +168,12 @@ class Building extends React.Component {
         this.chartInstance.update();
       } else {
         // Destroy the old chart if a different error list was received and a chart exists
-        if (this.props.errorList[0].slice(0, prevProps.errorList[0].length) !== prevProps.errorList[0]) {
+        if (JSON.stringify(this.props.errorList[0].slice(0, prevProps.errorList[0].length)) !== JSON.stringify(prevProps.errorList[0])) {
           // If an old chart exists, destroy it
           if (this.chartInstance) {
             console.log("Destroying old chart, prevProps:", prevProps.errorList[0], "; this.props:", this.props.errorList[0])
             this.chartInstance.destroy();
+            this.chartInstance = null;
           }
         } 
         // Create a new chart if there is no chart now
