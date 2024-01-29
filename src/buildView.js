@@ -171,13 +171,13 @@ class Building extends React.Component {
         if (JSON.stringify(this.props.errorList[0].slice(0, prevProps.errorList[0].length)) !== JSON.stringify(prevProps.errorList[0])) {
           // If an old chart exists, destroy it
           if (this.chartInstance) {
-            console.log("Destroying old chart, prevProps:", prevProps.errorList[0], "; this.props:", this.props.errorList[0])
+            console.log("Destroying old chart")
             this.chartInstance.destroy();
             this.chartInstance = null;
           }
         } 
       }
-      // Create a new chart if there is no chart now
+      // Create a new chart if there is no chart
       if (this.chartInstance === null) {
         // create a new chart
         console.log("Creating new chart")
@@ -359,8 +359,7 @@ class Building extends React.Component {
               ) : (this.props.isTraining===1 ? (
                 <Flex direction= 'column'>
                   <div style={{ fontFamily:'monospace' }}><b>Training: </b></div>
-                  {(this.props.isTraining === 1 && console.log("this.props.progress:", this.props.progress))}
-                  <div style={{ fontFamily:'monospace' }}><b>Progress: {(parseFloat(this.props.progress)).toFixed(2)}%</b></div>
+                  <div style={{ fontFamily:'monospace' }}><b>Progress: {(parseFloat(this.props.progress))*100}%</b></div>
                   <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:20 }}></canvas>
                 </Flex>
               ) : (

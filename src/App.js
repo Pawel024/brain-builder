@@ -164,7 +164,7 @@ function App() {
   const intervalIdRef = useRef(null);
   const intervalTimestep = 1000;  // in milliseconds, the time between each progress check -> low values mean low latency but high server load
   const intervalTimeout = 60000;  // in milliseconds, the time to wait before ending the interval
-  const pendingTime = 3000;  // in milliseconds, the time to wait when putting or posting a request -> set this close to 0 in production, but higher for debugging
+  const pendingTime = 2000;  // in milliseconds, the time to wait when putting or posting a request -> set this close to 0 in production, but higher for debugging
 
   // ------- WINDOW RESIZING -------
 
@@ -689,196 +689,178 @@ function App() {
       return newBiases;
     });
 
-    // first, check if there is an entry in /api/progress and get the pk
-    let pk = null;
-    axios.get(window.location.origin + `/api/progress/?user_id=${userId}&task_id=${taskId}`, {
-      headers: {
-        'X-CSRFToken': csrftoken
-      }, 
-      timeout: pendingTime
-    }).then((response) => {
-      if (response.data.length > 0) {
-        pk = response.data[0].pk;
-      } else {
-        throw new Error('No Record');
-      }
-    }).catch((error) => {
-        console.log(error);
-    }).finally(() => {
+    {/*
+    let flatdata = pako.deflate(jsondata, { to: 'string' });
+    // let bs = Array.prototype.reduce.call(flatdata, (acc, byte) => acc + String.fromCharCode(byte), '');
+    let b64s = btoa(flatdata);
+    console.log("b64s: ", b64s);  // for debugging
+    */}
+    // make sure the cytoLayers have the right input and output nodes
+    cytoLayers[0] = nOfInputs;
+    cytoLayers[cytoLayers.length - 1] = nOfOutputs;
+    const trainingData = {
+      action: 1,
+      user_id: userId,
+      task_id: taskId,
+      progress_pk: null,
+      learning_rate: learningRate,
+      epochs: iterations,
+      normalization: true, // todo: replace with normalization when ready for it
+      network_input: JSON.stringify(cytoLayers),
+      games_data: gamesData,  
+    };
+    console.log("trainingData: ", trainingData);  // for debugging
+    setApiData(prevApiData => {
+      const newApiData = [...prevApiData];
+      newApiData[index] = trainingData;
+      return newApiData;
+    });
+    setAccuracy(prevAccuracy => {
+      const newAccuracy = [...prevAccuracy];
+      newAccuracy[index] = null;
+      return newAccuracy;
+    });
+    setIsTraining(prevIsTraining => {
+      const newIsTraining = [...prevIsTraining];
+      newIsTraining[index] = 1;
+      return newIsTraining;
+    });
 
-        {/*
-        let flatdata = pako.deflate(jsondata, { to: 'string' });
-        // let bs = Array.prototype.reduce.call(flatdata, (acc, byte) => acc + String.fromCharCode(byte), '');
-        let b64s = btoa(flatdata);
-        console.log("b64s: ", b64s);  // for debugging
-        */}
-        // make sure the cytoLayers have the right input and output nodes
-        cytoLayers[0] = nOfInputs;
-        cytoLayers[cytoLayers.length - 1] = nOfOutputs;
-        const trainingData = {
-          action: 1,
-          user_id: userId,
-          task_id: taskId,
-          progress_pk: pk,
-          learning_rate: learningRate,
-          epochs: iterations,
-          normalization: true, // todo: replace with normalization when ready for it
-          network_input: JSON.stringify(cytoLayers),
-          games_data: gamesData,  
-        };
-        console.log("trainingData: ", trainingData);  // for debugging
-        setApiData(prevApiData => {
-          const newApiData = [...prevApiData];
-          newApiData[index] = trainingData;
-          return newApiData;
-        });
-        setAccuracy(prevAccuracy => {
-          const newAccuracy = [...prevAccuracy];
-          newAccuracy[index] = null;
-          return newAccuracy;
-        });
+    // first, set up the websocket
+    const ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
+
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    ws.onerror = function(event) {
+      console.error('Error:', event);
+    };
+
+    ws.onopen = () => {
+      console.log('WebSocket connection opened');
+
+      axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+        headers: {
+          'X-CSRFToken': csrftoken
+        },
+        timeout: pendingTime
+      }).then((response) => {
+        if (response.data.length > 0) {
+            // If the record exists, update it
+            let pk = response.data[0].pk;
+            axios.put(window.location.origin + `/api/backend/${pk}`, trainingData, {
+              headers: {
+                'X-CSRFToken': csrftoken
+              }, 
+              timeout: pendingTime
+            }).catch((error) => {
+                console.log(error);
+          });
+        } else {
+            // If the record does not exist, throw an error
+            throw new Error('No Record');
+        }
+      }).catch((error) => {
+          console.log(error);
+          if (axios.isCancel(error) || error.message === 'No Record' || error.code === 'ECONNABORTED') {
+            console.log('No record found, creating a new one');
+            axios.post(window.location.origin + "/api/backend/", trainingData, {
+              headers: {
+                'X-CSRFToken': csrftoken
+              }, 
+              timeout: pendingTime
+            }).catch((error) => {
+                console.log(error);
+            })
+          }
+      })
+
+      let timeoutId = setTimeout(() => {
+        ws.close();
         setIsTraining(prevIsTraining => {
           const newIsTraining = [...prevIsTraining];
-          newIsTraining[index] = 1;
+          newIsTraining[index] = 0;
           return newIsTraining;
         });
+        console.log("Training failed")
+        alert("Training failed. Please try again. If the problem persists, please contact us.");
+      }, intervalTimeout); // stop after n milliseconds
 
-        // first, set up the websocket
-        const ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
+      ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        if (data.title === 'progress') {  // every 1%; includes progress, error_list, and network_weights
 
-        ws.onclose = () => {
-          console.log('WebSocket connection closed');
-        };
-
-        ws.onopen = () => {
-          console.log('WebSocket connection opened');
-
-          axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
-            headers: {
-              'X-CSRFToken': csrftoken
-            },
-            timeout: pendingTime
-          }).then((response) => {
-            if (response.data.length > 0) {
-                // If the record exists, update it
-                let pk = response.data[0].pk;
-                axios.put(window.location.origin + `/api/backend/${pk}`, trainingData, {
-                  headers: {
-                    'X-CSRFToken': csrftoken
-                  }, 
-                  timeout: pendingTime
-                }).catch((error) => {
-                    console.log(error);
-              });
-            } else {
-                // If the record does not exist, throw an error
-                throw new Error('No Record');
-            }
-          }).catch((error) => {
-              console.log(error);
-              if (axios.isCancel(error) || error.message === 'No Record' || error.code === 'ECONNABORTED') {
-                console.log('No record found, creating a new one');
-                axios.post(window.location.origin + "/api/backend/", trainingData, {
-                  headers: {
-                    'X-CSRFToken': csrftoken
-                  }, 
-                  timeout: pendingTime
-                }).catch((error) => {
-                    console.log(error);
-                })
-              }
-          })
-
-          let timeoutId = setTimeout(() => {
-            ws.close();
-            setIsTraining(prevIsTraining => {
-              const newIsTraining = [...prevIsTraining];
-              newIsTraining[index] = 0;
-              return newIsTraining;
+          if (JSON.stringify(data.progress) !== JSON.stringify(progress[index])) {
+            setProgress(prevProgress => {
+              const newProgress = [...prevProgress];
+              newProgress[index] = data.progress;
+              return newProgress;
             });
-            console.log("Training failed")
-            alert("Training failed. Please try again. If the problem persists, please contact us.");
-          }, intervalTimeout); // stop after n milliseconds
 
-          ws.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            if (data.title === 'progress') {  // every 1%; includes progress, error_list, and network_weights
-
-              if (JSON.stringify(data.progress) !== JSON.stringify(progress[index])) {
-                setProgress(prevProgress => {
-                  const newProgress = [...prevProgress];
-                  newProgress[index] = data.progress;
-                  return newProgress;
+            if (data.progress === 1 ) {
+              ws.close();
+              clearTimeout(timeoutId);
+              setTimeout(() => {
+                setIsTraining(prevIsTraining => {
+                  const newIsTraining = [...prevIsTraining];
+                  newIsTraining[index] = 2;
+                  return newIsTraining;
                 });
-
-                if (data.progress === 1 ) {
-                  ws.close();
-                  clearTimeout(timeoutId);
-                  setTimeout(() => {
-                    setIsTraining(prevIsTraining => {
-                      const newIsTraining = [...prevIsTraining];
-                      newIsTraining[index] = 2;
-                      return newIsTraining;
-                    });
-                    console.log("Training finished")
-                  }, 1000);
-                }
-
-                // update the error list if it changed
-                if (data.error_list[0].length !== errorList[index][0].length || data.error_list[1] !== errorList[index][1]) {
-                  console.log("updating error list");  // for debugging
-                  setErrorList(prevErrorList => {
-                    const newErrorList = [...prevErrorList];
-                    newErrorList[index] = data.error_list;
-                    return newErrorList;
-                  });
-                }
-                
-                // update the weights if they changed 
-                if (weights[index].length === 0 || data.network_weights[0][0] !== weights[index][0][0]) {
-                  setWeights(prevWeights => {
-                    const newWeights = [...prevWeights];
-                    newWeights[index] = data.network_weights;
-                    return newWeights;
-                  });
-                }
-              }
-            } else if (data.title === 'update') {  // every 10%; includes network_biases and plots
-                  // update the biases if it changed
-                  if (data.network_biases.length !== biases[index].length) {
-                    setBiases(prevBiases => {
-                      const newBiases = [...prevBiases];
-                      newBiases[index] = data.network_biases;
-                      return newBiases;
-                    });
-                  }
-
-                  // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
-                  if (data.plots.length > 0 && data.plots.length !== imgs[index].length) {
-                    setImgs(prevImgs => {
-                      const newImgs = [...prevImgs];
-                      newImgs[index] = data.plots.map(base64String => { 
-                        const binaryString = atob(base64String);  // decode from base64 to binary string
-                        const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
-                        for (let i = 0; i < binaryString.length; i++) {
-                          bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
-                        }
-                        const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
-                        const url = URL.createObjectURL(blob);
-                        // now images can be accessed with <img src={url} />
-                        return url;
-                      })
-                      return newImgs;
-                    });
-                  }
+                console.log("Training finished")
+              }, 1000);
             }
-          };
 
-          ws.onerror = function(event) {
-            console.error('Error:', event);
-          };
-        };
-      });
+            // update the error list if it changed
+            if (data.error_list[0].length !== errorList[index][0].length || data.error_list[1] !== errorList[index][1]) {
+              console.log("updating error list");  // for debugging
+              setErrorList(prevErrorList => {
+                const newErrorList = [...prevErrorList];
+                newErrorList[index] = data.error_list;
+                return newErrorList;
+              });
+            }
+            
+            // update the weights if they changed 
+            if (weights[index].length === 0 || data.network_weights[0][0] !== weights[index][0][0]) {
+              setWeights(prevWeights => {
+                const newWeights = [...prevWeights];
+                newWeights[index] = data.network_weights;
+                return newWeights;
+              });
+            }
+          }
+        } else if (data.title === 'update') {  // every 10%; includes network_biases and plots
+          // update the biases if it changed
+          if (data.network_biases.length !== biases[index].length) {
+            setBiases(prevBiases => {
+              const newBiases = [...prevBiases];
+              newBiases[index] = data.network_biases;
+              return newBiases;
+            });
+          }
+
+          // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
+          if (data.plots.length > 0 && data.plots.length !== imgs[index].length) {
+            setImgs(prevImgs => {
+              const newImgs = [...prevImgs];
+              newImgs[index] = data.plots.map(base64String => { 
+                const binaryString = atob(base64String);  // decode from base64 to binary string
+                const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+                for (let i = 0; i < binaryString.length; i++) {
+                  bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+                }
+                const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+                const url = URL.createObjectURL(blob);
+                // now images can be accessed with <img src={url} />
+                return url;
+              })
+              return newImgs;
+            });
+          }
+        }
+      };
+    };
   };
 
 
