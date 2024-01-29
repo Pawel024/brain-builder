@@ -174,11 +174,10 @@ class DataFromExcel(Dataset):
                             ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
                             ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
                             k += 1
-            # Create a legend with target_names
-            legend_elements = [Line2D([0], [0], marker='o', color='w', label=self.target_names[i],
-                          markerfacecolor=plt.cm.viridis(i / len(self.target_names)), markersize=10) 
-                   for i in range(len(self.target_names))]
-            ax[0, 0].legend(handles=legend_elements, loc='upper right', bbox_to_anchor=(1.5, 1.0), ncol=1)
+            # some Copilot code to generate a legend
+            handles, labels = scatter.legend_elements()
+            labels = [self.target_names[int(label)] for label in labels]
+            fig.legend(handles, labels, loc='lower right')
 
         elif self.data_type == 2:
             n_plots = (self.n_features + self.n_targets) * (self.n_features + self.n_targets - 1) // 2
