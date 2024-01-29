@@ -48,7 +48,6 @@ function getCookie(name) {
 
 // function to generate cytoscape elements
 function generateCytoElements(list, apiData, isTraining, weights, biases) {
-  console.log("Length of weights: ", weights.length, "Weights: ", weights);
   const cElements = [];
 
   // Generate nodes
@@ -805,7 +804,6 @@ function App() {
             const data = JSON.parse(event.data);
             if (data.title === 'progress') {  // every 1%; includes progress, error_list, and network_weights
 
-              console.log("data.progress: ", data.progress);  // for debugging
               if (JSON.stringify(data.progress) !== JSON.stringify(progress[index])) {
                 setProgress(prevProgress => {
                   const newProgress = [...prevProgress];

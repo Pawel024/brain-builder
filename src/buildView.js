@@ -176,33 +176,33 @@ class Building extends React.Component {
             this.chartInstance = null;
           }
         } 
-        // Create a new chart if there is no chart now
-        if (this.chartInstance === null) {
-          // create a new chart
-          console.log("Creating new chart")
-          this.chartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-              labels: this.props.errorList[0].map((_, i) => i + 1), // Generate labels based on error array length
-              datasets: [{
-                  label: 'Errors',
-                  data: this.props.errorList[0],
-                  borderColor: 'rgba(7, 151, 185, 1)',
-                  backgroundColor: 'rgba(7, 151, 185, 0.2)',
-              }]
+      }
+      // Create a new chart if there is no chart now
+      if (this.chartInstance === null) {
+        // create a new chart
+        console.log("Creating new chart")
+        this.chartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: this.props.errorList[0].map((_, i) => i + 1), // Generate labels based on error array length
+            datasets: [{
+                label: 'Errors',
+                data: this.props.errorList[0],
+                borderColor: 'rgba(7, 151, 185, 1)',
+                backgroundColor: 'rgba(7, 151, 185, 0.2)',
+            }]
+          },
+          options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
             },
-            options: {
-              scales: {
-                  y: {
-                      beginAtZero: true
-                  }
-              },
-              animation: {
-                duration: 1000 // general animation time
-              }
-            }  
-          });
-        }
+            animation: {
+              duration: 1000 // general animation time
+            }
+          }  
+        });
       }
     }
   }
@@ -359,9 +359,8 @@ class Building extends React.Component {
               ) : (this.props.isTraining===1 ? (
                 <Flex direction= 'column'>
                   <div style={{ fontFamily:'monospace' }}><b>Training: </b></div>
-                  {(this.props.isTraining === 1 && console.log("this.state.progress:", this.state.progress))}
-                  {(this.props.isTraining === 1 && console.log("this.props.errorList:", this.props.errorList))}
-                  <div style={{ fontFamily:'monospace' }}><b>Progress: {(parseFloat(this.state.progress)).toFixed(2)}%</b></div>
+                  {(this.props.isTraining === 1 && console.log("this.props.progress:", this.props.progress))}
+                  <div style={{ fontFamily:'monospace' }}><b>Progress: {(parseFloat(this.props.progress)).toFixed(2)}%</b></div>
                   <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:20 }}></canvas>
                 </Flex>
               ) : (
