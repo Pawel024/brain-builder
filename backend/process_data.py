@@ -67,6 +67,7 @@ async def process(req):
 
     elif req['action'] == 1:  # create and train a network
         d, u = {}, {}
+        building.errors = []
         epochs, learning_rate = int(req['epochs']), float(req['learning_rate'])
         input_list = ((learning_rate, epochs, bool(req['normalization'])), json.loads(req['network_input']))
         tag = int(req['task_id'])
