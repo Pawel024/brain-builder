@@ -22,6 +22,37 @@ from torch.utils.data import Dataset, DataLoader
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 
+# first, some plotting functions:
+def create_plot11(x=None, y=None, a=None, b=None):
+    """
+    Creates a plot of some datapoints, along with a line ax + b. 
+    Limits are -10 and +10 for both x and y. 
+    Returns the plot as the value of a BytesIO object.
+    """
+    
+    if x and y:
+        plt.scatter(x, y, color='blue')
+        if a and b:
+            x_s = np.linspace(-10, 10, 200)
+            y_s = we*x_s + bi
+            plt.plot(x_s, y_s, color='red')
+        # save the image to a BytesIO and return it
+        img = BytesIO()
+        plt.savefig(img, format='png')
+        img.seek(0)
+        plt.clf()
+        return img.getvalue()
+
+    else: 
+        # set up the plot
+        a = np.tan((np.random.random()-0.001)*np.pi/2)
+        b = np.random.randint(-5, 5)
+        x = np.random.randint(-10, 10, 100)
+        y = w*x + b + np.random.normal(0, 2, 100)
+        return x, y
+
+
+# now the dataset classes:
 
 class DataFromExcel(Dataset):
     """Create a dataset from a CSV file with column labels in the first row.

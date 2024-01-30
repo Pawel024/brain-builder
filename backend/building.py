@@ -39,7 +39,7 @@ n_outputs = 0
 errors = []
 
 
-def build_nn(input_list, tag, pk=None, task_id=None, user_id=None, root_link=None):
+def build_nn(input_list, tag):
     global n_inputs, n_outputs
     # convert the input list to usable values
     structure, learning_rate, epochs = levels.convert_input(input_list, tag)

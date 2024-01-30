@@ -1,5 +1,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
+import data_functions as df
+from base64 import b64encode, b64decode
 
 class Coach(AsyncWebsocketConsumer):
     connections = {}
@@ -33,3 +35,23 @@ class Coach(AsyncWebsocketConsumer):
         task_type = data['title']
         print("sending data for task ", task_type)
         await self.send(json.dumps(data))
+
+
+class Plotter(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.user_id = self.scope['url_route']['kwargs']['userId']
+        self.custom_id = self.scope['url_route']['kwargs']['customId']
+        if self.custom_id == '11':
+            self.x, self.y = df.create_plot11()
+        print("plotter connected")
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        print("plotter disconnected")
+    
+    async def receive(self, data):
+        data = json.loads(data)
+        if self.custom_id == '11':
+            plot = df.create_plot11(self.x, self.y, data['a'], data['b'])
+            plot = b64encode(plot).decode()
+            await self.send(json.dumps({'title': 'plot', 'plot': plot}))

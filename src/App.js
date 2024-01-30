@@ -14,6 +14,7 @@ import chroma from 'chroma-js';
 import Readme from './readme';
 import Introduction from './introduction';
 import QuizApp from './quiz';
+import CustomBlock from './customBlocks';
 
 
 const colorScale = chroma.scale(['#49329b', '#5e5cc2', '#8386d8', '#afb0e1', '#dddddd', '#e3a692', '#d37254', '#b64124', '#8f0500']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
@@ -187,8 +188,6 @@ function App() {
       window.removeEventListener('resize', handleWindowResize);
     };
   }, []);
-
-  const [webSocket, setWebSocket] = useState(null)
 
   const loadData = (taskId, index, normalization) => {
     var userId = getCookie('user_id');
@@ -1117,6 +1116,14 @@ function App() {
                     </Flex>
                     </ChallengeButton>
                 </Link>
+                <Link to="custom11" style={{ color: 'inherit', textDecoration: 'none' }}>
+                  <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                      <label>Visualization</label>
+                      <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                  </ChallengeButton>
+                </Link>  
                 </Box>
               </Box>
               {Object.entries(tasksByLevel).map(([level, challenges]) => (
@@ -1193,6 +1200,13 @@ function App() {
               </Box>
             </div>}
           />
+          <Route path="/custom11" element={
+            <CustomBlock
+            root = {window.location.origin}
+            customId = {11}
+            userId = {getCookie('user_id')}
+            />
+          } />
           {/*
             <Tutorial
             nOfInputs={4}

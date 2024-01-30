@@ -58,7 +58,7 @@ def query_list(request):
 
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        processed_data = loop.run_until_complete(process(request.data, root_url, csrf_token=request.META.get('HTTP_X_CSRFTOKEN')))
+        processed_data = loop.run_until_complete(process(request.data))
 
         processed_data['user_id'] = user_id
         processed_data['task_id'] = task_id
@@ -87,7 +87,7 @@ def query_detail(request, pk):
 
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        processed_data = loop.run_until_complete(process(request.data, root_url, pk, csrf_token=request.META.get('HTTP_X_CSRFTOKEN')))
+        processed_data = loop.run_until_complete(process(request.datas))
 
         processed_data['user_id'] = user_id
         processed_data['task_id'] = task_id
