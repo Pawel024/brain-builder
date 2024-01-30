@@ -43,8 +43,8 @@ class Plotter(AsyncWebsocketConsumer):
         self.custom_id = self.scope['url_route']['kwargs']['customId']
         if self.custom_id == '11':
             self.x, self.y = df.create_plot11()
-        print("plotter connected")
         await self.accept()
+        print("plotter connected")
 
     async def disconnect(self, close_code):
         print("plotter disconnected")
@@ -56,3 +56,4 @@ class Plotter(AsyncWebsocketConsumer):
             plot = df.create_plot11(self.x, self.y, data['a'], data['b'])
             plot = b64encode(plot).decode()
             await self.send(json.dumps({'title': 'plot', 'plot': plot}))
+            print("plot sent")

@@ -212,7 +212,7 @@ class DataFromExcel(Dataset):
             norm = Normalize(vmin=min(self.data.loc[:, 'Target']), vmax=max(self.data.loc[:, 'Target']))
             sm = ScalarMappable(cmap=cmap, norm=norm)
             legend_elements = [Line2D([0], [0], marker='o', color='w', markerfacecolor=sm.to_rgba(i), markersize=10) for i in range(len(self.target_names))]
-            fig.legend(handles=legend_elements, labels=self.target_names, loc='lower right')
+            fig.legend(handles=legend_elements, labels=list(self.target_names), loc='lower right')
 
         elif self.data_type == 2:
             n_plots = (self.n_features + self.n_targets) * (self.n_features + self.n_targets - 1) // 2

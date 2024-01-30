@@ -26,7 +26,7 @@ class CustomBlock extends Component {
         this.ws.onopen = () => {
             console.log('WebSocket connection opened');
             // send a message to the websocket to create a baseline plot
-            this.ws.send(JSON.stringify({ title: 'plot', a: 1, b: 0 }));
+            // this.ws.send(JSON.stringify({ title: 'plot', a: 1, b: 0 }));
         }
 
         this.ws.onerror = (error) => {
