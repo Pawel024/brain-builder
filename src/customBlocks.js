@@ -15,7 +15,7 @@ class CustomBlock extends Component {
             bias: 0,
             img: null,
         };
-        this.ws = new WebSocket(`wss://${this.props.root}/ws/${this.props.userId}/custom${this.props.customId}/`);
+        this.ws = new WebSocket(`wss://${this.props.host}/ws/${this.props.userId}/custom${this.props.customId}/`);
     }
 
     componentDidMount() {

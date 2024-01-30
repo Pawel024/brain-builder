@@ -1202,7 +1202,7 @@ function App() {
           />
           <Route path="/custom11" element={
             <CustomBlock
-            root = {window.location.origin}
+            host = {window.location.host}
             customId = {11}
             userId = {getCookie('user_id')}
             />
