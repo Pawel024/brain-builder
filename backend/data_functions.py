@@ -206,7 +206,7 @@ class DataFromExcel(Dataset):
                             ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
                             k += 1
             # some Copilot code to generate a legend
-            handles, labels = scatter.legend_elements()
+            handles, labels = plt.scatter.legend_elements()
             labels = [self.target_names[int(label)] for label in labels]
             fig.legend(handles, labels, loc='lower right')
 
