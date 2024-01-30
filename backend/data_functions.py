@@ -48,7 +48,7 @@ def create_plot11(x=None, y=None, a=None, b=None):
         a = np.tan((np.random.random()-0.001)*np.pi/2)
         b = np.random.randint(-5, 5)
         x = np.random.randint(-10, 10, 100)
-        y = w*x + b + np.random.normal(0, 2, 100)
+        y = a*x + b + np.random.normal(0, 2, 100)
         return x, y
 
 
