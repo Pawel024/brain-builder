@@ -51,7 +51,7 @@ def convert_input(lst, tag):
 
     # modifications depending on tag
     if games.loc[tag, 'type'] == 1:
-        structure[-1][2] = 'Log_Softmax'
+        structure[-1][2] = 'Softmax'
     elif games.loc[tag, 'type'] == 2:
         structure[-1][2] = ''
 

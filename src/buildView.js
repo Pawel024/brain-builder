@@ -22,6 +22,7 @@ import {
   Legend 
 } from 'chart.js';
 import axios from 'axios';
+import { interpolate } from 'chroma-js';
 
 function BuildingWrapper(props) {
   const navigate = useNavigate();
@@ -359,7 +360,7 @@ class Building extends React.Component {
               ) : (this.props.isTraining===1 ? (
                 <Flex direction= 'column'>
                   <div style={{ fontFamily:'monospace' }}><b>Training: </b></div>
-                  <div style={{ fontFamily:'monospace' }}><b>Progress: {(parseFloat(this.props.progress))*100}%</b></div>
+                  <div style={{ fontFamily:'monospace' }}><b>Progress: {Math.round((parseFloat(this.props.progress))*100)}%</b></div>
                   <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:20 }}></canvas>
                 </Flex>
               ) : (

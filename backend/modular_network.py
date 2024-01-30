@@ -49,9 +49,9 @@ class BuildNetwork(torch.nn.Module):
         elif activation == 'ReLu':
             return torch.nn.functional.relu(x)
         elif activation == 'Softmax':
-            return torch.nn.functional.softmax(x)
+            return torch.nn.functional.softmax(x, dim=-1)
         elif activation == 'Log_Softmax':
-            return torch.nn.functional.log_softmax(x, dim=1)
+            return torch.nn.functional.log_softmax(x, dim=-1)
         else:
             return x
 
