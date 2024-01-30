@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as Slider from '@radix-ui/react-slider';
 import './App.css';
-import { Theme, Box, Grid, Heading, IconButton, Separator } from '@radix-ui/themes';
+import { Flex, Theme, Box, Grid, Heading, IconButton, Separator } from '@radix-ui/themes';
 import { Link } from 'react-router-dom';
 import { HomeIcon } from '@radix-ui/react-icons';
 import tu_delft_pic from "./tud_black_new.png";
@@ -35,6 +35,7 @@ class CustomBlock extends Component {
 
         this.ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
+            console.log("Message", data.title, " received")
             if (data.title === 'plot') {
                 const binaryString = atob(data.plot);  // decode from base64 to binary string
                 const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
@@ -76,7 +77,7 @@ class CustomBlock extends Component {
             <Slider.Root
               className="SliderRoot"
               defaultValue={[45]}
-              onValueChangeEnd={(value) => this.handleWeightChange(value)}
+              onValueCommit={(value) => this.handleWeightChange(value)}
               min={0}
               max={90}
               step={1}
@@ -93,7 +94,7 @@ class CustomBlock extends Component {
             <Slider.Root
               className="SliderRoot"
               defaultValue={[0]}
-              onValueChangeEnd={(value) => this.handleBiasChange(value)}
+              onValueCommit={(value) => this.handleBiasChange(value)}
               min={-5}
               max={5}
               step={0.1}
@@ -129,23 +130,25 @@ class CustomBlock extends Component {
             </Box>
 
             {this.props.customId === 11 && (
-                <Grid columns={2} gap={0}>
+                <Flex direction='row' gap={0}>
                     <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+                        <Flex direction='column' gap={2}>
                         <div className="weightSlider">
                             {weightSlider}
                         </div>
-                        <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Weight: {this.state.weight}</div>
+                        <div>Weight: {this.state.weight}</div>
                         <div className="biasSlider">
                             {biasSlider}
                         </div>
-                        <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Bias: {this.state.bias}</div>
+                        <div>Bias: {this.state.bias}</div>
                         <img src={this.state.img} alt="No plot available" />
+                        </Flex>
                     </Box>
                     <Separator orientation='vertical' style = {{ height: '100vh' }}/>
                     <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu</p>
                     </Box>
-                </Grid>
+                </Flex>
             )}
 
             {/* Add more custom blocks later */}
