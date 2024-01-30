@@ -34,7 +34,7 @@ def create_plot11(x=None, y=None, a=None, b=None):
         plt.scatter(x, y, color='blue')
         if a and b:
             x_s = np.linspace(-10, 10, 200)
-            y_s = we*x_s + bi
+            y_s = a*x_s + b
             plt.plot(x_s, y_s, color='red')
         # save the image to a BytesIO and return it
         img = BytesIO()
