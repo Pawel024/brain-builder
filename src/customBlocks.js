@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as Slider from '@radix-ui/react-slider';
 import './App.css';
-import { Theme, Box, Grid, Heading, IconButton } from '@radix-ui/themes';
+import { Theme, Box, Grid, Heading, IconButton, Separator } from '@radix-ui/themes';
 import { Link } from 'react-router-dom';
 import { HomeIcon } from '@radix-ui/react-icons';
 import tu_delft_pic from "./tud_black_new.png";
@@ -54,6 +54,7 @@ class CustomBlock extends Component {
     }
 
     handleWeightChange = (value) => {
+        console.log("Weight changed to: " + value)  // for debugging
         const radians = value * Math.PI / 180;
         const slope = Math.tan(radians);
         this.setState({ weight: slope });
@@ -129,7 +130,7 @@ class CustomBlock extends Component {
 
             {this.props.customId === 11 && (
                 <Grid columns={2} gap={0}>
-                    <Box>
+                    <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
                         <div className="weightSlider">
                             {weightSlider}
                         </div>
@@ -140,7 +141,8 @@ class CustomBlock extends Component {
                         <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Bias: {this.state.bias}</div>
                         <img src={this.state.img} alt="No plot available" />
                     </Box>
-                    <Box>
+                    <Separator orientation='vertical' style = {{ height: '100vh' }}/>
+                    <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu</p>
                     </Box>
                 </Grid>
