@@ -21,6 +21,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
+from matplotlib.cm import ScalarMappable
 
 # first, some plotting functions:
 def create_plot11(x=None, y=None, a=None, b=None):
@@ -30,9 +31,9 @@ def create_plot11(x=None, y=None, a=None, b=None):
     Returns the plot as the value of a BytesIO object.
     """
     
-    if x and y:
+    if x is not None and y is not None:
         plt.scatter(x, y, color='blue')
-        if a and b:
+        if a is not None and b is not None:
             x_s = np.linspace(-10, 10, 200)
             y_s = a*x_s + b
             plt.plot(x_s, y_s, color='red')
@@ -193,7 +194,7 @@ class DataFromExcel(Dataset):
             n_cols = 2
             n_rows = int(np.ceil(n_plots / n_cols))
             fig, ax = plt.subplots(n_rows, n_cols)
-            k, scatter = 0, None
+            k = 0
 
             for i in range(self.n_features):
                 if type(self.data.iloc[0, i]) is not str and self.data.columns[i] != 'Target':
@@ -205,11 +206,12 @@ class DataFromExcel(Dataset):
                             ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
                             ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
                             k += 1
-            if scatter: 
-                # some Copilot code to generate a legend
-                handles, labels = scatter.legend_elements()
-                labels = [self.target_names[int(label)] for label in labels]
-                fig.legend(handles, labels, loc='lower right')
+            # Create a legend
+            cmap = scatter.get_cmap()
+            norm = Normalize(vmin=min(self.data.loc[:, 'Target']), vmax=max(self.data.loc[:, 'Target']))
+            sm = ScalarMappable(cmap=cmap, norm=norm)
+            legend_elements = [Line2D([0], [0], marker='o', color='w', markerfacecolor=sm.to_rgba(i), markersize=10) for i in range(len(self.target_names))]
+            fig.legend(handles=legend_elements, labels=self.target_names, loc='lower right')
 
         elif self.data_type == 2:
             n_plots = (self.n_features + self.n_targets) * (self.n_features + self.n_targets - 1) // 2
