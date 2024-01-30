@@ -1,6 +1,6 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
-import data_functions as df
+from backend import data_functions as df
 from base64 import b64encode, b64decode
 
 class Coach(AsyncWebsocketConsumer):
