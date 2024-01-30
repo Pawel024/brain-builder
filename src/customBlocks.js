@@ -36,18 +36,15 @@ class CustomBlock extends Component {
         this.ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data.title === 'plot') {
-                const newImg = data.plot.map(base64String => { 
-                    const binaryString = atob(base64String);  // decode from base64 to binary string
-                    const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
-                    for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
-                    }
-                    const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
-                    const url = URL.createObjectURL(blob);
-                    // now images can be accessed with <img src={url} />
-                    return url;
-                })
-                this.setState({ img: newImg });
+                const binaryString = atob(data.plot);  // decode from base64 to binary string
+                const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+                for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+                }
+                const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+                const url = URL.createObjectURL(blob);
+                // now images can be accessed with <img src={url} />
+                this.setState({ img: url });
             }
         }
     }

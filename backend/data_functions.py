@@ -22,6 +22,7 @@ from torch.utils.data import Dataset, DataLoader
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.cm import ScalarMappable
+from matplotlib.colors import Normalize
 
 # first, some plotting functions:
 def create_plot11(x=None, y=None, a=None, b=None):
