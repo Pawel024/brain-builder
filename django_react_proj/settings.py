@@ -35,7 +35,7 @@ SESSION_COOKIE_SECURE = True
 IS_HEROKU_APP = "DYNO" in os.environ and not "CI" in os.environ
 
 # Redirect all HTTP traffic to HTTPS -> not sure if this is necessary
-SECURE_SSL_REDIRECT = False  # I SET THIS TO FALSE TO TRY DEBUG A 301 ISSUE -> TODO
+SECURE_SSL_REDIRECT = True  # I SET THIS TO FALSE TO TRY DEBUG A 301 ISSUE -> TODO
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -43,7 +43,16 @@ DEBUG = True
 
 
 if IS_HEROKU_APP:
-    ALLOWED_HOSTS = ["*"]
+    ALLOWED_HOSTS = [
+        "brain-builder-development-b6afefb63981.herokuapp.com",
+        "www.brain-builder-development-b6afefb63981.herokuapp.com",
+        "brain-builder.app",
+        "www.brain-builder.app",
+        "brain-builder-laurens-3406ee2c9cdb.herokuapp.com",
+        "www.brain-builder-laurens-3406ee2c9cdb.herokuapp.com",
+        "brain-builder-f6e4dc8afc4d.herokuapp.com",
+        "www.brain-builder-f6e4dc8afc4d.herokuapp.com",
+    ]
 else:
     ALLOWED_HOSTS = []
 
