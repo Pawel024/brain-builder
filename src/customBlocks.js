@@ -49,6 +49,10 @@ class CustomBlock extends Component {
         }
     }
 
+    componentWillUnmount() {
+        this.ws.close();
+    }
+
     handleWeightChange = (value) => {
         const radians = value * Math.PI / 180;
         const slope = Math.tan(radians);
@@ -71,7 +75,7 @@ class CustomBlock extends Component {
             <Slider.Root
               className="SliderRoot"
               defaultValue={45}
-              onValueChange={(value) => this.handleWeightChange(value)}
+              onValueChangeEnd={(value) => this.handleWeightChange(value)}
               min={0}
               max={90}
               step={1}
@@ -88,7 +92,7 @@ class CustomBlock extends Component {
             <Slider.Root
               className="SliderRoot"
               defaultValue={0}
-              onValueChange={(value) => this.handleBiasChange(value)}
+              onValueChangeEnd={(value) => this.handleBiasChange(value)}
               min={-5}
               max={5}
               step={0.1}
@@ -123,7 +127,7 @@ class CustomBlock extends Component {
             </Grid>
             </Box>
 
-            {this.props.customid === 11 && (
+            {this.props.customId === 11 && (
                 <Grid columns={2} gap={0}>
                     <Box>
                         <div className="weightSlider">

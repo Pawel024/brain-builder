@@ -87,7 +87,7 @@ def query_detail(request, pk):
 
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        processed_data = loop.run_until_complete(process(request.datas))
+        processed_data = loop.run_until_complete(process(request.data))
 
         processed_data['user_id'] = user_id
         processed_data['task_id'] = task_id
