@@ -193,7 +193,7 @@ class DataFromExcel(Dataset):
             n_cols = 2
             n_rows = int(np.ceil(n_plots / n_cols))
             fig, ax = plt.subplots(n_rows, n_cols)
-            k = 0
+            k, scatter = 0, None
 
             for i in range(self.n_features):
                 if type(self.data.iloc[0, i]) is not str and self.data.columns[i] != 'Target':
@@ -201,14 +201,15 @@ class DataFromExcel(Dataset):
                         if type(self.data.iloc[0, j]) is not str and self.data.columns[j] != 'Target':
                             row = k // n_cols
                             col = k % n_cols
-                            ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
+                            scatter = ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
                             ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
                             ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
                             k += 1
-            # some Copilot code to generate a legend
-            handles, labels = plt.scatter.legend_elements()
-            labels = [self.target_names[int(label)] for label in labels]
-            fig.legend(handles, labels, loc='lower right')
+            if scatter: 
+                # some Copilot code to generate a legend
+                handles, labels = scatter.legend_elements()
+                labels = [self.target_names[int(label)] for label in labels]
+                fig.legend(handles, labels, loc='lower right')
 
         elif self.data_type == 2:
             n_plots = (self.n_features + self.n_targets) * (self.n_features + self.n_targets - 1) // 2

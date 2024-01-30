@@ -19,7 +19,7 @@ class Coach(AsyncWebsocketConsumer):
         print("coach disconnected")
         
     # Receive message from WebSocket
-    async def receive(self, data):
+    async def receive(self, text_data):
         print("coach received data, but is currently unequipped to handle it")
         # uncomment if we decide to send frontend data via the WebSocket as well
         """
@@ -49,9 +49,10 @@ class Plotter(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         print("plotter disconnected")
     
-    async def receive(self, data):
-        data = json.loads(data)
+    async def receive(self, text_data):
+        data = json.loads(text_data)
         if self.custom_id == '11':
+            print(data['title'], " received")
             plot = df.create_plot11(self.x, self.y, data['a'], data['b'])
             plot = b64encode(plot).decode()
             await self.send(json.dumps({'title': 'plot', 'plot': plot}))
