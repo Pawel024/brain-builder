@@ -35,8 +35,12 @@ SESSION_COOKIE_SECURE = True
 IS_HEROKU_APP = "DYNO" in os.environ and not "CI" in os.environ
 
 # Redirect all HTTP traffic to HTTPS -> not sure if this is necessary
-SECURE_SSL_REDIRECT = False  # I SET THIS TO FALSE TO TRY DEBUG A 301 ISSUE -> TODO
+SECURE_SSL_REDIRECT = True  # I SET THIS TO FALSE TO TRY DEBUG A 301 ISSUE -> TODO
 
+# Instruct browsers to use HTTPS for all future requests
+SECURE_HSTS_SECONDS = 3600
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -75,7 +79,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'sslify.middleware.SSLifyMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
