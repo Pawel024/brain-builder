@@ -74,7 +74,7 @@ class CustomBlock extends Component {
         const weightSlider = (
             <Slider.Root
               className="SliderRoot"
-              defaultValue={45}
+              defaultValue={[45]}
               onValueChangeEnd={(value) => this.handleWeightChange(value)}
               min={0}
               max={90}
@@ -91,7 +91,7 @@ class CustomBlock extends Component {
         const biasSlider = (
             <Slider.Root
               className="SliderRoot"
-              defaultValue={0}
+              defaultValue={[0]}
               onValueChangeEnd={(value) => this.handleBiasChange(value)}
               min={-5}
               max={5}
