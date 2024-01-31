@@ -74,14 +74,14 @@ class CustomBlock extends Component {
         // Send a message through the WebSocket
         const message = JSON.stringify({ title: 'weightChange', a: value, b: this.state.bias});
         this.ws.send(message);
-    }, 10)
+    }, 100)
 
     handleBiasChange = this.throttle((value) => {
         this.setState({ bias: value[0] });
         // Send a message through the WebSocket
         const message = JSON.stringify({ title: 'biasChange', a: this.state.weight, b: value[0]});
         this.ws.send(message);
-    }, 10)
+    }, 100)
 
     render() {
 
