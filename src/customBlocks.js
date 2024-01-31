@@ -55,10 +55,10 @@ class CustomBlock extends Component {
     }
 
     handleWeightChange = (value) => {
-        value = parseFloat(value[0].toFixed(3));
         console.log("Weight changed to: " + value)  // for debugging
-        value = value * Math.PI / 180;
+        value = value[0] * Math.PI / 180;
         value = Math.tan(value);
+        value = parseFloat(value[0].toFixed(3));
         this.setState({ weight: value });
         // Send a message through the WebSocket
         const message = JSON.stringify({ title: 'weightChange', a: value, b: this.state.bias});
