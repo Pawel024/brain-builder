@@ -664,6 +664,7 @@ class DataFromFunction(Dataset):  # this one is for one to one regression on sim
         self.target_minima = min(self.targets)
         self.target_maxima = max(self.targets)
 
+        self.normalization = normalize
         if normalize:
             self.data = ((self.data - self.minima) / (self.maxima - self.minima))
             self.targets = ((self.targets - self.target_minima) /

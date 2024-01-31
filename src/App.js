@@ -57,10 +57,10 @@ function generateCytoElements(list, apiData, isTraining, weights, biases) {
       const id = list.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
       const label = `Node ${id}`;
       const hAvailable = window.innerHeight - 326;
-      const wAvailable = 0.7 * (window.innerWidth * 0.97);
+      const wAvailable = 0.4 * (window.innerWidth * 0.97);
       const xDistBetweenNodes = wAvailable/list.length;
       const yDistBetweenNodes = hAvailable/Math.max(...list);
-      const position = { x: Math.round((0.78 * window.innerWidth * 0.97) + (i-list.length) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes - 65 + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
+      const position = { x: Math.round((0.6 * window.innerWidth * 0.97) + (i-list.length) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes - 65 + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
       cElements.push({ data: { id, label }, position });
     }
   });
@@ -117,13 +117,15 @@ function generateCytoElements(list, apiData, isTraining, weights, biases) {
 
 // function to generate cytoscape style
 function generateCytoStyle(list = []) {
+  const nodeSize = 180/Math.max(...list) < 90 ? 180/Math.max(...list) : 90;
+
   const cStyle = [ // the base stylesheet for the graph
     {
       selector: 'node',
       style: {
         'background-color': '#666',
-        'width': 180/Math.max(...list),
-        'height': 180/Math.max(...list)
+        'width': nodeSize,
+        'height': nodeSize,
       }
     },
 
