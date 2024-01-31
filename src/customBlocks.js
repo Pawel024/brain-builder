@@ -54,7 +54,18 @@ class CustomBlock extends Component {
         this.ws.close();
     }
 
-    handleWeightChange = (value) => {
+    throttle(func, limit) {
+        let inThrottle;
+        return function(...args) {
+            if (!inThrottle) {
+                func.apply(this, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        };
+    }
+
+    handleWeightChange = this.throttle((value) => {
         console.log("Weight changed to: " + value)  // for debugging
         value = value[0] * Math.PI / 180;
         value = Math.tan(value);
@@ -63,14 +74,14 @@ class CustomBlock extends Component {
         // Send a message through the WebSocket
         const message = JSON.stringify({ title: 'weightChange', a: value, b: this.state.bias});
         this.ws.send(message);
-    }
+    }, 10)
 
-    handleBiasChange = (value) => {
+    handleBiasChange = this.throttle((value) => {
         this.setState({ bias: value[0] });
         // Send a message through the WebSocket
         const message = JSON.stringify({ title: 'biasChange', a: this.state.weight, b: value[0]});
         this.ws.send(message);
-    }
+    }, 10)
 
     render() {
 
