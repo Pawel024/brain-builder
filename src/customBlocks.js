@@ -91,7 +91,7 @@ class CustomBlock extends Component {
               defaultValue={[45]}
               onValueChange={(value) => this.handleWeightChange(value)}
               min={0}
-              max={90}
+              max={85}
               step={1}
               style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
             >

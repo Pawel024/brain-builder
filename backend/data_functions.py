@@ -39,6 +39,8 @@ def create_plot11(x=None, y=None, a=None, b=None):
             x_s = torch.linspace(-10, 10, 200)
             y_s = a*x_s + b
             plt.plot(x_s, y_s, color='red')
+        plt.xlim(-10, 10)
+        plt.ylim(-10, 10)
         # save the image to a BytesIO and return it
         img = BytesIO()
         plt.savefig(img, format='png')
