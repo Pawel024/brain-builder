@@ -14,6 +14,8 @@ import os
 import django_heroku
 import random
 import urllib
+import dj_database_url
+
 
 def get_random_secret_key():
     chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
@@ -132,10 +134,7 @@ ASGI_APPLICATION = "django_react_proj.asgi.application"
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    'default': dj_database_url.config(default='postgres://user:password@localhost/dbname', conn_max_age=600, max_conns=20)
 }
 
 

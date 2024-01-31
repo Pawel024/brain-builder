@@ -878,7 +878,8 @@ function App() {
   function generateFloatingButtons(top, left, xPositions, isItPlus, nLayers, cytoLayers, setCytoLayers, taskId, index) {
     const buttons = [];
     const icon = isItPlus ? <PlusIcon /> : <MinusIcon />;
-    for (let i = 1; i < nLayers-1; i++) {
+    console.log("xPositions: ", xPositions)
+    for (let i = 1; i < nLayers-1; i++) { // we start at i and end at nLayers-1 because we don't want to add or remove nodes from the input or output layers
       const style = { top: top, left: xPositions[i] + left};
       const button = (
         <div>
@@ -1251,6 +1252,7 @@ function App() {
               path={`/challenge${taskId}`}
               element={
                 <>
+                {console.log(`listXPositions[${index}]: ${listXPositions[index]}`)}
                 <BuildView
                   nOfInputs={nInputs[index]}
                   nOfOutputs={nOutputs[index]}
