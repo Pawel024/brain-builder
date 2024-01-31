@@ -77,7 +77,7 @@ class CustomBlock extends Component {
             <Slider.Root
               className="SliderRoot"
               defaultValue={[45]}
-              onValueCommit={(value) => this.handleWeightChange(value)}
+              onValueChange={(value) => this.handleWeightChange(value)}
               min={0}
               max={90}
               step={1}
@@ -94,7 +94,7 @@ class CustomBlock extends Component {
             <Slider.Root
               className="SliderRoot"
               defaultValue={[0]}
-              onValueCommit={(value) => this.handleBiasChange(value)}
+              onValueChange={(value) => this.handleBiasChange(value)}
               min={-5}
               max={5}
               step={0.1}
