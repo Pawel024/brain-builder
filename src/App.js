@@ -601,9 +601,11 @@ function App() {
       console.log("weights:", weights);
       const {newCytoElements, newXPositions} = generateCytoElements(cytoLayers[index], apiData[index], isTraining[index], weights[index], biases[index]);
       newListXPositions.push(newXPositions);
+      console.log("newXPositions: ", newXPositions);  // for debugging
       return newCytoElements;
     }
     ));
+    console.log("newListXPositions: ", newListXPositions);  // for debugging
     setListXPositions(newListXPositions);
   }, [taskIds, cytoLayers, apiData, isTraining, weights, biases]);
 
