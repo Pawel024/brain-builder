@@ -58,19 +58,16 @@ def convert_input(lst, tag):
     return structure, learning_rate, epochs
 
 
-def get_data(tag):
+def get_data(tag, dat=None):
     global normalization, data
     magic_box = {'df': df, 'datasets': datasets, 'normalization': normalization}
-    data, train, test = None, None, None
+    data, train, test = dat, None, None
     if games.loc[tag, 'dataset'] is None:
-        pass
+        print("No dataset found for tag ", tag)
     
-    # if the dataset is already saved as a txt file, load it
-    elif os.path.isfile(games.loc[tag, 'dataset']+'.txt'):
-        with open(games.loc[tag, 'dataset']+'.txt', 'rb') as input:
-            data = pickle.load(input)
-        data.images = []
-        data.plot_data()
+    # if the dataset has been passed on, just use that
+    elif data is not None:
+        pass
 
     elif type(games.loc[tag, 'dataset']) is str and games.loc[tag, 'dataset'].startswith('load_'):
         # import a dataset from sklearn
@@ -95,8 +92,4 @@ def get_data(tag):
         # load the dataset from Excel -> use custom dataset class
         data = df.DataFromExcel(os.path.join(os.path.dirname(__file__), games.loc[tag, 'dataset']), data_type=games.loc[tag, 'type'], normalize=normalization)
 
-    # save the dataset to a pickle file
-    with open(games.loc[tag, 'dataset']+'.txt', 'wb') as output:
-        pickle.dump(data, output, pickle.HIGHEST_PROTOCOL)
-
-    return train_test_split(data, test_size=0.1, random_state=np.random.randint(1000))
+    return data, train_test_split(data, test_size=0.1, random_state=np.random.randint(1000))

@@ -16,7 +16,7 @@ These classes and their functions are used in the building.py and levels.py modu
 import os
 from io import BytesIO  # for saving the images
 import numpy as np
-import mpmath
+import math
 import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
@@ -48,7 +48,7 @@ def create_plot11(x=None, y=None, a=None, b=None):
 
     else: 
         # set up the plot
-        a = round(torch.tan((torch.rand(1).item()-0.001)*mpmath.pi/2), 3)
+        a = round(torch.tan((torch.rand(1).item()-0.001)*math.pi/2), 3)
         b = round(torch.randint(-5, 6, size=(1,)).item(), 3)
         x = torch.randint(-10, 10, size=(100,))
         y = a*x + b + torch.normal(0, 2, size=(100,))

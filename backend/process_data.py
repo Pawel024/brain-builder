@@ -24,6 +24,7 @@ import pandas as pd
 import json
 from base64 import b64encode, b64decode
 from django_react_proj.consumers import Coach
+from backend.models import BackendData
 #from django_eventstream import send_event
 #import aiohttp
 import time
@@ -41,11 +42,27 @@ async def process(req):
     if req['action'] == 0:  # load the data and send the feature names and images to the frontend
         d = {}
         tag = int(req['task_id'])
-        levels.get_data(tag)
+
+        # check if a BackendData model exists for this user_id and task_id, and load the stuff in there if it does
+        nn = None
+        if BackendData.objects.filter(user_id=user_id, task_id=task_id).exists():
+            backend_data = BackendData.objects.get(user_id=user_id, task_id=task_id)
+            data = pickle.loads(backend_data.dataset)
+            nn = backend_data.nn
+
+        data, training_set, test_set = levels.get_data(tag)  # replace the data anyway, in case changes were made
         d['title'] = 'data'
-        d['feature_names'] = [x.replace('_', ' ') for x in levels.data.feature_names]
-        d['plot'] = b64encode(levels.data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data
-        d['n_objects'] = levels.data.n_objects
+        d['feature_names'] = [x.replace('_', ' ') for x in data.feature_names]
+        d['plot'] = b64encode(data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data
+        d['n_objects'] = data.n_objects
+
+        # store the data in the BackendData model
+        data = pickle.dumps(data)
+        if nn is not None:
+            backend_data.dataset = data
+        else:
+            backend_data = BackendData(user_id=user_id, task_id=task_id, dataset=data, nn=None)
+        backend_data.save()
 
         print("Coach.connections = ", Coach.connections)
         coach = Coach.connections.get((str(user_id), str(task_id)))
@@ -58,22 +75,23 @@ async def process(req):
         if coach is not None:
             print('Sending data to coach')
             await coach.send_data(d)
-        
-        """
-        if callback is not None:  # in case we wanna use websockets for receiving instructions
-            callback(d)
-        """
 
 
     elif req['action'] == 1:  # create and train a network
         d, u = {}, {}
         building.errors = []
-        levels.data.images = []
         epochs, learning_rate = int(req['epochs']), float(req['learning_rate'])
-        input_list = ((learning_rate, epochs, bool(req['normalization'])), json.loads(req['network_input']))
+        input_list = ((learning_rate, epochs, bool(req['normalization'])), json.loads(req['network_input']))  # TODO: remove the learning rate and epochs from this path
         tag = int(req['task_id'])
 
-        network, training_set, test_set = building.build_nn(input_list, tag)
+        backend_data, data = None, None
+        # check if there is an entry in the BackendData model for this user_id and task_id
+        if BackendData.objects.filter(user_id=user_id, task_id=task_id).exists():
+            # load the data from this model
+            backend_data = BackendData.objects.get(user_id=user_id, task_id=task_id)
+            data = pickle.loads(data.dataset)
+
+        network, data, training_set, test_set = building.build_nn(input_list, tag, data)
         print("Network initiated, starting training")
         d['title'] = 'progress'
         d['progress'] = 0  # just update the progress
@@ -116,12 +134,19 @@ async def process(req):
                     print('Sending data to coach')
                     await coach.send_data(d)
         
-        # save the network to a pickle file
-        with open('nn.txt', 'wb') as output:
-            pickle.dump(network, output, pickle.HIGHEST_PROTOCOL)
+        levels.data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
+
+        # save the network and data to pickle files and store them back in the BackendData model
+        network = pickle.dumps(network)
+        data = pickle.dumps(data)
+        if backend_data is not None:
+            backend_data.dataset = data
+            backend_data.nn = network
+        else:
+            backend_data = BackendData(user_id=user_id, task_id=task_id, nn=network, dataset=data)  # store the network and the data
+        backend_data.save()
         
         d['progress'] = 1
-        levels.data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
         d['error_list'] = e  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
         d['network_weights'] = w  # list of lists of floats representing the weights
         
@@ -138,12 +163,10 @@ async def process(req):
 
 
     elif req['action'] == 2:  # classify a given input
-        if 'nn.txt' in os.listdir() and 'data.txt' in os.listdir():
-            # load neural network from json using nn_path
-            with open('nn.txt', 'rb') as inpu:
-                nn = pickle.load(inpu)
-            with open('data.txt', 'rb') as inpu:
-                data = pickle.load(inpu)
+        if BackendData.objects.filter(user_id=user_id, task_id=task_id).exists():
+            backend_data = BackendData.objects.get(user_id=user_id, task_id=task_id)
+            nn = pickle.loads(backend_data.nn)
+            data = pickle.loads(backend_data.dataset)
 
             input_vector = json.loads(req['network_input'])
             if len(input_vector) != data.n_inputs:
@@ -151,11 +174,10 @@ async def process(req):
                 output_value = "Wrong Network"
             else:
                 tag = int(req['task_id'])
-                building.dataset = data
-                output_value = building.predict(input_vector, nn, tag, normalization=bool(req['normalization']), name=True)
+                output_value = building.predict(input_vector, nn, tag, data, normalization=bool(req['normalization']), name=True)
         else:
-            print("No Network / No Data")
-            output_value = "No Network / No Data"
+            print("No Network (or no data)")
+            output_value = "No Network"
         req['network_input'] = json.dumps(output_value)
 
     req['action'] = 0

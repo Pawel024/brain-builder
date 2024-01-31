@@ -40,7 +40,7 @@ n_outputs = 0
 errors = []
 
 
-def build_nn(input_list, tag):
+def build_nn(input_list, tag, dat=None):
     global n_inputs, n_outputs
     # convert the input list to usable values
     structure, learning_rate, epochs = levels.convert_input(input_list, tag)
@@ -48,7 +48,7 @@ def build_nn(input_list, tag):
 
     # now separate into training and testing data:
     batch_size = 1  # feed small amounts of data to adjust gradient with, usually between 8 and 64
-    training_set, test_set = levels.get_data(tag)
+    data, training_set, test_set = levels.get_data(tag, dat)
     training_set = torch.utils.data.DataLoader(training_set, batch_size=batch_size, shuffle=True)
     test_set = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=True)
     # shuffle: always turn on if dataset is ordered!
@@ -70,7 +70,7 @@ def build_nn(input_list, tag):
                 input("Press Enter ")
     """
 
-    return nn, training_set, test_set
+    return nn, data, training_set, test_set
 
 
 def train_nn_epoch(nn, training_set, test_set, current_epoch, epochs, learning_rate, tag):
@@ -106,31 +106,24 @@ def get_parameters(nn):
     return weights, biases
 
 
-def predict(x, nn, tag, normalization=False, name=False):
+def predict(x, nn, tag, data, normalization=False, name=False):
     global n_inputs, n_outputs
-    if os.path.isfile(levels.games.loc[tag, 'dataset']+'.txt'):
-        with open(levels.games.loc[tag, 'dataset']+'.txt', 'rb') as input:
-            levels.data = pickle.load(input)
-    else:
-        levels.get_data(tag)
-        with open(levels.games.loc[tag, 'dataset']+'.txt', 'wb') as output:
-            pickle.dump(levels.data, output, pickle.HIGHEST_PROTOCOL)
     if levels.find_type(tag) == 1:
         if normalization:
-            x = levels.data.normalize(x)
+            x = data.normalize(x)
             x = torch.tensor(x, dtype=torch.float32)
         output = torch.argmax(nn(x.view(-1, n_inputs))[0]).item()
         if name:
-            output = levels.data.label_name(output)
+            output = data.label_name(output)
         return output
 
     elif levels.find_type(tag) == 2:
         if normalization:
-            x = levels.data.normalize(x)
+            x = data.normalize(x)
             x = torch.tensor(x, dtype=torch.float32)
         output = nn(x.view(-1, n_inputs))[0]
         if normalization:
-            output = levels.data.denormalize(output.tolist())
+            output = data.denormalize(output.tolist())
         return output
 
     else:

@@ -1,5 +1,11 @@
 from django.db import models
 
+class BackendData(models.Model):
+    user_id = models.CharField(max_length=100)
+    task_id = models.IntegerField()
+    nn = models.BinaryField()
+    dataset = models.BinaryField()
+
 class Row(models.Model):
     action = models.IntegerField()
     user_id = models.CharField(max_length=100)

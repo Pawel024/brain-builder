@@ -55,12 +55,13 @@ class CustomBlock extends Component {
     }
 
     handleWeightChange = (value) => {
+        value = parseFloat(value.toFixed(3));
         console.log("Weight changed to: " + value)  // for debugging
-        const radians = value * Math.PI / 180;
-        const slope = Math.tan(radians);
-        this.setState({ weight: slope });
+        value = value * Math.PI / 180;
+        value = Math.tan(value);
+        this.setState({ weight: value });
         // Send a message through the WebSocket
-        const message = JSON.stringify({ title: 'weightChange', a: slope, b: this.state.bias});
+        const message = JSON.stringify({ title: 'weightChange', a: value, b: this.state.bias});
         this.ws.send(message);
     }
 
@@ -97,7 +98,7 @@ class CustomBlock extends Component {
               onValueChange={(value) => this.handleBiasChange(value)}
               min={-5}
               max={5}
-              step={0.1}
+              step={0.01}
               style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
             >
               <Slider.Track className="SliderTrack" style={{ height: 3 }}>
