@@ -44,7 +44,7 @@ async def process(req):
         levels.get_data(tag)
         d['title'] = 'data'
         d['feature_names'] = [x.replace('_', ' ') for x in levels.data.feature_names]
-        d['plots'] = [b64encode(image).decode() for image in levels.data.images]
+        d['plot'] = b64encode(levels.data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data
         d['n_objects'] = levels.data.n_objects
 
         print("Coach.connections = ", Coach.connections)
@@ -68,6 +68,7 @@ async def process(req):
     elif req['action'] == 1:  # create and train a network
         d, u = {}, {}
         building.errors = []
+        levels.data.images = []
         epochs, learning_rate = int(req['epochs']), float(req['learning_rate'])
         input_list = ((learning_rate, epochs, bool(req['normalization'])), json.loads(req['network_input']))
         tag = int(req['task_id'])
@@ -100,7 +101,7 @@ async def process(req):
                 if epoch % (epochs // 10 if epochs >= 10 else 1) == 0:  # every 10% of the total epochs:
                     print("Updating all the stuff")
                     levels.data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
-                    u['plots'] = [b64encode(image).decode() for image in levels.data.images]  # list of base64 encoded images, showing pyplots of the data (potentially with decision boundary)
+                    u['plot'] = b64encode(levels.data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data (potentially with decision boundary)
                     u['network_biases'] = b  # list of lists of floats representing the biases
 
                     print("Epoch: ", epoch, ", Error: ", errors[-1])
@@ -125,7 +126,7 @@ async def process(req):
         d['network_weights'] = w  # list of lists of floats representing the weights
         
         u['network_biases'] = b  # list of lists of floats representing the biases
-        u['plots'] = [b64encode(image).decode() for image in levels.data.images]  # list of base64 encoded images, showing pyplots of the data (potentially with decision boundary)
+        u['plot'] = b64encode(levels.data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data (potentially with decision boundary)
         
         time.sleep(1)  # for debugging
         coach = Coach.connections.get((str(user_id), str(task_id)))

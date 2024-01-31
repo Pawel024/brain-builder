@@ -16,6 +16,7 @@ These classes and their functions are used in the building.py and levels.py modu
 import os
 from io import BytesIO  # for saving the images
 import numpy as np
+import mpmath
 import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
@@ -35,7 +36,7 @@ def create_plot11(x=None, y=None, a=None, b=None):
     if x is not None and y is not None:
         plt.scatter(x, y, color='blue')
         if a is not None and b is not None:
-            x_s = np.linspace(-10, 10, 200)
+            x_s = torch.linspace(-10, 10, 200)
             y_s = a*x_s + b
             plt.plot(x_s, y_s, color='red')
         # save the image to a BytesIO and return it
@@ -47,10 +48,10 @@ def create_plot11(x=None, y=None, a=None, b=None):
 
     else: 
         # set up the plot
-        a = np.tan((np.random.random()-0.001)*np.pi/2)
-        b = np.random.randint(-5, 5)
-        x = np.random.randint(-10, 10, 100)
-        y = a*x + b + np.random.normal(0, 2, 100)
+        a = round(torch.tan((torch.rand(1).item()-0.001)*mpmath.pi/2), 3)
+        b = round(torch.randint(-5, 6, size=(1,)).item(), 3)
+        x = torch.randint(-10, 10, size=(100,))
+        y = a*x + b + torch.normal(0, 2, size=(100,))
         return x, y
 
 
@@ -305,7 +306,6 @@ class DataFromExcel(Dataset):
                 plt.tight_layout()
                 plt.savefig(img, format='png')
                 img.seek(0)
-                img = b64encode(img.getvalue()).decode('utf-8')
                 self.images.append(img.getvalue())
                 plt.clf()
 

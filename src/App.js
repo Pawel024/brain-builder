@@ -276,10 +276,10 @@ function App() {
           return newNObjects;
         });
 
-        // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
+        // decompress and parse the images in 'plot'
         setInitPlots(prevInitPlots => {
           const newInitPlots = [...prevInitPlots];
-          const binaryString = atob(data.plots[0]);  // decode from base64 to binary string
+          const binaryString = atob(data.plot[0]);  // decode from base64 to binary string
           const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
           for (let i = 0; i < binaryString.length; i++) {
             bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
@@ -846,18 +846,15 @@ function App() {
           if (data.plots.length > 0 && data.plots.length !== imgs[index].length) {
             setImgs(prevImgs => {
               const newImgs = [...prevImgs];
-              newImgs[index] = data.plots.map(base64String => { 
-                const binaryString = atob(base64String);  // decode from base64 to binary string
-                const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
-                for (let i = 0; i < binaryString.length; i++) {
-                  bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
-                }
-                const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
-                const url = URL.createObjectURL(blob);
-                // now images can be accessed with <img src={url} />
-                return url;
-              })
-              return newImgs;
+              const binaryString = atob(data.plot);  // decode from base64 to binary string
+              const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+              for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+              }
+              const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+              const url = URL.createObjectURL(blob);
+              // now images can be accessed with <img src={url} />
+              newImgs[index] = url
             });
           }
         }
@@ -1301,7 +1298,7 @@ function App() {
                   progress={progress[index]}
                   featureNames={featureNames[index]}
                   errorList={errorList[index]}
-                  imgs={imgs[index]}
+                  img={imgs[index]}
                   initPlot={initPlots[index]}
                   loadData={loadData}
                   normalization={true}

@@ -265,7 +265,7 @@ class Building extends React.Component {
                 This dataset contains {this.props.nOfObjects}, each with {this.props.nOfInputs} features. There are {this.props.nOfOutputs} targets. The features are: {this.props.featureNames.join(', ')}.
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}></div>
-              <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }}/>
+              <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => URL.revokeObjectURL(this.props.initPlot)}/>
             </>
           )}
           </Box>
@@ -494,14 +494,12 @@ class Building extends React.Component {
             
             {/* This will render the images, if they exist */}
             <Flex direction="column" gap="2">
-              {this.props.imgs.length > 0 ? (
-                this.props.imgs.map((img, index) => (
-                  <img key={index} src={img} alt={`Image ${index}`} />
-                ))
+              {this.props.img ? (
+                <img src={this.props.img} alt={`Plot(s) of the data`} onLoad={() => URL.revokeObjectURL(this.props.img)}/>
               ) : (
-                <div>No data loaded. Try reloading the page? If this problem persists, please contact us.</div>
+                <div>No image available. Try reloading the page? If this problem persists, please contact us.</div>
               )}
-            {/* TODO: Only print last image, maybe add button to print all or smth */}
+            {/* TODO: Turn this into a pretty animation */}
             </Flex>
           </Flex>
         </Tabs.Content>

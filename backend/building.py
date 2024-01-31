@@ -12,6 +12,7 @@ and calls the levels module for information on the games, and the modular_networ
 from .modular_network import * 
 from . import levels  
 import pickle
+import os
 
 # an example input
 # input_list = [
