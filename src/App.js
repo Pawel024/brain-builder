@@ -49,7 +49,7 @@ function getCookie(name) {
 // ------- CYTOSCAPE FUNCTIONS -------
 
 // function to generate cytoscape elements
-function generateCytoElements(list, apiData, isTraining, weights, biases) {
+export function generateCytoElements(list, apiData, isTraining, weights, biases) {
   const cElements = [];
 
   // Generate nodes
@@ -117,7 +117,7 @@ function generateCytoElements(list, apiData, isTraining, weights, biases) {
 }
 
 // function to generate cytoscape style
-function generateCytoStyle(list = []) {
+export function generateCytoStyle(list = []) {
   const nodeSize = 180/Math.max(...list) < 90 ? 180/Math.max(...list) : 90;
 
   const cStyle = [ // the base stylesheet for the graph
@@ -592,10 +592,12 @@ function App() {
 
   // Update the state when the dependencies change
   useEffect(() => {
-    setCytoElements(taskIds.map((taskId, index) => 
-      generateCytoElements(cytoLayers[index], apiData[index], isTraining[index], weights[index], biases[index])
+    setCytoElements(taskIds.map((taskId, index) => {
+      console.log("apiData:", apiData);
+      console.log("weights:", weights);
+      return generateCytoElements(cytoLayers[index], apiData[index], isTraining[index], weights[index], biases[index])
+    }
     ));
-    console.log("cytoLayers:", cytoLayers);
   }, [taskIds, cytoLayers, apiData, isTraining, weights, biases]);
 
   useEffect(() => {
@@ -876,7 +878,7 @@ function App() {
           <FloatingButton
             variant="outline"
             disabled={(isItPlus && cytoLayers[i] >= 16) | (!isItPlus && cytoLayers[i] < 2)}
-            onClick = {isItPlus ? () => addNode(i, setCytoLayers, taskId, index, maxNodes[index]) : () => removeNode(i, setCytoLayers, taskId, index)}
+            onClick = {taskId !== 0 ? (isItPlus ? () => addNode(i, setCytoLayers, taskId, index, maxNodes[index]) : () => removeNode(i, setCytoLayers, taskId, index)) : () => {}}
             style={{...style}}
             key={i}
           >
@@ -900,9 +902,9 @@ function App() {
               color: 'var(--cyan-12)',
               fontWeight: 'bold'
             }}
-            onBlur={() => setNodes(i, setCytoLayers, taskId, index)}
+            onBlur={taskId !== 0 ? () => setNodes(i, setCytoLayers, taskId, index) : () => {}}
             onKeyDown={(event) => {
-              if (event.key === "Enter") {
+              if (event.key === "Enter" && taskId !== 0) {
                 event.preventDefault();
                 setNodes(i, setCytoLayers, taskId, index);
               }
@@ -1174,32 +1176,60 @@ function App() {
             </Flex>
           </div>
           } />
+          
           <Route path="/introduction" element={
             <Introduction/>
           } />
+
           <Route path="/tutorial" element={
             <div className="App">
-              <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
-              <Grid columns='3' mt='1'>
-                <Box ml='3' style={{display:"flex"}}>  
-                  <Link to="/">
-                    <IconButton aria-label="navigate to home" width='auto' height='21' style={{ marginLeft: 'auto', color: 'inherit', textDecoration: 'none' }}>
-                      <HomeIcon color="white" width='auto' height='18' style={{ marginTop: 2 }} />
-                    </IconButton>
-                  </Link>
-                </Box>
-                <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
-                <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily:'monospace, Courier New, Courier' }}>brAIn builder</Heading>
-                </Link>
-                <Box align='end' mr='3' >
-                    <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
-                    <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
-                    </Link>
-                </Box>
-              </Grid>
-              </Box>
+              <Tutorial
+                nOfInputs={4}
+                nOfOutputs={3}
+                maxLayers={10}
+                taskId={0}
+                index={null}
+                generateFloatingButtons={generateFloatingButtons}
+                updateCytoLayers={null}
+                loadLastCytoLayers={null}
+                FloatingButton={FloatingButton}
+                addLayer={null}
+                removeLayer={null}
+                iterations={null}
+                setIterations={null}
+                learningRate={null}
+                setLearningRate={null}
+                isTraining={0}
+                setIsTraining={null}
+                apiData={null}
+                setApiData={null}
+                taskData={null}
+                setTaskData={null}
+                putRequest={null}
+                accuracy={null}
+                setAccuracy={null}
+                accuracyColor={accuracyColor}
+                handleSubmit={null}
+                isResponding={null}
+                setIsResponding={null}
+                progress={null}
+                featureNames={null}
+                errorList={null}
+                imgs={null}
+                loadData={null}
+                normalization={null}
+                normalizationVisibility={true}
+                iterationsSliderVisibility={true}
+                lrSliderVisibility={true}
+                initPlot={null}
+                setProgress={null}
+                setErrorList={null}
+                setWeights={null}
+                setBiases={null}
+              />
             </div>}
           />
+
           <Route path="/custom11" element={
             <CustomBlock
             host = {window.location.host}
@@ -1207,52 +1237,7 @@ function App() {
             userId = {getCookie('user_id')}
             />
           } />
-          
-          {/*<Tutorial
-            nOfInputs={4}
-            nOfOutputs={3}
-            maxLayers={10}
-            taskId={0}
-            index={null}
-            cytoElements={null}
-            cytoStyle={null}
-            generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={null}
-            setCytoLayers={null}
-            updateCytoLayers={null}
-            loadLastCytoLayers={null}
-            FloatingButton={FloatingButton}
-            addLayer={null}
-            removeLayer={null}
-            iterationsSlider={null}
-            iterations={null}
-            setIterations={null}
-            learningRateSlider={null}
-            learningRate={null}
-            setLearningRate={null}
-            isTraining={0}
-            setIsTraining={null}
-            apiData={null}
-            setApiData={null}
-            taskData={null}
-            setTaskData={null}
-            putRequest={null}
-            accuracy={null}
-            setAccuracy={null}
-            accuracyColor={accuracyColor}
-            handleSubmit={null}
-            isResponding={null}
-            setIsResponding={null}
-            progress={null}
-            featureNames={null}
-            errorList={null}
-            imgs={null}
-            loadData={null}
-            normalization={null}
-            normalizationVisibility={true}
-            iterationsSliderVisibility={true}
-            lrSliderVisibility={true}
-          />*/}
+
           {taskIds.map((taskId, index) => (
             <Route
               key={taskId}

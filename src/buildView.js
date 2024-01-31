@@ -23,6 +23,7 @@ import {
 } from 'chart.js';
 import axios from 'axios';
 import { interpolate } from 'chroma-js';
+import { PrismAsync } from 'react-syntax-highlighter';
 
 function BuildingWrapper(props) {
   const navigate = useNavigate();
@@ -129,9 +130,6 @@ class Building extends React.Component {
   };
 
   componentDidMount() {
-    this.props.loadData(this.props.taskId, this.props.index)  // let the backend load the data, then set the images and feature names
-    this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.taskId, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs);
-    this.props.updateCytoLayers(this.props.setCytoLayers, this.props.nOfInputs, this.props.nOfOutputs, this.props.index);
     if (this.props.taskId === 0) {
       this.setState({ runTutorial: true }, () => {
         // Delay the click on the beacon until after the Joyride component has been rendered
@@ -143,6 +141,11 @@ class Building extends React.Component {
           }
         }, 0);
       });
+    }
+    else {
+    this.props.loadData(this.props.taskId, this.props.index)  // let the backend load the data, then set the images and feature names
+    this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.taskId, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs);
+    this.props.updateCytoLayers(this.props.setCytoLayers, this.props.nOfInputs, this.props.nOfOutputs, this.props.index);
     }
 
     axios.get(window.location.origin + '/api/tasks/?task_id=' + this.props.taskId)
@@ -158,7 +161,7 @@ class Building extends React.Component {
   chartInstance = null;
 
   componentDidUpdate(prevProps) {
-    if (this.chartRef.current) {
+    if (this.props.taskId !== 0 && this.chartRef.current) {
       const ctx = this.chartRef.current.getContext('2d');
 
       if (this.chartInstance && (JSON.stringify(this.props.errorList[0].slice(0, prevProps.errorList[0].length)) === JSON.stringify(prevProps.errorList[0]) && this.props.errorList[0].length > prevProps.errorList[0].length)) {
@@ -254,6 +257,7 @@ class Building extends React.Component {
 
         <Box px="4" pt="3" pb="0">
         <Tabs.Content value="task">
+          {this.props.taskId !== 0 && (
           <Box style={{ padding: '20px 300px', fontFamily:'monospace' }}>
           <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Task Description </Heading>
           <div style={{ textAlign:'justify' }}>{this.state.printedDescription}</div>
@@ -269,6 +273,7 @@ class Building extends React.Component {
             </>
           )}
           </Box>
+          )}
         </Tabs.Content>
         <Tabs.Content value="building">
           <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
@@ -283,7 +288,7 @@ class Building extends React.Component {
 
               <this.props.FloatingButton
                 variant="outline"
-                onClick = {() => this.props.addLayer(this.props.setCytoLayers, this.props.nOfOutputs, this.props.index, this.props.maxLayers)}
+                onClick = {this.props.taskId !== 0 ? () => this.props.addLayer(this.props.setCytoLayers, this.props.nOfOutputs, this.props.index, this.props.maxLayers) : () => {}}
                 size="0"
                 disabled={this.props.cytoLayers.length>this.props.maxLayers-1}
                 style={{top: window.innerHeight*0.285, 
@@ -303,7 +308,7 @@ class Building extends React.Component {
 
               <this.props.FloatingButton
                 variant="outline"
-                onClick = {() => this.props.removeLayer(this.props.setCytoLayers, this.props.index)}
+                onClick = {this.props.taskId !== 0 ? () => this.props.removeLayer(this.props.setCytoLayers, this.props.index) : () => {}}
                 size="0"
                 disabled={this.props.cytoLayers.length<3}
                 style= {{ top: window.innerHeight*0.285, 
@@ -372,7 +377,7 @@ class Building extends React.Component {
             </div>
           </Box>
 
-          <IconButton onClick={(event) => this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs, this.props.normalization)} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.16 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+          <IconButton onClick={this.props.taskId !== 0 ? (event) => this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs, this.props.normalization) : () => {}} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.16 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
             <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
               <PlayIcon width="18" height="18" />Start training!
             </Flex>
@@ -381,11 +386,12 @@ class Building extends React.Component {
         </Tabs.Content>
       
         <Tabs.Content value="stuff">
+        {this.props.taskId !== 0 && (
           <Flex direction="row" gap = "2">
             <Flex direction="column" gap="2">
             
             {/* This will render the form with the feature names received from the backend, if it exists */}
-            <Form.Root className="FormRoot" onSubmit={(event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData, this.props.taskId, this.props.index)} style={{ fontFamily:'monospace' }}>
+            <Form.Root className="FormRoot" onSubmit={this.props.taskId !== 0 ? (event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData, this.props.taskId, this.props.index) : () => {}} style={{ fontFamily:'monospace' }}>
               {this.props.featureNames.length > 0 && this.props.featureNames.map((featureName, index) => (
                 <Form.Field className="FormField" name={featureName} key={index}>
                   <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
@@ -502,6 +508,7 @@ class Building extends React.Component {
             {/* TODO: Turn this into a pretty animation */}
             </Flex>
           </Flex>
+        )}
         </Tabs.Content>
 
 
