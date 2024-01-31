@@ -51,18 +51,20 @@ function getCookie(name) {
 // function to generate cytoscape elements
 export function generateCytoElements(list, apiData, isTraining, weights, biases) {
   const cElements = [];
+  const xPositions = [];
 
   // Generate nodes
   list.forEach((nodesPerLayer, i) => {
     for (let j = 0; j < nodesPerLayer; j++) {
       const id = list.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
       const label = `Node ${id}`;
+      const wAvailable = 0.5 * (window.innerWidth * 0.97);
       const hAvailable = window.innerHeight - 326;
-      const wAvailable = 0.4 * (window.innerWidth * 0.97);
-      const xDistBetweenNodes = wAvailable/list.length;
+      const xDistBetweenNodes = wAvailable/Math.max(list.length-1, 1);
       const yDistBetweenNodes = hAvailable/Math.max(...list);
-      const position = { x: Math.round((0.6 * window.innerWidth * 0.97) + (i-list.length) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes - 65 + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
+      const position = { x: Math.round((0.7 * window.innerWidth * 0.97) + (i-list.length) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes - 65 + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
       cElements.push({ data: { id, label }, position });
+      xPositions.push(position.x);
     }
   });
 
@@ -113,7 +115,7 @@ export function generateCytoElements(list, apiData, isTraining, weights, biases)
     }
   });
 
-  return cElements;
+  return {cElements, xPositions};
 }
 
 // function to generate cytoscape style
@@ -589,15 +591,20 @@ function App() {
 
   const [cytoElements, setCytoElements] = useState([]);
   const [cytoStyle, setCytoStyle] = useState([]);
+  const [listXPositions, setListXPositions] = useState([[]]);
 
   // Update the state when the dependencies change
   useEffect(() => {
+    let newListXPositions = [];
     setCytoElements(taskIds.map((taskId, index) => {
       console.log("apiData:", apiData);
       console.log("weights:", weights);
-      return generateCytoElements(cytoLayers[index], apiData[index], isTraining[index], weights[index], biases[index])
+      const {newCytoElements, newXPositions} = generateCytoElements(cytoLayers[index], apiData[index], isTraining[index], weights[index], biases[index]);
+      newListXPositions.push(newXPositions);
+      return newCytoElements;
     }
     ));
+    setListXPositions(newListXPositions);
   }, [taskIds, cytoLayers, apiData, isTraining, weights, biases]);
 
   useEffect(() => {
@@ -868,11 +875,11 @@ function App() {
   // ------- FLOATING BUTTONS -------
 
   // function to generate floating buttons
-  function generateFloatingButtons(top, left, dist, isItPlus, nLayers, cytoLayers, setCytoLayers, taskId, index) {
+  function generateFloatingButtons(top, left, xPositions, isItPlus, nLayers, cytoLayers, setCytoLayers, taskId, index) {
     const buttons = [];
     const icon = isItPlus ? <PlusIcon /> : <MinusIcon />;
     for (let i = 1; i < nLayers-1; i++) {
-      const style = { top: top, left: left + i * dist };
+      const style = { top: top, left: xPositions[i] + left};
       const button = (
         <div>
           <FloatingButton
@@ -896,7 +903,7 @@ function App() {
               textAlign: 'center',
               position: 'absolute',
               top: window.innerHeight - 258,
-              left: left + i * dist + 16.5,
+              left: xPositions[i] + left + 16.5,
               transform: 'translateX(-50%)',
               fontSize: 'var(--font-size-2)',
               color: 'var(--cyan-12)',
@@ -1294,6 +1301,7 @@ function App() {
                   setErrorList={setErrorList}
                   setWeights={setWeights}
                   setBiases={setBiases}
+                  listXPositions={listXPositions[index]}
                 />
                 </>
               }

@@ -125,7 +125,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'django_react_proj.wsgi.application'
 
-ASGI_APPLICATION = "django_react_proj.routing.application"
+ASGI_APPLICATION = "django_react_proj.asgi.application"
 
 
 # Database
