@@ -264,10 +264,12 @@ class Building extends React.Component {
           {/* a little below this, plot the dataset */}
           {this.props.initPlot && (
             <>
+              {/*
               <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginTop: 20, marginBottom:7 }}>&gt;_The Dataset</Heading>	
               <div style={{ textAlign:'justify' }}>
                 This dataset contains {this.props.nOfObjects}, each with {this.props.nOfInputs} features. There are {this.props.nOfOutputs} targets. The features are: {this.props.featureNames.join(', ')}.
               </div>
+              */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}></div>
               <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => URL.revokeObjectURL(this.props.initPlot)}/>
             </>

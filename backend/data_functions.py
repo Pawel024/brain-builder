@@ -34,11 +34,11 @@ def create_plot11(x=None, y=None, a=None, b=None):
     """
     
     if x is not None and y is not None:
-        plt.scatter(x, y, color='blue')
+        plt.scatter(x, y, color=(4/255, 151/255, 185/255))
         if a is not None and b is not None:
             x_s = torch.linspace(-10, 10, 200)
             y_s = a*x_s + b
-            plt.plot(x_s, y_s, color='red')
+            plt.plot(x_s, y_s, color=(185/255,38/255,4/255))
         plt.xlim(-10, 10)
         plt.ylim(-10, 10)
         # save the image to a BytesIO and return it
