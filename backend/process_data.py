@@ -58,6 +58,7 @@ async def process(req):
         d['plot'] = b64encode(data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data
         d['n_objects'] = data.n_objects
 
+        print("Data Loaded, about to store it")
         # store the data in the BackendData model
         data = pickle.dumps(data)
         if nn is not None:
@@ -65,10 +66,9 @@ async def process(req):
         else:
             backend_data = BackendData(user_id=user_id, task_id=task_id, dataset=data, nn=None)
         await sync_to_async(backend_data.save)()
+        print("Data stored, sending to coach")
 
-        print("Coach.connections = ", Coach.connections)
         coach = Coach.connections.get((str(user_id), str(task_id)))
-        print("Looking for coach with id ", (str(user_id), str(task_id)))
         t = 0
         while coach is None and t < 10:
             time.sleep(0.1)
