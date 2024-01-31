@@ -32,6 +32,7 @@ from asgiref.sync import sync_to_async
 import asyncio
 
 async def process(req):
+    print("Processing action ", req['action'])
 
     req = dict(req)
     task_id, user_id = req['task_id'], req['user_id']
@@ -47,11 +48,13 @@ async def process(req):
 
         # check if a BackendData model exists for this user_id and task_id, and load the stuff in there if it does
         nn = None
+        print("About to check BackendData")
         if await sync_to_async(BackendData.objects.filter(user_id=user_id, task_id=task_id).exists)():
             backend_data = await sync_to_async(BackendData.objects.get)(user_id=user_id, task_id=task_id)
             data = pickle.loads(backend_data.dataset)
             nn = backend_data.nn
 
+        print("Getting dataset...")
         data, training_set, test_set = levels.get_data(tag)  # replace the data anyway, in case changes were made
         d['title'] = 'data'
         d['feature_names'] = [x.replace('_', ' ') for x in data.feature_names]
