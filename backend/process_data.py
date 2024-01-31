@@ -28,6 +28,8 @@ from backend.models import BackendData
 #from django_eventstream import send_event
 #import aiohttp
 import time
+from asgiref.sync import sync_to_async
+import asyncio
 
 async def process(req):
 
@@ -45,8 +47,8 @@ async def process(req):
 
         # check if a BackendData model exists for this user_id and task_id, and load the stuff in there if it does
         nn = None
-        if BackendData.objects.filter(user_id=user_id, task_id=task_id).exists():
-            backend_data = BackendData.objects.get(user_id=user_id, task_id=task_id)
+        if await sync_to_async(BackendData.objects.filter(user_id=user_id, task_id=task_id).exists)():
+            backend_data = await sync_to_async(BackendData.objects.get)(user_id=user_id, task_id=task_id)
             data = pickle.loads(backend_data.dataset)
             nn = backend_data.nn
 
@@ -62,7 +64,7 @@ async def process(req):
             backend_data.dataset = data
         else:
             backend_data = BackendData(user_id=user_id, task_id=task_id, dataset=data, nn=None)
-        backend_data.save()
+        await sync_to_async(backend_data.save)()
 
         print("Coach.connections = ", Coach.connections)
         coach = Coach.connections.get((str(user_id), str(task_id)))
@@ -86,9 +88,9 @@ async def process(req):
 
         backend_data, data = None, None
         # check if there is an entry in the BackendData model for this user_id and task_id
-        if BackendData.objects.filter(user_id=user_id, task_id=task_id).exists():
+        if await sync_to_async(BackendData.objects.filter(user_id=user_id, task_id=task_id).exists)():
             # load the data from this model
-            backend_data = BackendData.objects.get(user_id=user_id, task_id=task_id)
+            backend_data = await sync_to_async(BackendData.objects.get)(user_id=user_id, task_id=task_id)
             data = pickle.loads(data.dataset)
 
         network, data, training_set, test_set = building.build_nn(input_list, tag, data)
@@ -144,7 +146,7 @@ async def process(req):
             backend_data.nn = network
         else:
             backend_data = BackendData(user_id=user_id, task_id=task_id, nn=network, dataset=data)  # store the network and the data
-        backend_data.save()
+        await sync_to_async(backend_data.save)()
         
         d['progress'] = 1
         d['error_list'] = e  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
@@ -153,7 +155,7 @@ async def process(req):
         u['network_biases'] = b  # list of lists of floats representing the biases
         u['plot'] = b64encode(levels.data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data (potentially with decision boundary)
         
-        time.sleep(1)  # for debugging
+        asyncio.sleep(1)  # for debugging
         coach = Coach.connections.get((str(user_id), str(task_id)))
         if coach is not None:
             print('Sending double data to coach')
@@ -163,8 +165,8 @@ async def process(req):
 
 
     elif req['action'] == 2:  # classify a given input
-        if BackendData.objects.filter(user_id=user_id, task_id=task_id).exists():
-            backend_data = BackendData.objects.get(user_id=user_id, task_id=task_id)
+        if await sync_to_async(BackendData.objects.filter(user_id=user_id, task_id=task_id).exists)():
+            backend_data = await sync_to_async(BackendData.objects.get)(user_id=user_id, task_id=task_id)
             nn = pickle.loads(backend_data.nn)
             data = pickle.loads(backend_data.dataset)
 
