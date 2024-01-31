@@ -50,7 +50,7 @@ def create_plot11(x=None, y=None, a=None, b=None):
 
     else: 
         # set up the plot
-        a = round(torch.tan((torch.rand(1)-0.001)*math.pi/2).item(), 3)
+        a = round(torch.tan((torch.rand(1)/3)*math.pi).item(), 3)
         b = round(torch.randint(-5, 6, size=(1,)).item(), 3)
         x = torch.randint(-10, 10, size=(100,))
         y = a*x + b + torch.normal(0, 2, size=(100,))
