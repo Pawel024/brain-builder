@@ -29,7 +29,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_random_secret_key()
+SECRET_KEY = os.environ.get('SECRET_KEY', get_random_secret_key())
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
@@ -134,7 +134,7 @@ ASGI_APPLICATION = "django_react_proj.asgi.application"
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(default='postgres://user:password@localhost/dbname', conn_max_age=600, max_conns=20)
+    'default': dj_database_url.config(default='postgres://aaoydsqplnytyj:34b115476ab35523b0e68c244b7dc27b7c115a96d7692d510c0bf0131f890a6b@ec2-34-242-154-118.eu-west-1.compute.amazonaws.com:5432/dan5645q1865tq', conn_max_age=0)
 }
 
 
