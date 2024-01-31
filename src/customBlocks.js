@@ -133,21 +133,21 @@ class CustomBlock extends Component {
 
             <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', fontFamily: 'monospace', height: window.innerHeight-52, width:'100vw' }}>
             {this.props.customId === 11 && (
-                <Flex direction='row' gap={0} style={{ height: window.innerHeight-52, width:'100vw', alignItems: 'center', justifyContent: 'center' }}>
+                <Flex direction='row' gap="0" style={{ height: window.innerHeight-52, width:'100vw', alignItems: 'center', justifyContent: 'center' }}>
                     <Box style={{ flex:1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: window.innerHeight-52, padding:'30px 50px' }}>
-                        <Flex direction='column' gap={2} style={{ alignItems: 'center', justifyContent: 'center' }}>
+                        <Flex direction='column' gap="2" style={{ alignItems: 'center', justifyContent: 'center' }}>
                         <div className="weightSlider">
                             {weightSlider}
                         </div>
                         <div>Weight: {this.state.weight}</div>
-                        <div className="biasSlider">
+                        <div className="biasSlider" style={{ marginTop:20 }}>
                             {biasSlider}
                         </div>
                         <div>Bias: {this.state.bias}</div>
-                        <img src={this.state.img} alt="No plot available" />
+                        <img src={this.state.img} alt="No plot available" style={{ marginTop:20 }}/>
                         </Flex>
                     </Box>
-                    <Separator orientation='vertical' style = {{ height: window.innerHeight-100 }}/>
+                    <Separator orientation='vertical' style = {{ height: window.innerHeight-110 }}/>
                     <Box style={{ flex:1, display: 'flex', flexDirection: 'column', textAlign:'justify', alignItems: 'flex-start', justifyContent: 'center', height: window.innerHeight-52, padding:'30px 50px' }}>
                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae elementum curabitur vitae nunc sed. Consectetur purus ut faucibus pulvinar elementum integer enim. Diam quis enim lobortis scelerisque fermentum dui. Sed egestas egestas fringilla phasellus faucibus scelerisque eleifend donec. Consectetur adipiscing elit ut aliquam purus sit. At erat pellentesque adipiscing commodo. Aliquam etiam erat velit scelerisque in. Sem viverra aliquet eget sit amet tellus cras adipiscing enim. Sed viverra tellus in hac. Eros donec ac odio tempor orci dapibus. Facilisi cras fermentum odio eu feugiat. Ut eu sem integer vitae justo eget.</p>
                     </Box>

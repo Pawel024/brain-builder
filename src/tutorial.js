@@ -4,26 +4,27 @@ import './App.css';
 
 function Tutorial({ nOfInputs, nOfOutputs, maxLayers, taskDescription, cytoElements, cytoStyle, generateFloatingButtons, cytoLayers, setCytoLayers, updateCytoLayers, loadLastCytoLayers, FloatingButton, addLayer, removeLayer, iterationsSlider, iterations, setIterations, learningRateSlider, learningRate, setLearningRate, isTraining, setIsTraining, apiData, setApiData, postRequest, accuracy, setAccuracy, accuracyColor, handleSubmit, isResponding, setIsResponding, MontyPythonSwitch }) {
   return (
-        <BuildView
+    <div>
+        {/*<BuildView
             currentGameNumber={0} 
             nOfInputs={nOfInputs}
             nOfOutputs={nOfOutputs}
             maxLayers={maxLayers}
             taskDescription={taskDescription}
-            cytoElements={cytoElements}
-            cytoStyle={cytoStyle}
+            cytoElements={tutorialCytoElements}
+            cytoStyle={tutorialCytoStyle}
             generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers}
+            cytoLayers={tutorialCytoLayers}
             setCytoLayers={setCytoLayers}
             updateCytoLayers={updateCytoLayers}
             loadLastCytoLayers={loadLastCytoLayers}
             FloatingButton={FloatingButton}
             addLayer={addLayer}
             removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider}
+            iterationsSlider={tutorialIterationsSlider}
             iterations={iterations}
             setIterations={setIterations}
-            learningRateSlider={learningRateSlider}
+            learningRateSlider={tutorialLearningRateSlider}
             learningRate={learningRate}
             setLearningRate={setLearningRate}
             isTraining={isTraining}
@@ -38,7 +39,8 @@ function Tutorial({ nOfInputs, nOfOutputs, maxLayers, taskDescription, cytoEleme
             isResponding={isResponding}
             setIsResponding={setIsResponding}
             MontyPythonSwitch={MontyPythonSwitch}
-          />
+  />*/}
+    </div>
   );
 }
 

@@ -15,6 +15,7 @@ import Readme from './readme';
 import Introduction from './introduction';
 import QuizApp from './quiz';
 import CustomBlock from './customBlocks';
+import Tutorial from './tutorial';
 
 
 const colorScale = chroma.scale(['#49329b', '#5e5cc2', '#8386d8', '#afb0e1', '#dddddd', '#e3a692', '#d37254', '#b64124', '#8f0500']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
@@ -1209,52 +1210,52 @@ function App() {
             userId = {getCookie('user_id')}
             />
           } />
-          {/*
-            <Tutorial
+          
+          {/*<Tutorial
             nOfInputs={4}
             nOfOutputs={3}
             maxLayers={10}
             taskId={0}
-            index={-1}
-            cytoElements={cytoElements[index]}
-            cytoStyle={cytoStyle[index]}
+            index={null}
+            cytoElements={null}
+            cytoStyle={null}
             generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers[index]}
-            setCytoLayers={setCytoLayers}
-            updateCytoLayers={updateCytoLayers}
-            loadLastCytoLayers={loadLastCytoLayers}
+            cytoLayers={null}
+            setCytoLayers={null}
+            updateCytoLayers={null}
+            loadLastCytoLayers={null}
             FloatingButton={FloatingButton}
-            addLayer={addLayer}
-            removeLayer={removeLayer}
-            iterationsSlider={iterationsSliders[index]}
-            iterations={iterations[index]}
-            setIterations={setIterations}
-            learningRateSlider={learningRateSliders[index]}
-            learningRate={learningRate[index]}
-            setLearningRate={setLearningRate}
-            isTraining={isTraining[index]}
-            setIsTraining={setIsTraining}
-            apiData={apiData[index]}
-            setApiData={setApiData}
-            taskData={taskData}
-            setTaskData={setTaskData}
-            putRequest={putRequest}
-            accuracy={accuracy[index]}
-            setAccuracy={setAccuracy}
+            addLayer={null}
+            removeLayer={null}
+            iterationsSlider={null}
+            iterations={null}
+            setIterations={null}
+            learningRateSlider={null}
+            learningRate={null}
+            setLearningRate={null}
+            isTraining={0}
+            setIsTraining={null}
+            apiData={null}
+            setApiData={null}
+            taskData={null}
+            setTaskData={null}
+            putRequest={null}
+            accuracy={null}
+            setAccuracy={null}
             accuracyColor={accuracyColor}
-            handleSubmit={handleSubmit}
-            isResponding={isResponding[index]}
-            setIsResponding={setIsResponding}
-            progress={progress[index]}
-            featureNames={featureNames[index]}
-            errorList={errorList[index]}
-            imgs={imgs[index]}
-            loadData={loadData}
-            normalization={normalization[index]}
-            normalizationVisibility={normalizationVisibility[index]}
-            iterationsSliderVisibility={iterationsSliderVisibility[index]}
-            lrSliderVisibility={lrSliderVisibility[index]}
-        />*/}
+            handleSubmit={null}
+            isResponding={null}
+            setIsResponding={null}
+            progress={null}
+            featureNames={null}
+            errorList={null}
+            imgs={null}
+            loadData={null}
+            normalization={null}
+            normalizationVisibility={true}
+            iterationsSliderVisibility={true}
+            lrSliderVisibility={true}
+          />*/}
           {taskIds.map((taskId, index) => (
             <Route
               key={taskId}
