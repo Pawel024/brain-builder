@@ -1,4 +1,4 @@
-﻿Target,Semi-Major_Axis_[kg],Inclination_[deg],Expected_Life_[years],Launch_Mass_[kg]
+﻿Target,Semi-Major_Axis_[km],Inclination_[deg],Expected_Life_[years],Launch_Mass_[kg]
 Communications,0.948010886,0.000503018,0.743589744,0.423946848
 Communications,0.946329945,0.000402414,0.743589744,0.841391009
 Communications,0.946436671,0.000201207,0.743589744,0.719394967

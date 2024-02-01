@@ -127,6 +127,7 @@ class DataFromExcel(Dataset):
                 for i in range(self.n_features + self.n_targets):
                     self.data.iloc[:, i] = ((self.data.iloc[:, i] - self.minima.iloc[i]) /
                                             (self.maxima.iloc[i] - self.minima.iloc[i]))
+            print("First 5 rows: ", self.data.head(5))
 
         else:
             print("Data type not supported yet")
