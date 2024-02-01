@@ -54,11 +54,10 @@ function Tutorial({ nOfInputs,
   const [tutorialCytoLayers, setTutorialCytoLayers] = useState([4, 8, 8, 8, 8, 3]);
   const [tutorialApiData, setTutorialApiData] = useState([]);
   const [tutorialWeights, setTutorialWeights] = useState([]);
-  const [tutorialListXPositions, setTutorialListXPositions] = useState([]);
 
   // Update the state when the dependencies change
   useEffect(() => {
-    setTutorialCytoElements(generateCytoElements([4,10,3], tutorialApiData, isTraining, tutorialWeights, null));
+    setTutorialCytoElements(generateCytoElements(tutorialCytoLayers, tutorialApiData, isTraining, tutorialWeights, null));
     setTutorialCytoStyle(generateCytoStyle(tutorialCytoLayers));
   }, [tutorialCytoLayers, tutorialApiData, isTraining, tutorialWeights]);
 
@@ -144,7 +143,6 @@ function Tutorial({ nOfInputs,
           setErrorList={setErrorList}
           setWeights={setWeights}
           setBiases={setBiases}
-          listXPositions={tutorialListXPositions}
       />
     </div>
   );

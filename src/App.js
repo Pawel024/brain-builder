@@ -51,7 +51,6 @@ function getCookie(name) {
 // function to generate cytoscape elements
 export function generateCytoElements(list, apiData, isTraining, weights, biases) {
   const cElements = [];
-  const xPositions = [];
 
   // Generate nodes
   list.forEach((nodesPerLayer, i) => {
@@ -64,9 +63,6 @@ export function generateCytoElements(list, apiData, isTraining, weights, biases)
       const yDistBetweenNodes = hAvailable/Math.max(...list);
       const position = { x: Math.round((0.7 * window.innerWidth * 0.97) + (i-list.length) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes - 65 + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
       cElements.push({ data: { id, label }, position });
-      if (j===0) {xPositions.push(position.x);}
-      if (j===1) {xPositions.push(position.x-xPositions[0]);}
-      console.log("xPositions(original): ", xPositions);
     }
   });
 
@@ -118,8 +114,7 @@ export function generateCytoElements(list, apiData, isTraining, weights, biases)
   });
 
   console.log('cElements before return:', cElements)
-  console.log('xPositions before return:', xPositions);
-  return {cElements, xPositions};
+  return cElements;
 }
 
 // function to generate cytoscape style
@@ -595,24 +590,16 @@ function App() {
 
   const [cytoElements, setCytoElements] = useState([]);
   const [cytoStyle, setCytoStyle] = useState([]);
-  const [listXPositions, setListXPositions] = useState([[]]);
 
   // Update the state when the dependencies change
   useEffect(() => {
-    let newListXPositions = [];
-    let newCytoElements = [];
-    taskIds.forEach((taskId, index) => {
+    setCytoElements(taskIds.map((taskId, index) => {
       console.log("apiData:", apiData);
       console.log("weights:", weights);
       console.log(`cytoLayers[${index}] before running generateCytoElements:`, cytoLayers[index]);
-      const {currentCytoElements, currentXPositions} = generateCytoElements(cytoLayers[index], apiData[index], isTraining[index], weights[index], biases[index]);
-      newListXPositions.push(currentXPositions);
-      console.log("newXPositions: ", currentXPositions);  // for debugging
-      newCytoElements.push(currentCytoElements);
-    });
-    console.log("newListXPositions: ", newListXPositions);  // for debugging
-    setListXPositions(newListXPositions);
-    setCytoElements(newCytoElements);
+      return generateCytoElements(cytoLayers[index], apiData[index], isTraining[index], weights[index], biases[index])
+    }
+    ));
   }, [taskIds, cytoLayers, apiData, isTraining, weights, biases]);
 
   useEffect(() => {
@@ -883,12 +870,11 @@ function App() {
   // ------- FLOATING BUTTONS -------
 
   // function to generate floating buttons
-  function generateFloatingButtons(top, left, xPositions, isItPlus, nLayers, cytoLayers, setCytoLayers, taskId, index) {
+  function generateFloatingButtons(top, left, dist, isItPlus, nLayers, cytoLayers, setCytoLayers, taskId, index) {
     const buttons = [];
     const icon = isItPlus ? <PlusIcon /> : <MinusIcon />;
-    console.log("xPositions: ", xPositions)
-    for (let i = 1; i < nLayers-1; i++) { // we start at i and end at nLayers-1 because we don't want to add or remove nodes from the input or output layers
-      const style = { top: top, left: xPositions[0] + i*xPositions[1] + left};
+    for (let i = 1; i < nLayers-1; i++) {
+      const style = { top: top, left: left + i * dist };
       const button = (
         <div>
           <FloatingButton
@@ -912,7 +898,7 @@ function App() {
               textAlign: 'center',
               position: 'absolute',
               top: window.innerHeight - 258,
-              left: xPositions[0] + i*xPositions[1] + left + 16.5,
+              left: left + i * dist + 16.5,
               transform: 'translateX(-50%)',
               fontSize: 'var(--font-size-2)',
               color: 'var(--cyan-12)',
@@ -1260,7 +1246,6 @@ function App() {
               path={`/challenge${taskId}`}
               element={
                 <>
-                {console.log(`listXPositions[${index}]: ${listXPositions[index]}`)}
                 <BuildView
                   nOfInputs={nInputs[index]}
                   nOfOutputs={nOutputs[index]}
@@ -1311,7 +1296,6 @@ function App() {
                   setErrorList={setErrorList}
                   setWeights={setWeights}
                   setBiases={setBiases}
-                  listXPositions={listXPositions[index]}
                 />
                 </>
               }

@@ -285,9 +285,8 @@ class Building extends React.Component {
               
               <img src={color_scale_pic} alt='Color scale from purple for negative to red for positive' width='20' height='auto' style={{ position: 'absolute', top: 15, left: 15 }}/>
 
-              {console.log(this.props.listXPositions)}
-              {this.props.generateFloatingButtons(window.innerHeight - 223, 0, this.props.listXPositions, true, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}                    
-              {this.props.generateFloatingButtons(window.innerHeight - 178, 0, this.props.listXPositions, false, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}
+              {this.props.generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.5 * (window.innerWidth * 0.97)/Math.max(this.props.cytoLayers.length-1,1), true, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}                    
+              {this.props.generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.5 * (window.innerWidth * 0.97)/Math.max(this.props.cytoLayers.length-1,1), false, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}
 
               <this.props.FloatingButton
                 variant="outline"
