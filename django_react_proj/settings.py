@@ -134,7 +134,10 @@ ASGI_APPLICATION = "django_react_proj.asgi.application"
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(default='postgres://aaoydsqplnytyj:34b115476ab35523b0e68c244b7dc27b7c115a96d7692d510c0bf0131f890a6b@ec2-34-242-154-118.eu-west-1.compute.amazonaws.com:5432/dan5645q1865tq', conn_max_age=0)
+#    'default': dj_database_url.config(default='postgres://aaoydsqplnytyj:34b115476ab35523b0e68c244b7dc27b7c115a96d7692d510c0bf0131f890a6b@ec2-34-242-154-118.eu-west-1.compute.amazonaws.com:5432/dan5645q1865tq', conn_max_age=0)
+    'default': dj_database_url.config(
+        default = os.environ.get('DATABASE_URL', 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')), conn_max_age=0
+    )
 }
 
 
