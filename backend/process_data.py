@@ -46,6 +46,10 @@ async def process(req):
         d = {}
         tag = int(req['task_id'])
 
+        print("Trying to add an empty entry to BackendData")
+        backend_data = BackendData(user_id=user_id, task_id=task_id, dataset=b'', nn=None)
+        await sync_to_async(backend_data.save)()
+
         # check if a BackendData model exists for this user_id and task_id, and load the stuff in there if it does
         nn = None
         print("About to check BackendData")
@@ -53,7 +57,6 @@ async def process(req):
             if await asyncio.wait_for(sync_to_async(BackendData.objects.filter(user_id=user_id, task_id=task_id).exists)(), timeout = 5):
                 backend_data = await asyncio.wait_for(sync_to_async(BackendData.objects.get)(user_id=user_id, task_id=task_id), timeout=5)
                 data = pickle.loads(backend_data.dataset)
-                nn = backend_data.nn
         except Exception as e:
             print("Error occured when checking BackendData: ")
             print(e)
@@ -68,6 +71,13 @@ async def process(req):
         print("Data Loaded, about to store it")
         # store the data in the BackendData model
         data = pickle.dumps(data)
+        try:
+            pickle.loads(data)
+            print("Pickled data could be loaded")
+        except Exception as e:
+            print("Error occurred when unpickling data: ")
+            print(e)
+        print("Data pickled: length = ", len(data))
         if nn is not None:
             backend_data.dataset = data
         else:
