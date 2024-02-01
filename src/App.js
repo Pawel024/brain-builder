@@ -824,9 +824,9 @@ function App() {
             return newProgress;
           });
 
-          if (data.progress >= 0.999 ) {
+          if (data.progress >= 0.98 ) {
             ws.close();
-          clearTimeout(timeoutId);
+            clearTimeout(timeoutId);
             setIsTraining(prevIsTraining => {
               const newIsTraining = [...prevIsTraining];
               newIsTraining[index] = 2;
