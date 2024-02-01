@@ -6,6 +6,9 @@ class BackendData(models.Model):
     nn = models.BinaryField()
     dataset = models.BinaryField()
 
+    def __str__(self):
+        return self.user_id + " - " + str(self.task_id)
+
 class Row(models.Model):
     action = models.IntegerField()
     user_id = models.CharField(max_length=100)
