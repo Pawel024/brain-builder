@@ -239,9 +239,14 @@ class DataFromExcel(Dataset):
                         if type(self.data.iloc[0, j]) is not str:
                             row = k // n_cols
                             col = k % n_cols
-                            ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j])
-                            ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
-                            ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
+                            if n_rows == 1:
+                                ax[col].scatter(self.data.iloc[:, i], self.data.iloc[:, j])
+                                ax[col].set_xlabel(self.data.columns[i].replace('_', ' '))
+                                ax[col].set_ylabel(self.data.columns[j].replace('_', ' '))
+                            else: 
+                                ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j])
+                                ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
+                                ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
                             k += 1
 
         fig.tight_layout()
