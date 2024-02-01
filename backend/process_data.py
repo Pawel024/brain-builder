@@ -50,8 +50,8 @@ async def process(req):
         nn = None
         print("About to check BackendData")
         try: 
-            if asyncio.wait_for(sync_to_async(BackendData.objects.filter(user_id=user_id, task_id=task_id).exists)(), timeout = 10):
-                backend_data = asyncio.wait_for(sync_to_async(BackendData.objects.get)(user_id=user_id, task_id=task_id), timeout=10)
+            if await asyncio.wait_for(sync_to_async(BackendData.objects.filter(user_id=user_id, task_id=task_id).exists)(), timeout = 5):
+                backend_data = await asyncio.wait_for(sync_to_async(BackendData.objects.get)(user_id=user_id, task_id=task_id), timeout=5)
                 data = pickle.loads(backend_data.dataset)
                 nn = backend_data.nn
         except Exception as e:
@@ -59,7 +59,7 @@ async def process(req):
             print(e)
 
         print("Getting dataset...")
-        data, training_set, test_set = levels.get_data(tag)  # replace the data anyway, in case changes were made
+        data, (training_set, test_set) = levels.get_data(tag)  # replace the data anyway, in case changes were made
         d['title'] = 'data'
         d['feature_names'] = [x.replace('_', ' ') for x in data.feature_names]
         d['plot'] = b64encode(data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data
