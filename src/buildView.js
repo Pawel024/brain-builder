@@ -161,6 +161,7 @@ class Building extends React.Component {
   chartInstance = null;
 
   componentDidUpdate(prevProps) {
+    if (this.cy) {this.cy.resize();console.log("Resizing cytoscape");} // this seems to do nothing
     if (this.props.taskId !== 0 && this.chartRef.current) {
       const ctx = this.chartRef.current.getContext('2d');
 
@@ -278,10 +279,10 @@ class Building extends React.Component {
           )}
         </Tabs.Content>
         <Tabs.Content value="building">          
-          <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
-            <div className='cytoscape'style={{top: 5, left: 3, position: 'absolute', width: window.innerWidth*0.77, height: window.innerHeight-130}}></div>
-            <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
-              <CytoscapeComponent elements={this.props.cytoElements} stylesheet={this.props.cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
+          <Box style={{ display: 'flex', height: '100vh' }}>
+            <div className='cytoscape'style={{top: 5, left: 3, position: 'absolute', width: window.innerWidth*0.65, height: window.innerHeight-130}}></div>
+            <Flex direction="column" gap="2" height={'100vh'}>
+              <CytoscapeComponent elements={this.props.cytoElements} stylesheet={this.props.cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } onCy={(cy) => {this.cy = cy;}}/>
               
               <img src={color_scale_pic} alt='Color scale from purple for negative to red for positive' width='20' height='auto' style={{ position: 'absolute', top: 15, left: 15 }}/>
 
@@ -300,7 +301,7 @@ class Building extends React.Component {
                 variant="outline"
                 onClick = {this.props.taskId !== 0 ? () => this.props.addLayer(this.props.setCytoLayers, this.props.nOfOutputs, this.props.index, this.props.maxLayers) : () => {}}
                 size="0"
-                disabled={this.props.cytoLayers.length>this.props.maxLayers-1}
+                disabled={this.props.cytoLayers.length>this.props.maxLayers-1 || this.props.isTraining===1}
                 style={{top: window.innerHeight*0.285, 
                         left: window.innerWidth*0.60, 
                         position: 'absolute',
@@ -320,7 +321,7 @@ class Building extends React.Component {
                 variant="outline"
                 onClick = {this.props.taskId !== 0 ? () => this.props.removeLayer(this.props.setCytoLayers, this.props.index) : () => {}}
                 size="0"
-                disabled={this.props.cytoLayers.length<3}
+                disabled={this.props.cytoLayers.length<3 || this.props.isTraining===1}
                 style= {{ top: window.innerHeight*0.285, 
                           left: window.innerWidth*0.56,
                           position: 'absolute',
@@ -359,7 +360,7 @@ class Building extends React.Component {
           {this.props.normalizationVisibility ? (
           <Text as="label" size="2">
             <Flex style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.7 * (window.innerWidth * 0.97)), width: Math.round(0.27 * (window.innerWidth * 0.97)), justifyContent:"flex-start", alignItems:"flex-start"}} gap="2">          
-              <Checkbox/>
+              <Checkbox disabled = { this.props.isTraining===1 } />
               Normalize training data
             </Flex>
           </Text>):(<div></div>)}
@@ -393,10 +394,14 @@ class Building extends React.Component {
             </div>
           </Box>
 
-          <IconButton onClick={this.props.taskId !== 0 ? (event) => this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs, this.props.normalization) : () => {}} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.92 * (window.innerHeight-140)), left: Math.round(0.835 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.12 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-            <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
-              <PlayIcon width="18" height="18" />Start training!
-            </Flex>
+          <IconButton
+            onClick={this.props.taskId !== 0 ? (event) => this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs, this.props.normalization) : () => {}}
+            variant="solid"
+            style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.92 * (window.innerHeight-140)), left: Math.round(0.835 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.12 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}
+            disabled = { this.props.isTraining===1 }>
+              <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
+                <PlayIcon width="18" height="18" />Start training!
+              </Flex>
           </IconButton>
         </Tabs.Content>
       

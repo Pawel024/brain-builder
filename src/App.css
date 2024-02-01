@@ -3,7 +3,6 @@
 @import '@radix-ui/colors/black-alpha.css';
 
 .App {
-  text-align: center;
   max-height: 100vh;
   overflow: hidden;
 }

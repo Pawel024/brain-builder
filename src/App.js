@@ -894,7 +894,7 @@ function App() {
         <div>
           <FloatingButton
             variant="outline"
-            disabled={(isItPlus && cytoLayers[i] >= 16) | (!isItPlus && cytoLayers[i] < 2)}
+            disabled={(isItPlus && cytoLayers[i] >= 16) | (!isItPlus && cytoLayers[i] < 2) | isTraining[index] === 1}
             onClick = {taskId !== 0 ? (isItPlus ? () => addNode(i, setCytoLayers, taskId, index, maxNodes[index]) : () => removeNode(i, setCytoLayers, taskId, index)) : () => {}}
             style={{...style}}
             key={i}
@@ -1031,6 +1031,7 @@ function App() {
         max={maxEpochs[index] / 2}
         step={0.5}
         style={{ width: Math.round(0.19 * (window.innerWidth * 0.97)) }}
+        disabled={isTraining[index] === 1}
       >
         <Slider.Track className="SliderTrack" style={{ height: 3 }}>
           <Slider.Range className="SliderRange" />
@@ -1050,6 +1051,7 @@ function App() {
         max={70}
         step={10}
         style={{ width: Math.round(0.19 * (window.innerWidth * 0.97)) }}
+        disabled={isTraining[index] === 1}
       >
         <Slider.Track className="SliderTrack" style={{ height: 3 }}>
           <Slider.Range className="SliderRange" />
@@ -1199,53 +1201,51 @@ function App() {
           } />
 
           <Route path="/tutorial" element={
-            <div className="App">
-              <Tutorial
-                nOfInputs={4}
-                nOfOutputs={3}
-                maxLayers={10}
-                taskId={0}
-                index={null}
-                generateFloatingButtons={generateFloatingButtons}
-                updateCytoLayers={null}
-                loadLastCytoLayers={null}
-                FloatingButton={FloatingButton}
-                addLayer={null}
-                removeLayer={null}
-                iterations={null}
-                setIterations={null}
-                learningRate={null}
-                setLearningRate={null}
-                isTraining={0}
-                setIsTraining={null}
-                apiData={null}
-                setApiData={null}
-                taskData={null}
-                setTaskData={null}
-                putRequest={null}
-                accuracy={null}
-                setAccuracy={null}
-                accuracyColor={accuracyColor}
-                handleSubmit={null}
-                isResponding={null}
-                setIsResponding={null}
-                progress={null}
-                featureNames={null}
-                errorList={null}
-                img={null}
-                loadData={null}
-                normalization={null}
-                normalizationVisibility={true}
-                iterationsSliderVisibility={true}
-                lrSliderVisibility={true}
-                initPlot={null}
-                setProgress={null}
-                setErrorList={null}
-                setWeights={null}
-                setBiases={null}
-              />
-            </div>}
-          />
+            <Tutorial
+              nOfInputs={4}
+              nOfOutputs={3}
+              maxLayers={10}
+              taskId={0}
+              index={null}
+              generateFloatingButtons={generateFloatingButtons}
+              updateCytoLayers={null}
+              loadLastCytoLayers={null}
+              FloatingButton={FloatingButton}
+              addLayer={null}
+              removeLayer={null}
+              iterations={null}
+              setIterations={null}
+              learningRate={null}
+              setLearningRate={null}
+              isTraining={0}
+              setIsTraining={null}
+              apiData={null}
+              setApiData={null}
+              taskData={null}
+              setTaskData={null}
+              putRequest={null}
+              accuracy={null}
+              setAccuracy={null}
+              accuracyColor={accuracyColor}
+              handleSubmit={null}
+              isResponding={null}
+              setIsResponding={null}
+              progress={null}
+              featureNames={null}
+              errorList={null}
+              img={null}
+              loadData={null}
+              normalization={null}
+              normalizationVisibility={true}
+              iterationsSliderVisibility={true}
+              lrSliderVisibility={true}
+              initPlot={null}
+              setProgress={null}
+              setErrorList={null}
+              setWeights={null}
+              setBiases={null}
+            />
+          }/>
 
           <Route path="/custom11" element={
             <CustomBlock

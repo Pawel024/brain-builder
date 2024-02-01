@@ -68,7 +68,8 @@ function Tutorial({ nOfInputs,
         defaultValue={[50]}
         max={100}
         step={0.5}
-        style={{ width: Math.round(0.25 * (window.innerWidth * 0.97)) }}
+        style={{ width: Math.round(0.19 * (window.innerWidth * 0.97)) }}
+        disabled={isTraining === 1}
       >
         <Slider.Track className="SliderTrack" style={{ height: 3 }}>
           <Slider.Range className="SliderRange" />
@@ -83,7 +84,8 @@ function Tutorial({ nOfInputs,
         defaultValue={[35]}
         max={70}
         step={10}
-        style={{ width: Math.round(0.25 * (window.innerWidth * 0.97)) }}
+        style={{ width: Math.round(0.19 * (window.innerWidth * 0.97)) }}
+        disabled={isTraining === 1}
       >
         <Slider.Track className="SliderTrack" style={{ height: 3 }}>
           <Slider.Range className="SliderRange" />
@@ -93,58 +95,56 @@ function Tutorial({ nOfInputs,
     );
   
   return (
-    <div>
-        <BuildView
-          nOfInputs={nOfInputs}
-          nOfOutputs={nOfOutputs}
-          maxLayers={maxLayers}
-          cytoElements={tutorialCytoElements}
-          cytoStyle={tutorialCytoStyle}
-          generateFloatingButtons={generateFloatingButtons}
-          cytoLayers={tutorialCytoLayers}
-          setCytoLayers={setTutorialCytoLayers}
-          updateCytoLayers={updateCytoLayers}
-          loadLastCytoLayers={loadLastCytoLayers}
-          FloatingButton={FloatingButton}
-          addLayer={addLayer}
-          removeLayer={removeLayer}
-          iterationsSlider={tutorialIterationsSlider}
-          iterations={iterations}
-          setIterations={setIterations}
-          learningRateSlider={tutorialLearningRateSlider}
-          learningRate={learningRate}
-          setLearningRate={setLearningRate}
-          isTraining={isTraining}
-          setIsTraining={setIsTraining}
-          apiData={apiData}
-          setApiData={setApiData}
-          accuracy={accuracy}
-          setAccuracy={setAccuracy}
-          accuracyColor={accuracyColor}
-          handleSubmit={handleSubmit}
-          isResponding={isResponding}
-          setIsResponding={setIsResponding}
-          taskId={taskId}
-          index={index}
-          taskData={taskData}
-          setTaskData={setTaskData}
-          putRequest={putRequest}
-          progress={progress}
-          featureNames={featureNames}
-          errorList={errorList}
-          imgs={imgs}
-          loadData={loadData}
-          normalization={normalization}
-          normalizationVisibility={normalizationVisibility}
-          iterationsSliderVisibility={iterationsSliderVisibility}
-          lrSliderVisibility={lrSliderVisibility}
-          initPlot={initPlot}
-          setProgress={setProgress}
-          setErrorList={setErrorList}
-          setWeights={setWeights}
-          setBiases={setBiases}
-      />
-    </div>
+      <BuildView
+        nOfInputs={nOfInputs}
+        nOfOutputs={nOfOutputs}
+        maxLayers={maxLayers}
+        cytoElements={tutorialCytoElements}
+        cytoStyle={tutorialCytoStyle}
+        generateFloatingButtons={generateFloatingButtons}
+        cytoLayers={tutorialCytoLayers}
+        setCytoLayers={setTutorialCytoLayers}
+        updateCytoLayers={updateCytoLayers}
+        loadLastCytoLayers={loadLastCytoLayers}
+        FloatingButton={FloatingButton}
+        addLayer={addLayer}
+        removeLayer={removeLayer}
+        iterationsSlider={tutorialIterationsSlider}
+        iterations={iterations}
+        setIterations={setIterations}
+        learningRateSlider={tutorialLearningRateSlider}
+        learningRate={learningRate}
+        setLearningRate={setLearningRate}
+        isTraining={isTraining}
+        setIsTraining={setIsTraining}
+        apiData={apiData}
+        setApiData={setApiData}
+        accuracy={accuracy}
+        setAccuracy={setAccuracy}
+        accuracyColor={accuracyColor}
+        handleSubmit={handleSubmit}
+        isResponding={isResponding}
+        setIsResponding={setIsResponding}
+        taskId={taskId}
+        index={index}
+        taskData={taskData}
+        setTaskData={setTaskData}
+        putRequest={putRequest}
+        progress={progress}
+        featureNames={featureNames}
+        errorList={errorList}
+        imgs={imgs}
+        loadData={loadData}
+        normalization={normalization}
+        normalizationVisibility={normalizationVisibility}
+        iterationsSliderVisibility={iterationsSliderVisibility}
+        lrSliderVisibility={lrSliderVisibility}
+        initPlot={initPlot}
+        setProgress={setProgress}
+        setErrorList={setErrorList}
+        setWeights={setWeights}
+        setBiases={setBiases}
+    />
   );
 }
 
