@@ -277,9 +277,7 @@ class Building extends React.Component {
           </Box>
           )}
         </Tabs.Content>
-        <Tabs.Content value="building">
-          <div className='App'>
-          
+        <Tabs.Content value="building">          
           <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
             <div className='cytoscape'style={{top: 5, left: 3, position: 'absolute', width: window.innerWidth*0.77, height: window.innerHeight-130}}></div>
             <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
@@ -378,7 +376,7 @@ class Building extends React.Component {
                 </div>
               )
               )}
-              
+
             </div>
           </Box>
 
@@ -387,7 +385,6 @@ class Building extends React.Component {
               <PlayIcon width="18" height="18" />Start training!
             </Flex>
           </IconButton>
-          </div>
         </Tabs.Content>
       
         <Tabs.Content value="stuff">
