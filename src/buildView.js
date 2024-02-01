@@ -338,19 +338,19 @@ class Building extends React.Component {
             <div className="iterationsSlider">
               {this.props.iterationsSlider}
             </div>
-            <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.125 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Epochs: {this.props.iterations}</div>
+            <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.095 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Epochs: {this.props.iterations}</div>
           </Box>) : (<div></div>)}
 
-          {this.props.lrSliderVisibility ? (<Box style={{ position:"absolute", top: Math.round(0.26 * (window.innerHeight-140)), left: Math.round(0.71 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', fontFamily:'monospace'  }}>
+          {this.props.lrSliderVisibility ? (<Box style={{ position:"absolute", top: Math.round(0.26 * (window.innerHeight-140)), left: Math.round(0.74 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', fontFamily:'monospace'  }}>
             <div className="learningRateSlider">
               {this.props.learningRateSlider}
             </div>
-            <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.125 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Learning rate: {this.props.learningRate}</div>
+            <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.095 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Learning rate: {this.props.learningRate}</div>
           </Box>) : (<div></div>)}
           
           {this.props.normalizationVisibility ? (
           <Text as="label" size="2">
-            <Flex style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.71 * (window.innerWidth * 0.97))}} gap="2">          
+            <Flex style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.7 * (window.innerWidth * 0.97))}} gap="2">          
               <Checkbox/>
               Normalize training data
             </Flex>
@@ -379,7 +379,7 @@ class Building extends React.Component {
             </div>
           </Box>
 
-          <IconButton onClick={this.props.taskId !== 0 ? (event) => this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs, this.props.normalization) : () => {}} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.16 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
+          <IconButton onClick={this.props.taskId !== 0 ? (event) => this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs, this.props.normalization) : () => {}} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.835 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.16 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
             <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
               <PlayIcon width="18" height="18" />Start training!
             </Flex>
