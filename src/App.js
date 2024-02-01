@@ -66,6 +66,7 @@ export function generateCytoElements(list, apiData, isTraining, weights, biases)
       cElements.push({ data: { id, label }, position });
       if (j===0) {xPositions.push(position.x);}
       if (j===1) {xPositions.push(position.x-xPositions[0]);}
+      console.log("xPositions(original): ", xPositions);
     }
   });
 
