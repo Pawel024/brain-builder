@@ -64,7 +64,8 @@ export function generateCytoElements(list, apiData, isTraining, weights, biases)
       const yDistBetweenNodes = hAvailable/Math.max(...list);
       const position = { x: Math.round((0.7 * window.innerWidth * 0.97) + (i-list.length) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes - 65 + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
       cElements.push({ data: { id, label }, position });
-      xPositions.push(position.x);
+      if (j===0) {xPositions.push(position.x);}
+      if (j===1) {xPositions.push(position.x-xPositions[0]);}
     }
   });
 
@@ -596,17 +597,18 @@ function App() {
   // Update the state when the dependencies change
   useEffect(() => {
     let newListXPositions = [];
-    setCytoElements(taskIds.map((taskId, index) => {
+    let newCytoElements = [];
+    taskIds.forEach((taskId, index) => {
       console.log("apiData:", apiData);
       console.log("weights:", weights);
-      const {newCytoElements, newXPositions} = generateCytoElements(cytoLayers[index], apiData[index], isTraining[index], weights[index], biases[index]);
-      newListXPositions.push(newXPositions);
-      console.log("newXPositions: ", newXPositions);  // for debugging
-      return newCytoElements;
-    }
-    ));
+      const {currentCytoElements, currentXPositions} = generateCytoElements(cytoLayers[index], apiData[index], isTraining[index], weights[index], biases[index]);
+      newListXPositions.push(currentXPositions);
+      console.log("newXPositions: ", currentXPositions);  // for debugging
+      newCytoElements.push(currentCytoElements);
+    });
     console.log("newListXPositions: ", newListXPositions);  // for debugging
     setListXPositions(newListXPositions);
+    setCytoElements(newCytoElements);
   }, [taskIds, cytoLayers, apiData, isTraining, weights, biases]);
 
   useEffect(() => {
@@ -882,7 +884,7 @@ function App() {
     const icon = isItPlus ? <PlusIcon /> : <MinusIcon />;
     console.log("xPositions: ", xPositions)
     for (let i = 1; i < nLayers-1; i++) { // we start at i and end at nLayers-1 because we don't want to add or remove nodes from the input or output layers
-      const style = { top: top, left: xPositions[i] + left};
+      const style = { top: top, left: xPositions[0] + i*xPositions[1] + left};
       const button = (
         <div>
           <FloatingButton
@@ -906,7 +908,7 @@ function App() {
               textAlign: 'center',
               position: 'absolute',
               top: window.innerHeight - 258,
-              left: xPositions[i] + left + 16.5,
+              left: xPositions[0] + i*xPositions[1] + left + 16.5,
               transform: 'translateX(-50%)',
               fontSize: 'var(--font-size-2)',
               color: 'var(--cyan-12)',
