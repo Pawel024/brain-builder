@@ -673,7 +673,7 @@ function App() {
     if (!learningRate) {learningRate = 0.01};  // set learning rate to default if it's undefined
     normalization = true;  // TODO: replace this with the actual normalization value
     if (taskId === 11){
-      learningRate = 0.0001;
+      learningRate = 0.0005;
       normalization = false;
     }
     var userId = getCookie('user_id');
@@ -822,16 +822,14 @@ function App() {
           });
 
           if (data.progress >= 0.999 ) {
-            clearTimeout(timeoutId);
-            setTimeout(() => {
-              ws.close();
-              setIsTraining(prevIsTraining => {
-                const newIsTraining = [...prevIsTraining];
-                newIsTraining[index] = 2;
-                return newIsTraining;
-              });
-              console.log("Training finished")
-            }, 1000);
+            ws.close();
+          clearTimeout(timeoutId);
+            setIsTraining(prevIsTraining => {
+              const newIsTraining = [...prevIsTraining];
+              newIsTraining[index] = 2;
+              return newIsTraining;
+            });
+            console.log("Training finished")
           }
 
           // update the error list if it changed

@@ -339,6 +339,12 @@ class DataFromExcel(Dataset):
                 plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]], color=(4/255, 151/255, 185/255))
                 plt.plot(inp, Z, color=(185/255,38/255,4/255))
                 plt.xlabel(self.feature_names[0].replace('_', ' '))
+                if self.normalization:
+                    plt.xlim(0, 1)
+                    plt.ylim(0, 1)
+                else:
+                    plt.xlim(mini, maxi)
+                    plt.ylim(mini, maxi)
                 plt.ylabel(self.target_names[0].replace('_', ' '))
                 img = BytesIO()
                 plt.tight_layout()
