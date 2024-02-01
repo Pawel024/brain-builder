@@ -207,6 +207,9 @@ class DataFromExcel(Dataset):
             n_plots = self.n_features * (self.n_features - 1) // 2
             n_cols = 2
             n_rows = int(np.ceil(n_plots / n_cols))
+            if n_plots == 1:
+                n_cols = 1
+                n_rows = 1
             fig, ax = plt.subplots(n_rows, n_cols)
             k = 0
 
