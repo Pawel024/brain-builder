@@ -305,12 +305,27 @@ class DataFromExcel(Dataset):
                                 # Put the result into a color plot
                                 row = k // n_cols
                                 col = k % n_cols
-                                ax[row, col].contourf(mesh[np.where(np.array(self.feature_names) == self.data.columns[i])[0]][0],
-                                             mesh[np.where(np.array(self.feature_names) == self.data.columns[j])[0]][0],
-                                             Z, alpha=0.5)
-                                ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
-                                ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
-                                ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
+                                if n_plots == 1:
+                                    ax.contourf(mesh[i][0],
+                                                mesh[j][0],
+                                                Z, alpha=0.5)
+                                    ax.scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
+                                    ax.set_xlabel(self.data.columns[i].replace('_', ' '))
+                                    ax.set_ylabel(self.data.columns[j].replace('_', ' '))
+                                elif n_rows == 1:
+                                    ax[col].contourf(mesh[i][0],
+                                                    mesh[j][0],
+                                                    Z, alpha=0.5)
+                                    ax[col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
+                                    ax[col].set_xlabel(self.data.columns[i].replace('_', ' '))
+                                    ax[col].set_ylabel(self.data.columns[j].replace('_', ' '))
+                                else:
+                                    ax[row, col].contourf(mesh[np.where(np.array(self.feature_names) == self.data.columns[i])[0]][0],
+                                                mesh[np.where(np.array(self.feature_names) == self.data.columns[j])[0]][0],
+                                                Z, alpha=0.5)
+                                    ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
+                                    ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
+                                    ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
                                 k += 1
                 img = BytesIO()
                 fig.tight_layout()
@@ -445,6 +460,9 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
         n_plots = self.n_features * (self.n_features - 1) // 2
         n_cols = 2
         n_rows = int(np.ceil(n_plots / n_cols))
+        if n_plots == 1:
+            n_cols = 1
+            n_rows = 1
         fig, ax = plt.subplots(n_rows, n_cols)
         k = 0
 
@@ -454,9 +472,18 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
                     if type(self.data[0, j]) is not str:
                         row = k // n_cols
                         col = k % n_cols
-                        ax[row, col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
-                        ax[row, col].set_xlabel(self.feature_names[i].replace('_', ' '))
-                        ax[row, col].set_ylabel(self.feature_names[j].replace('_', ' '))
+                        if n_plots == 1:
+                            ax.scatter(self.data[:, i], self.data[:, j], c=self.targets)
+                            ax.set_xlabel(self.feature_names[i].replace('_', ' '))
+                            ax.set_ylabel(self.feature_names[j].replace('_', ' '))
+                        elif n_rows == 1:
+                            ax[col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
+                            ax[col].set_xlabel(self.feature_names[i].replace('_', ' '))
+                            ax[col].set_ylabel(self.feature_names[j].replace('_', ' '))
+                        else:
+                            ax[row, col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
+                            ax[row, col].set_xlabel(self.feature_names[i].replace('_', ' '))
+                            ax[row, col].set_ylabel(self.feature_names[j].replace('_', ' '))
                         k += 1
         
         fig.tight_layout()
@@ -483,6 +510,9 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
             n_plots = self.n_features * (self.n_features - 1) // 2
             n_cols = 2
             n_rows = int(np.ceil(n_plots / n_cols))
+            if n_plots == 1:
+                n_cols = 1
+                n_rows = 1
             fig, ax = plt.subplots(n_rows, n_cols)
             k = 0
 
@@ -493,12 +523,27 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
                             # Put the result into a color plot
                             row = k // n_cols
                             col = k % n_cols
-                            ax[row, col].contourf(mesh[i][0],
-                                         mesh[j][0],
-                                         Z, alpha=0.5)
-                            ax[row, col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
-                            ax[row, col].set_xlabel(self.feature_names[i].replace('_', ' '))
-                            ax[row, col].set_ylabel(self.feature_names[j].replace('_', ' '))
+                            if n_plots == 1:
+                                ax.contourf(mesh[i][0],
+                                            mesh[j][0],
+                                            Z, alpha=0.5)
+                                ax.scatter(self.data[:, i], self.data[:, j], c=self.targets)
+                                ax.set_xlabel(self.feature_names[i].replace('_', ' '))
+                                ax.set_ylabel(self.feature_names[j].replace('_', ' '))
+                            elif n_rows == 1:
+                                ax[col].contourf(mesh[i][0],
+                                                mesh[j][0],
+                                                Z, alpha=0.5)
+                                ax[col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
+                                ax[col].set_xlabel(self.feature_names[i].replace('_', ' '))
+                                ax[col].set_ylabel(self.feature_names[j].replace('_', ' '))
+                            else:
+                                ax[row, col].contourf(mesh[i][0],
+                                             mesh[j][0],
+                                             Z, alpha=0.5)
+                                ax[row, col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
+                                ax[row, col].set_xlabel(self.feature_names[i].replace('_', ' '))
+                                ax[row, col].set_ylabel(self.feature_names[j].replace('_', ' '))
                             k += 1
 
             img = BytesIO()
@@ -623,6 +668,9 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
             n_plots = self.n_features * (self.n_features - 1) // 2
             n_cols = 2
             n_rows = int(np.ceil(n_plots / n_cols))
+            if n_plots == 1:
+                n_cols = 1
+                n_rows = 1
             fig, ax = plt.subplots(n_rows, n_cols)
             k = 0
 
@@ -632,9 +680,18 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
                         if type(self.data[0, j]) is not str:
                             row = k // n_cols
                             col = k % n_cols
-                            ax[row, col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
-                            ax[row, col].xlabel(self.feature_names[i].replace('_', ' '))
-                            ax[row, col].ylabel(self.feature_names[j].replace('_', ' '))
+                            if n_plots == 1:
+                                ax.scatter(self.data[:, i], self.data[:, j], c=self.targets)
+                                ax.set_xlabel(self.feature_names[i].replace('_', ' '))
+                                ax.set_ylabel(self.feature_names[j].replace('_', ' '))
+                            elif n_rows == 1:
+                                ax[col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
+                                ax[col].set_xlabel(self.feature_names[i].replace('_', ' '))
+                                ax[col].set_ylabel(self.feature_names[j].replace('_', ' '))
+                            else:
+                                ax[row, col].scatter(self.data[:, i], self.data[:, j], c=self.targets)
+                                ax[row, col].xlabel(self.feature_names[i].replace('_', ' '))
+                                ax[row, col].ylabel(self.feature_names[j].replace('_', ' '))
                             k += 1
 
         else:
@@ -645,6 +702,9 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
             n_plots = (self.n_features + self.n_targets) * (self.n_features + self.n_targets - 1) // 2
             n_cols = 2
             n_rows = int(np.ceil(n_plots / n_cols))
+            if n_plots == 1:
+                n_cols = 1
+                n_rows = 1
             fig, ax = plt.subplots(n_rows, n_cols)
             k = 0
 
@@ -654,9 +714,18 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
                         if type(d[0, j]) is not str:
                             row = k // n_cols
                             col = k % n_cols
-                            ax[row, col].scatter(d[:, i], d[:, j])
-                            ax[row, col].set_xlabel(c[i].replace('_', ' '))
-                            ax[row, col].set_ylabel(c[j].replace('_', ' '))
+                            if n_plots == 1:
+                                ax.scatter(d[:, i], d[:, j])
+                                ax.set_xlabel(c[i].replace('_', ' '))
+                                ax.set_ylabel(c[j].replace('_', ' '))
+                            elif n_rows == 1:
+                                ax[col].scatter(d[:, i], d[:, j])
+                                ax[col].set_xlabel(c[i].replace('_', ' '))
+                                ax[col].set_ylabel(c[j].replace('_', ' '))
+                            else:
+                                ax[row, col].scatter(d[:, i], d[:, j])
+                                ax[row, col].set_xlabel(c[i].replace('_', ' '))
+                                ax[row, col].set_ylabel(c[j].replace('_', ' '))
                             k += 1
         
         fig.tight_layout()
@@ -666,30 +735,50 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
         plt.clf()
 
     def plot_decision_boundary(self, model):
-        if self.n_features < 2 and self.n_targets < 2:
-            step = 0.01
-            if self.normalization:
-                inp = np.arange(-0.1, 1.1, step)
-            else:
-                mini, maxi = self.minima[0], self.maxima[0]
-                inp = np.arange(mini, maxi, step)
+        if self.data_type == 1:
+            if self.n_features < 3 and self.n_targets < 5:
+                step = 0.01
+                if self.normalization:
+                    mesh = np.meshgrid(*self.n_features * [np.arange(-0.1, 1.1, step)])
+                else:
+                    mesh = np.meshgrid(*[np.arange(mini, maxi, step) for mini, maxi in zip(self.minima, self.maxima)])
+                
+                # Plot the decision boundary. For that, we will assign a color to each
+                # point in the mesh.
+                    
+                mesh = np.array(mesh)
+                Z = np.array(model.predict(mesh.reshape(self.n_features, -1).T))
+                Z = Z.reshape(mesh[0].shape)
 
-            # Plot the decision boundary. For that, we will assign a color to each
-            # point in the mesh.
-            inp = np.array(inp)
-            Z = np.array(model.predict(inp.reshape(self.n_features, -1).T))
+                plt.contourf(mesh[0], mesh[1], Z, alpha=0.5)
+        
+        elif self.data_type == 2:
+            if self.n_features == 1 and self.n_targets == 1:
+                step = 0.01
+                if self.normalization:
+                    inp = np.arange(-0.1, 1.1, step)
+                else:
+                    mini, maxi = self.minima[0], self.maxima[0]
+                    inp = np.arange(mini, maxi, (maxi-mini)*step)
 
-            
-            plt.plot(inp, Z)
-            plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
-            plt.xlabel(self.feature_names[0].replace('_', ' '))
-            plt.ylabel(self.target_names[0].replace('_', ' '))
-            img = BytesIO()
-            plt.tight_layout()
-            plt.savefig(img, format='png')
-            img.seek(0)
-            self.images.append(img.getvalue())
-            plt.clf()
+                # Plot the decision boundary. For that, we will assign a color to each
+                # point in the mesh.
+                inp = np.array(inp)
+                Z = np.array(model.predict(inp.reshape(self.n_features, -1).T, typ=2))
+                Z = Z[:, 0]
+
+                plt.plot(inp, Z, color=(185/255,38/255,4/255))
+
+
+        plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
+        plt.xlabel(self.feature_names[0].replace('_', ' '))
+        plt.ylabel(self.target_names[0].replace('_', ' '))
+        img = BytesIO()
+        plt.tight_layout()
+        plt.savefig(img, format='png')
+        img.seek(0)
+        self.images.append(img.getvalue())
+        plt.clf()
 
 
 class DataFromFunction(Dataset):  # this one is for one to one regression on simple functions
@@ -773,7 +862,7 @@ class DataFromFunction(Dataset):  # this one is for one to one regression on sim
     def plot_data(self):
         """Plots the data."""
         img = BytesIO()
-        plt.scatter(self.data, self.targets)
+        plt.scatter(self.data, self.targets, color=(4/255, 151/255, 185/255))
         plt.xlabel(self.feature_names[0].replace('_', ' '))
         plt.ylabel(self.target_names[0].replace('_', ' '))
         
@@ -794,11 +883,11 @@ class DataFromFunction(Dataset):  # this one is for one to one regression on sim
         # Plot the decision boundary. For that, we will assign a color to each
         # point in the mesh.
         inp = np.array(inp)
-        Z = np.array(model.predict(inp.reshape(self.n_features, -1).T))
-
+        Z = np.array(model.predict(inp.reshape(self.n_features, -1).T, typ=2))
+        Z = Z[:, 0]
         
-        plt.plot(inp, Z)
-        plt.scatter(self.data, self.targets)
+        plt.scatter(self.data, self.targets, color=(4/255, 151/255, 185/255))
+        plt.plot(inp, Z, color=(185/255,38/255,4/255))
         plt.xlabel(self.feature_names[0].replace('_', ' '))
         plt.ylabel(self.target_names[0].replace('_', ' '))
         img = BytesIO()
