@@ -146,10 +146,11 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"{redis_url.hostname}:{redis_url.port}",
+        "LOCATION": f"redis://{redis_url.hostname}:{redis_url.port}",
         "OPTIONS": {
             "PASSWORD": redis_url.password,
             "DB": 0,
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
     }
 }
