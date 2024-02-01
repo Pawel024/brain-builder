@@ -350,28 +350,30 @@ class Building extends React.Component {
           
           {this.props.normalizationVisibility ? (
           <Text as="label" size="2">
-            <Flex style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.7 * (window.innerWidth * 0.97))}} gap="2">          
+            <Flex style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.74 * (window.innerWidth * 0.97)), width: Math.round(0.19 * (window.innerWidth * 0.97)), justifyContent:"center", alignItems:"center"}} gap="2">          
+              <div>
               <Checkbox/>
               Normalize training data
+              </div>
             </Flex>
           </Text>):(<div></div>)}
 
           {/* make the position of the box shift down if normalization is true */}
-          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)) + (this.props.normalizationVisibility ? 50 : 0), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
+          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)) + (this.props.normalizationVisibility ? 50 : 0), left: Math.round(0.72 * (window.innerWidth * 0.97)), alignItems: 'center', justifyContent: 'start', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
             <div id="/api-data">
               {this.props.isTraining===2 ? (
                 <Flex direction='column' >
                   <div style={{ color: this.props.accuracyColor, fontFamily:'monospace' }}><b>Accuracy: {(parseFloat(this.props.errorList[1])*100).toFixed(2)}%</b></div>
-                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:20 }}></canvas>
+                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.23 * (window.innerWidth * 0.97)), height: Math.round(0.3 * (window.innerHeight-140)), marginTop:20 }}></canvas>
                 </Flex>
               ) : (this.props.isTraining===1 ? (
                 <Flex direction= 'column'>
-                  <div style={{ fontFamily:'monospace' }}><b>Training: </b></div>
+                  <div style={{ fontFamily:'monospace' }}><b>Training... </b></div>
                   <div style={{ fontFamily:'monospace' }}><b>Progress: {Math.round((parseFloat(this.props.progress))*100)}%</b></div>
-                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:20 }}></canvas>
+                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.23 * (window.innerWidth * 0.97)), height: Math.round(0.3 * (window.innerHeight-140)), marginTop:20 }}></canvas>
                 </Flex>
               ) : (
-                <div style={{ textAlign:'justify', width: Math.round(0.16 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
+                <div style={{ textAlign:'justify', width: Math.round(0.23 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
                   {this.props.taskDescription}
                 </div>
               )
