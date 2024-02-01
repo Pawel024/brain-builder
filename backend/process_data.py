@@ -47,7 +47,7 @@ async def process(req):
         tag = int(req['task_id'])
 
         print("Trying to add an empty entry to BackendData")
-        backend_data = BackendData(user_id=user_id, task_id=task_id, dataset=b'', nn=None)
+        backend_data = BackendData(user_id='abc', task_id=1, dataset=b'', nn=None)
         await sync_to_async(backend_data.save)()
 
         # check if a BackendData model exists for this user_id and task_id, and load the stuff in there if it does
