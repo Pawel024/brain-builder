@@ -1,8 +1,8 @@
 from django.db import models
 
 class BackendData(models.Model):
-    user_id = models.CharField(max_length=100)
-    task_id = models.IntegerField()
+    user_id = models.CharField(max_length=100, db_index=True)
+    task_id = models.IntegerField(db_index=True)
     nn = models.BinaryField()
     dataset = models.BinaryField()
 

@@ -49,6 +49,11 @@ async def process(req):
         # check if a BackendData model exists for this user_id and task_id, and load the stuff in there if it does
         nn = None
         print("About to check BackendData")
+        try: 
+            await asyncio.wait_for(sync_to_async(BackendData.objects.filter(user_id=user_id, task_id=task_id).exists)(), timeout=10)
+        except Exception as e:
+            print("Error occured when checking BackendData: ")
+            print(e)
         if await sync_to_async(BackendData.objects.filter(user_id=user_id, task_id=task_id).exists)():
             backend_data = await sync_to_async(BackendData.objects.get)(user_id=user_id, task_id=task_id)
             data = pickle.loads(backend_data.dataset)
