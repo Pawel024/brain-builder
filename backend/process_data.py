@@ -46,14 +46,14 @@ async def process(req):
 
         print("About to check cache for data")
         # check if a cached version of the data exists and load it if it does
-        if cache.has_key(f'{user_id}_{task_id}_data'):
-            data = cache.get(f'{user_id}_{task_id}_data')
+        data = cache.get(f'{user_id}_data')
+        if data is None:
+            data, (training_set, test_set) = levels.get_data(tag)
+            cache.set(f'{user_id}_data', pickle.dumps(data), 10*60)  # cache the data for 10 minutes
+            print("Data not in cache, is loaded now")
+        else:
             data = pickle.loads(data)
             print("Loaded data from cache")
-        else:
-            data, (training_set, test_set) = levels.get_data(tag)
-            cache.set(f'{user_id}_{task_id}_data', pickle.dumps(data), 10*60)  # cache the data for 10 minutes
-            print("Data not in cache, is loaded now")
 
         d['title'] = 'data'
         d['feature_names'] = [x.replace('_', ' ') for x in data.feature_names]
@@ -79,9 +79,9 @@ async def process(req):
         tag = int(req['task_id'])
 
         # check if a cached version of the data exists and load it if it does
-        if cache.has_key(f'{user_id}_{task_id}_data'):
-            data = cache.get(f'{user_id}_{task_id}_data')
-            data = pickle.loads(data)
+        data = cache.get(f'{user_id}_data')
+        if data is not None:
+            data = pickle.loads(data, -1)
             print("Loaded data from cache")
         else:
             data = None
@@ -134,10 +134,10 @@ async def process(req):
 
         print("About to save network and data to cache...")
         # save the network and data to pickle files and store them in the cache
-        network = pickle.dumps(network)
-        data = pickle.dumps(data)
-        cache.set(f'{user_id}_{task_id}_network', network, 10*60)  # cache the network for 10 minutes
-        cache.set(f'{user_id}_{task_id}_data', data, 10*60)  # cache the data for 10 minutes
+        network = pickle.dumps(network, -1)
+        data = pickle.dumps(data, -1)
+        cache.set(f'{user_id}_nn', network, 10*60)  # cache the network for 10 minutes
+        cache.set(f'{user_id}_data', data, 10*60)  # cache the data for 10 minutes
         print("Network and data successfully saved to cache!")
         
         d['progress'] = 1
@@ -158,10 +158,11 @@ async def process(req):
 
     elif req['action'] == 2:  # classify a given input
         # check if a cached version of the network and data exist and load them if they do
-        if cache.has_key(f'{user_id}_{task_id}_network') and cache.has_key(f'{user_id}_{task_id}_data'):
-            nn = cache.get(f'{user_id}_{task_id}_network')
+        nn = cache.get(f'{user_id}_nn')
+        data = cache.get(f'{user_id}_data')
+
+        if nn is not None and data is not None:
             nn = pickle.loads(nn)
-            data = cache.get(f'{user_id}_{task_id}_data')
             data = pickle.loads(data)
 
             input_vector = json.loads(req['network_input'])
