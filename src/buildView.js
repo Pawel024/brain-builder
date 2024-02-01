@@ -272,7 +272,7 @@ class Building extends React.Component {
               </div>
               */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}></div>
-              <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => URL.revokeObjectURL(this.props.initPlot)}/>
+              <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}/*URL.revokeObjectURL(this.props.initPlot)*/}/>
             </>
           )}
           </Box>
@@ -287,7 +287,7 @@ class Building extends React.Component {
               <img src={color_scale_pic} alt='Color scale from purple for negative to red for positive' width='20' height='auto' style={{ position: 'absolute', top: 15, left: 15 }}/>
 
               {((this.props.taskId === 11 && this.props.img && this.props.img !== '' && this.props.isTraining===1) &&
-                <img src={this.props.img} alt={`No plots yet`} onLoad={() => URL.revokeObjectURL(this.props.img)} style={{ position: 'absolute', bottom: 250, left: 660, height: '200px', width: 'auto' }}/>
+                <img src={this.props.img} alt={`No plots yet`} onLoad={() => {}/*URL.revokeObjectURL(this.props.img)*/} style={{ position: 'absolute', bottom: 250, left: 660, height: '200px', width: 'auto' }}/>
               )}
 
               {((this.props.taskId === 11 && this.props.img && this.props.img !== '' && this.props.isTraining===2) &&
@@ -521,7 +521,7 @@ class Building extends React.Component {
             {/* This will render the images, if they exist */}
             <Flex direction="column" gap="2">
               {this.props.img ? (
-                <img src={this.props.img} alt={`No plots yet`} onLoad={() => URL.revokeObjectURL(this.props.img)}/>
+                <img src={this.props.img} alt={`No plots yet`} onLoad={() => {}/*URL.revokeObjectURL(this.props.img)*/}/>
               ) : (
                 <div>No image available. Try reloading the page? If this problem persists, please contact us.</div>
               )}
