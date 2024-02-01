@@ -75,7 +75,7 @@ class BuildNetwork(torch.nn.Module):
                 for datapoint in data:
                     if not torch.is_tensor(datapoint):
                         datapoint = torch.tensor(datapoint, dtype=torch.float32)
-                    predictions += [self(datapoint.float().view(-1, self.input[0][0])).tolist()]
+                    predictions += self(datapoint.float().view(-1, self.input[0][0])).tolist()
                 return predictions
 
     def train_epoch(self, data, optimizer, typ=1):

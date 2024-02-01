@@ -332,6 +332,7 @@ class DataFromExcel(Dataset):
                 # point in the mesh.
                 inp = np.array(inp)
                 Z = np.array(model.predict(inp.reshape(self.n_features, -1).T, typ=2))
+                Z = Z[:, 0]
                 print("First 5 predictions: ", Z[:5])
 
                 
