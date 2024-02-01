@@ -81,7 +81,7 @@ async def process(req):
         # check if a cached version of the data exists and load it if it does
         data = cache.get(f'{user_id}_data')
         if data is not None:
-            data = pickle.loads(data, -1)
+            data = pickle.loads(data)
             print("Loaded data from cache")
         else:
             data = None
