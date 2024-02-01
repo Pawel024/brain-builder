@@ -359,7 +359,7 @@ function App() {
   const [featureNames, setFeatureNames] = useState([]);
   const [weights, setWeights] = useState([]);
   const [biases, setBiases] = useState([]);
-  const [imgs, setImgs] = useState([]);
+  const [imgs, setImgs] = useState([[], [], []]);
 
   // this is for the quizzes
   const [quizIds, setQuizIds] = useState([]);
@@ -693,6 +693,12 @@ function App() {
       const newBiases = [...prevBiases];
       newBiases[index] = [];
       return newBiases;
+    });
+
+    setImgs(prevImgs => {
+      const newImgs = [...prevImgs];
+      newImgs[index] = [];
+      return newImgs;
     });
 
     {/*
