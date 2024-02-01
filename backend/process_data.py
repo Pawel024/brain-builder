@@ -44,16 +44,9 @@ async def process(req):
         d = {}
         tag = int(req['task_id'])
 
-        print("About to check cache for data")
-        # check if a cached version of the data exists and load it if it does
-        data = cache.get(f'{user_id}_data')
-        if data is None:
-            data, (training_set, test_set) = levels.get_data(tag)
-            cache.set(f'{user_id}_data', pickle.dumps(data), 10*60)  # cache the data for 10 minutes
-            print("Data not in cache, is loaded now")
-        else:
-            data = pickle.loads(data)
-            print("Loaded data from cache")
+        data, (training_set, test_set) = levels.get_data(tag)
+        cache.set(f'{user_id}_data', pickle.dumps(data), 10*60)  # cache the data for 10 minutes
+        print("Data loaded and stored in cache")
 
         d['title'] = 'data'
         d['feature_names'] = [x.replace('_', ' ') for x in data.feature_names]
