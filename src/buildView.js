@@ -291,7 +291,7 @@ class Building extends React.Component {
               )}
 
               {((this.props.taskId === 11 && this.props.img && this.props.img !== '' && this.props.isTraining===2) &&
-                <img src={this.props.img} alt={`No plots yet`} style={{ position: 'absolute', bottom: 250, left: 660, height: '200px', width: 'auto' }}/>
+                <img src={this.props.img} alt={`No plots yet`} style={{ position: 'absolute', bottom: 50, left: 660, height: '200px', width: 'auto' }}/>
               )}
 
               {this.props.generateFloatingButtons(window.innerHeight - 223, 0.1 * (window.innerWidth * 0.97) - 16.5, 0.4 * (window.innerWidth * 0.97)/Math.max(this.props.cytoLayers.length-1,1), true, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}                    
