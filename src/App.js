@@ -117,6 +117,8 @@ export function generateCytoElements(list, apiData, isTraining, weights, biases)
     }
   });
 
+  console.log('cElements before return:', cElements)
+  console.log('xPositions before return:', xPositions);
   return {cElements, xPositions};
 }
 
