@@ -331,7 +331,7 @@ class DataFromExcel(Dataset):
                 # Plot the decision boundary. For that, we will assign a color to each
                 # point in the mesh.
                 inp = np.array(inp)
-                Z = np.array(model.predict(inp.reshape(self.n_features, -1).T))
+                Z = np.array(model.predict(inp.reshape(self.n_features, -1).T, typ=2))
                 print("First 5 predictions: ", Z[:5])
 
                 
