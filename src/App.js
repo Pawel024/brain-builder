@@ -805,9 +805,9 @@ function App() {
             });
 
             if (data.progress === 1 ) {
-              ws.close();
               clearTimeout(timeoutId);
               setTimeout(() => {
+                ws.close();
                 setIsTraining(prevIsTraining => {
                   const newIsTraining = [...prevIsTraining];
                   newIsTraining[index] = 2;

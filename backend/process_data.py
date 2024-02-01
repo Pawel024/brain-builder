@@ -147,7 +147,6 @@ async def process(req):
         u['network_biases'] = b  # list of lists of floats representing the biases
         u['plot'] = b64encode(levels.data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data (potentially with decision boundary)
         
-        asyncio.sleep(1)  # for debugging
         coach = Coach.connections.get((str(user_id), str(task_id)))
         if coach is not None:
             print('Sending double data to coach')
