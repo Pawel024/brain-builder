@@ -302,21 +302,22 @@ class DataFromExcel(Dataset):
                                 
 
         elif self.data_type == 2:
-            if self.n_features < 2 and self.n_targets < 2:
+            if self.n_features == 1 and self.n_targets == 1:
                 if self.normalization:
                     inp = np.arange(-0.1, 1.1, step)
                 else:
                     mini, maxi = self.minima[0], self.maxima[0]
-                    inp = np.arange(mini, maxi, step)
+                    inp = np.arange(mini, maxi, (maxi-mini)*step)
 
                 # Plot the decision boundary. For that, we will assign a color to each
                 # point in the mesh.
                 inp = np.array(inp)
                 Z = np.array(model.predict(inp.reshape(self.n_features, -1).T))
+                Z = Z[:, 0]
 
                 
-                plt.plot(inp, Z)
-                plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
+                plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]], color=(4/255, 151/255, 185/255))
+                plt.plot(inp, Z, color=(185/255,38/255,4/255))
                 plt.xlabel(self.feature_names[0].replace('_', ' '))
                 plt.ylabel(self.target_names[0].replace('_', ' '))
                 img = BytesIO()

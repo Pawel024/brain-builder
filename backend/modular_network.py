@@ -60,14 +60,23 @@ class BuildNetwork(torch.nn.Module):
             x = self.select_activation(self.layers[i](x), self.input[i+1][2])
         return x
 
-    def predict(self, data):
-        with torch.no_grad():
-            predictions = []
-            for datapoint in data:
-                if not torch.is_tensor(datapoint):
-                    datapoint = torch.tensor(datapoint, dtype=torch.float32)
-                predictions += [torch.argmax(self(datapoint.float().view(-1, self.input[0][0]))).item()]
-            return predictions
+    def predict(self, data, typ=1):
+        if typ == 1: # classification
+            with torch.no_grad():
+                predictions = []
+                for datapoint in data:
+                    if not torch.is_tensor(datapoint):
+                        datapoint = torch.tensor(datapoint, dtype=torch.float32)
+                    predictions += [torch.argmax(self(datapoint.float().view(-1, self.input[0][0]))).item()]
+                return predictions
+        elif typ == 2:  # regression
+            with torch.no_grad():
+                predictions = []
+                for datapoint in data:
+                    if not torch.is_tensor(datapoint):
+                        datapoint = torch.tensor(datapoint, dtype=torch.float32)
+                    predictions += [self(datapoint.float().view(-1, self.input[0][0])).tolist()]
+                return predictions
 
     def train_epoch(self, data, optimizer, typ=1):
         for datapoint in data:
