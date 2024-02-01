@@ -57,11 +57,11 @@ export function generateCytoElements(list, apiData, isTraining, weights, biases)
     for (let j = 0; j < nodesPerLayer; j++) {
       const id = list.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
       const label = `Node ${id}`;
-      const wAvailable = 0.5 * (window.innerWidth * 0.97);
+      const wAvailable = 0.3 * (window.innerWidth * 0.97);
       const hAvailable = window.innerHeight - 326;
       const xDistBetweenNodes = wAvailable/Math.max(list.length-1, 1);
       const yDistBetweenNodes = hAvailable/Math.max(...list);
-      const position = { x: Math.round((0.7 * window.innerWidth * 0.97) + (i-list.length+1) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes - 65 + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
+      const position = { x: Math.round((0.45 * window.innerWidth * 0.97) + (i-list.length+1) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes - 65 + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
       cElements.push({ data: { id, label }, position });
     }
   });
