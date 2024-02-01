@@ -86,13 +86,20 @@ class DataFromExcel(Dataset):
             self.feature_names = [x.replace('/', '_') for x in self.feature_names]
 
             self.n_features = len(self.feature_names)
-            self.n_objects = len(self.data)
 
             self.target_names = self.data.loc[:, 'Target'].unique()
             self.n_targets = len(self.target_names)
             # now transform the target_names to integers
-            for i in range(self.n_objects):
-                self.data.loc[i, 'Target'] = np.where(self.target_names == self.data.loc[i, 'Target'])[0][0]
+            name_to_index = {name: i for i, name in enumerate(self.target_names)}
+            self.data.loc[:, 'Target'] = self.data.loc[:, 'Target'].map(name_to_index)
+            self.data.dropna(inplace=True)  # delete NaN values
+            self.data.reset_index(drop=True, inplace=True)  # reset the index
+
+            self.n_objects = len(self.data)
+            print("Number of objects: ", self.n_objects)
+            print("First object for each class: ", 
+                    self.data.groupby('Target').first().loc[:, self.feature_names].to_numpy()
+                  )
 
             self.minima = self.data.loc[:, self.feature_names].min(axis=0)
             self.maxima = self.data.loc[:, self.feature_names].max(axis=0)
