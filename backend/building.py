@@ -79,9 +79,7 @@ def train_nn_epoch(nn, training_set, test_set, current_epoch, epochs, learning_r
     optimizer = torch.optim.SGD(nn.parameters(), lr=learning_rate)  # optimizer has to be defined outside the network module, idk why
     typ = levels.find_type(tag)
 
-    print("Got to building.py line 83")
     nn.train_epoch(training_set, optimizer, typ)
-    print("Got to building.py line 85 (train_epoch succeeded)")
 
     if current_epoch % (epochs // 100 if epochs >= 100 else 1) == 0:
         error, accuracy = nn.test(test_set, typ, acc=False)  # TODO: should this be training_set or test_set?
@@ -90,8 +88,6 @@ def train_nn_epoch(nn, training_set, test_set, current_epoch, epochs, learning_r
         
     if current_epoch == epochs - 1:
         error, accuracy = nn.test(test_set, typ, acc=True)
-    
-    print("Got to building.py line 97 (test succeeded)")
 
     return errors, accuracy, weights, biases
 

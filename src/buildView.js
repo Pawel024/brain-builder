@@ -285,6 +285,14 @@ class Building extends React.Component {
               
               <img src={color_scale_pic} alt='Color scale from purple for negative to red for positive' width='20' height='auto' style={{ position: 'absolute', top: 15, left: 15 }}/>
 
+              {((this.props.img && this.props.isTraining===1) &&
+                <img src={this.props.img} alt={`No plots yet`} onLoad={() => URL.revokeObjectURL(this.props.img)} style={{ position: 'absolute', bottom: 200, left: 500, height: '150px', width: 'auto' }}/>
+              )}
+
+              {((this.props.img && this.props.isTraining===2) &&
+                <img src={this.props.img} alt={`No plots yet`} style={{ position: 'absolute', bottom: 200, left: 500, height: '150px', width: 'auto' }}/>
+              )}
+
               {this.props.generateFloatingButtons(window.innerHeight - 223, 0.1 * (window.innerWidth * 0.97) - 16.5, 0.4 * (window.innerWidth * 0.97)/Math.max(this.props.cytoLayers.length-1,1), true, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}                    
               {this.props.generateFloatingButtons(window.innerHeight - 178, 0.1 * (window.innerWidth * 0.97) - 16.5, 0.4 * (window.innerWidth * 0.97)/Math.max(this.props.cytoLayers.length-1,1), false, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}
 
@@ -503,7 +511,7 @@ class Building extends React.Component {
             {/* This will render the images, if they exist */}
             <Flex direction="column" gap="2">
               {this.props.img ? (
-                <img src={this.props.img} alt={`Plot(s) of the data`} onLoad={() => URL.revokeObjectURL(this.props.img)}/>
+                <img src={this.props.img} alt={`No plots yet`} onLoad={() => URL.revokeObjectURL(this.props.img)}/>
               ) : (
                 <div>No image available. Try reloading the page? If this problem persists, please contact us.</div>
               )}

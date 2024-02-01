@@ -105,9 +105,9 @@ async def process(req):
                 d['error_list'] = e  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
                 d['network_weights'] = w  # list of lists of floats representing the weights
 
-                if epoch % (epochs // 10 if epochs >= 10 else 1) == 0:  # every 10% of the total epochs:
+                if epoch % (epochs // 50 if epochs >= 50 else 1) == 0:  # every 10% of the total epochs:
                     print("Updating all the stuff")
-                    levels.data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
+                    data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
                     u['plot'] = b64encode(levels.data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data (potentially with decision boundary)
                     u['network_biases'] = b  # list of lists of floats representing the biases
 
