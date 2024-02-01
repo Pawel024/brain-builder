@@ -671,6 +671,11 @@ function App() {
   const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs, normalization) => {
     e.preventDefault();
     if (!learningRate) {learningRate = 0.01};  // set learning rate to default if it's undefined
+    normalization = true;  // TODO: replace this with the actual normalization value
+    if (taskId === 11){
+      learningRate = 0.0001;
+      normalization = false;
+    }
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
 
@@ -717,7 +722,7 @@ function App() {
       progress_pk: null,
       learning_rate: learningRate,
       epochs: iterations,
-      normalization: true, // todo: replace with normalization when ready for it
+      normalization: normalization,
       network_input: JSON.stringify(cytoLayers),
       games_data: gamesData,  
     };
@@ -739,6 +744,9 @@ function App() {
     });
 
     // first, set up the websocket
+    if (ws && ws.readyState !== WebSocket.CLOSED) {
+      ws.close();
+    }    
     const ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
 
     ws.onclose = () => {
@@ -748,6 +756,8 @@ function App() {
     ws.onerror = function(event) {
       console.error('Error:', event);
     };
+
+    let timeoutId = null;
 
     ws.onopen = () => {
       console.log('WebSocket connection opened');
@@ -788,7 +798,7 @@ function App() {
           }
       })
 
-      let timeoutId = setTimeout(() => {
+      timeoutId = setTimeout(() => {
         ws.close();
         setIsTraining(prevIsTraining => {
           const newIsTraining = [...prevIsTraining];
@@ -798,78 +808,78 @@ function App() {
         console.log("Training failed")
         alert("Training failed. Please try again. If the problem persists, please contact us.");
       }, intervalTimeout); // stop after n milliseconds
+    };
 
-      ws.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        if (data.title === 'progress') {  // every 1%; includes progress, error_list, and network_weights
+    ws.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      if (data.title === 'progress') {  // every 1%; includes progress, error_list, and network_weights
 
-          if (JSON.stringify(data.progress) !== JSON.stringify(progress[index])) {
-            setProgress(prevProgress => {
-              const newProgress = [...prevProgress];
-              newProgress[index] = data.progress;
-              return newProgress;
-            });
+        if (JSON.stringify(data.progress) !== JSON.stringify(progress[index])) {
+          setProgress(prevProgress => {
+            const newProgress = [...prevProgress];
+            newProgress[index] = data.progress;
+            return newProgress;
+          });
 
-            if (data.progress >= 0.991 ) {
-              clearTimeout(timeoutId);
-              setTimeout(() => {
-                ws.close();
-                setIsTraining(prevIsTraining => {
-                  const newIsTraining = [...prevIsTraining];
-                  newIsTraining[index] = 2;
-                  return newIsTraining;
-                });
-                console.log("Training finished")
-              }, 1000);
-            }
-
-            // update the error list if it changed
-            if (data.error_list[0].length !== errorList[index][0].length || data.error_list[1] !== errorList[index][1]) {
-              console.log("updating error list");  // for debugging
-              setErrorList(prevErrorList => {
-                const newErrorList = [...prevErrorList];
-                newErrorList[index] = data.error_list;
-                return newErrorList;
+          if (data.progress >= 0.999 ) {
+            clearTimeout(timeoutId);
+            setTimeout(() => {
+              ws.close();
+              setIsTraining(prevIsTraining => {
+                const newIsTraining = [...prevIsTraining];
+                newIsTraining[index] = 2;
+                return newIsTraining;
               });
-            }
-            
-            // update the weights if they changed 
-            if (weights[index].length === 0 || data.network_weights[0][0] !== weights[index][0][0]) {
-              setWeights(prevWeights => {
-                const newWeights = [...prevWeights];
-                newWeights[index] = data.network_weights;
-                return newWeights;
-              });
-            }
-          }
-        } else if (data.title === 'update') {  // every 10%; includes network_biases and plots
-          // update the biases if it changed
-          if (data.network_biases.length !== biases[index].length) {
-            setBiases(prevBiases => {
-              const newBiases = [...prevBiases];
-              newBiases[index] = data.network_biases;
-              return newBiases;
-            });
+              console.log("Training finished")
+            }, 1000);
           }
 
-          // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
-          if (data.plot.length > 0 && data.plot.length !== imgs[index].length) {
-            setImgs(prevImgs => {
-              const newImgs = [...prevImgs];
-              const binaryString = atob(data.plot);  // decode from base64 to binary string
-              const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
-              for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
-              }
-              const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
-              const url = URL.createObjectURL(blob);
-              // now images can be accessed with <img src={url} />
-              newImgs[index] = url
-              return newImgs;
+          // update the error list if it changed
+          if (data.error_list[0].length !== errorList[index][0].length || data.error_list[1] !== errorList[index][1]) {
+            console.log("updating error list");  // for debugging
+            setErrorList(prevErrorList => {
+              const newErrorList = [...prevErrorList];
+              newErrorList[index] = data.error_list;
+              return newErrorList;
+            });
+          }
+          
+          // update the weights if they changed 
+          if (weights[index].length === 0 || data.network_weights[0][0] !== weights[index][0][0]) {
+            setWeights(prevWeights => {
+              const newWeights = [...prevWeights];
+              newWeights[index] = data.network_weights;
+              return newWeights;
             });
           }
         }
-      };
+      } else if (data.title === 'update') {  // every 10%; includes network_biases and plots
+        // update the biases if it changed
+        if (data.network_biases.length !== biases[index].length) {
+          setBiases(prevBiases => {
+            const newBiases = [...prevBiases];
+            newBiases[index] = data.network_biases;
+            return newBiases;
+          });
+        }
+
+        // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
+        if (data.plot.length > 0 && data.plot.length !== imgs[index].length) {
+          setImgs(prevImgs => {
+            const newImgs = [...prevImgs];
+            const binaryString = atob(data.plot);  // decode from base64 to binary string
+            const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+            }
+            const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+            const url = URL.createObjectURL(blob);
+            // now images can be accessed with <img src={url} />
+            newImgs[index] = url
+            return newImgs;
+          });
+        }
+      }
     };
   };
 
