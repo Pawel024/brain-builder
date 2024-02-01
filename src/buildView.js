@@ -278,6 +278,8 @@ class Building extends React.Component {
           )}
         </Tabs.Content>
         <Tabs.Content value="building">
+          <div className='App'>
+          
           <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
             <div className='cytoscape'style={{top: 5, left: 3, position: 'absolute', width: window.innerWidth*0.77, height: window.innerHeight-130}}></div>
             <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
@@ -285,8 +287,8 @@ class Building extends React.Component {
               
               <img src={color_scale_pic} alt='Color scale from purple for negative to red for positive' width='20' height='auto' style={{ position: 'absolute', top: 15, left: 15 }}/>
 
-              {this.props.generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.4 * (window.innerWidth * 0.97)/Math.max(this.props.cytoLayers.length-1,1), true, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}                    
-              {this.props.generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.4 * (window.innerWidth * 0.97)/Math.max(this.props.cytoLayers.length-1,1), false, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}
+              {this.props.generateFloatingButtons(window.innerHeight - 223, 0.1 * (window.innerWidth * 0.97) - 16.5, 0.4 * (window.innerWidth * 0.97)/Math.max(this.props.cytoLayers.length-1,1), true, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}                    
+              {this.props.generateFloatingButtons(window.innerHeight - 178, 0.1 * (window.innerWidth * 0.97) - 16.5, 0.4 * (window.innerWidth * 0.97)/Math.max(this.props.cytoLayers.length-1,1), false, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}
 
               <this.props.FloatingButton
                 variant="outline"
@@ -350,32 +352,33 @@ class Building extends React.Component {
           
           {this.props.normalizationVisibility ? (
           <Text as="label" size="2">
-            <Flex style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.72 * (window.innerWidth * 0.97)), width: Math.round(0.23 * (window.innerWidth * 0.97)), justifyContent:"flex-start", alignItems:"flex-start"}} gap="2">          
+            <Flex style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.7 * (window.innerWidth * 0.97)), width: Math.round(0.27 * (window.innerWidth * 0.97)), justifyContent:"flex-start", alignItems:"flex-start"}} gap="2">          
               <Checkbox/>
               Normalize training data
             </Flex>
           </Text>):(<div></div>)}
 
           {/* make the position of the box shift down if normalization is true */}
-          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)) + (this.props.normalizationVisibility ? 50 : 0), left: Math.round(0.72 * (window.innerWidth * 0.97)), alignItems: 'center', justifyContent: 'start', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
+          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)) + (this.props.normalizationVisibility ? 50 : 0), left: Math.round(0.7 * (window.innerWidth * 0.97)), alignItems: 'center', justifyContent: 'start', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
             <div id="/api-data">
               {this.props.isTraining===2 ? (
                 <Flex direction='column' >
                   <div style={{ color: this.props.accuracyColor, fontFamily:'monospace' }}><b>Accuracy: {(parseFloat(this.props.errorList[1])*100).toFixed(2)}%</b></div>
-                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.23 * (window.innerWidth * 0.97)), height: Math.round(0.3 * (window.innerHeight-140)), marginTop:10 }}></canvas>
+                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.27 * (window.innerWidth * 0.97)), height: Math.round(0.3 * (window.innerHeight-140)), marginTop:10 }}></canvas>
                 </Flex>
               ) : (this.props.isTraining===1 ? (
                 <Flex direction= 'column'>
                   <div style={{ fontFamily:'monospace' }}><b>Training... </b></div>
                   <div style={{ fontFamily:'monospace' }}><b>Progress: {Math.round((parseFloat(this.props.progress))*100)}%</b></div>
-                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.23 * (window.innerWidth * 0.97)), height: Math.round(0.3 * (window.innerHeight-140)), marginTop:10 }}></canvas>
+                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.27 * (window.innerWidth * 0.97)), height: Math.round(0.3 * (window.innerHeight-140)), marginTop:10 }}></canvas>
                 </Flex>
               ) : (
-                <div style={{ textAlign:'justify', width: Math.round(0.23 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
+                <div style={{ textAlign:'justify', width: Math.round(0.27 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
                   {this.props.taskDescription}
                 </div>
               )
               )}
+              
             </div>
           </Box>
 
@@ -384,7 +387,7 @@ class Building extends React.Component {
               <PlayIcon width="18" height="18" />Start training!
             </Flex>
           </IconButton>
-
+          </div>
         </Tabs.Content>
       
         <Tabs.Content value="stuff">
