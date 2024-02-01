@@ -61,7 +61,7 @@ export function generateCytoElements(list, apiData, isTraining, weights, biases)
       const hAvailable = window.innerHeight - 326;
       const xDistBetweenNodes = wAvailable/Math.max(list.length-1, 1);
       const yDistBetweenNodes = hAvailable/Math.max(...list);
-      const position = { x: Math.round((0.7 * window.innerWidth * 0.97) + (i-list.length-1) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes - 65 + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
+      const position = { x: Math.round((0.7 * window.innerWidth * 0.97) + (i-list.length+1) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes - 65 + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
       cElements.push({ data: { id, label }, position });
     }
   });
