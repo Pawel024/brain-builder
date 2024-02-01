@@ -1,14 +1,5 @@
 from django.db import models
 
-class BackendData(models.Model):
-    user_id = models.CharField(max_length=100, db_index=True)
-    task_id = models.IntegerField(db_index=True)
-    nn = models.BinaryField()
-    dataset = models.BinaryField()
-
-    def __str__(self):
-        return self.user_id + " - " + str(self.task_id)
-
 class Row(models.Model):
     action = models.IntegerField()
     user_id = models.CharField(max_length=100)

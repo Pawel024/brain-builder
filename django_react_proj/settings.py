@@ -140,6 +140,20 @@ DATABASES = {
     )
 }
 
+# Cache setup -> we're using redis-cloud for this as well
+# Currently cache is only used in the backend to store the data and neural networks, so they don't have to be retrained every time
+# Watch out though: removing this will mean the predict function can't access the networks anymore and will break.
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"{redis_url.hostname}:{redis_url.port}",
+        "OPTIONS": {
+            "PASSWORD": redis_url.password,
+            "DB": 0,
+        },
+    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators

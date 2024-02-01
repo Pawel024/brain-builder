@@ -24,9 +24,7 @@ import pandas as pd
 import json
 from base64 import b64encode, b64decode
 from django_react_proj.consumers import Coach
-from backend.models import BackendData
-#from django_eventstream import send_event
-#import aiohttp
+from django.core.cache import cache
 import time
 from asgiref.sync import sync_to_async
 import asyncio
@@ -46,45 +44,21 @@ async def process(req):
         d = {}
         tag = int(req['task_id'])
 
-        print("Trying to add an empty entry to BackendData")
-        backend_data = BackendData(user_id='abc', task_id=1, dataset=b'', nn=None)
-        await sync_to_async(backend_data.save)()
+        print("About to check cache for data")
+        # check if a cached version of the data exists and load it if it does
+        if cache.has_key(f'{user_id}_{task_id}_data'):
+            data = cache.get(f'{user_id}_{task_id}_data')
+            data = pickle.loads(data)
+            print("Loaded data from cache")
+        else:
+            data, (training_set, test_set) = levels.get_data(tag)
+            cache.set(f'{user_id}_{task_id}_data', pickle.dumps(data), 10*60)  # cache the data for 10 minutes
+            print("Data not in cache, is loaded now")
 
-        # check if a BackendData model exists for this user_id and task_id, and load the stuff in there if it does
-        nn = None
-        print("About to check BackendData")
-        try: 
-            if await asyncio.wait_for(sync_to_async(BackendData.objects.filter(user_id=user_id, task_id=task_id).exists)(), timeout = 5):
-                backend_data = await asyncio.wait_for(sync_to_async(BackendData.objects.get)(user_id=user_id, task_id=task_id), timeout=5)
-                data = pickle.loads(backend_data.dataset)
-        except Exception as e:
-            print("Error occured when checking BackendData: ")
-            print(e)
-
-        print("Getting dataset...")
-        data, (training_set, test_set) = levels.get_data(tag)  # replace the data anyway, in case changes were made
         d['title'] = 'data'
         d['feature_names'] = [x.replace('_', ' ') for x in data.feature_names]
         d['plot'] = b64encode(data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data
         d['n_objects'] = data.n_objects
-
-        print("Data Loaded, about to store it")
-        # store the data in the BackendData model
-        data = pickle.dumps(data)
-        try:
-            pickle.loads(data)
-            print("Pickled data could be loaded")
-        except Exception as e:
-            print("Error occurred when unpickling data: ")
-            print(e)
-        print("Data pickled: length = ", len(data))
-        if nn is not None:
-            backend_data.dataset = data
-        else:
-            backend_data = BackendData(user_id=user_id, task_id=task_id, dataset=data, nn=None)
-            print("model created")
-        await sync_to_async(backend_data.save)()
-        print("Data stored, sending to coach")
 
         coach = Coach.connections.get((str(user_id), str(task_id)))
         t = 0
@@ -104,12 +78,14 @@ async def process(req):
         input_list = ((learning_rate, epochs, bool(req['normalization'])), json.loads(req['network_input']))  # TODO: remove the learning rate and epochs from this path
         tag = int(req['task_id'])
 
-        backend_data, data = None, None
-        # check if there is an entry in the BackendData model for this user_id and task_id
-        if await sync_to_async(BackendData.objects.filter(user_id=user_id, task_id=task_id).exists)():
-            # load the data from this model
-            backend_data = await sync_to_async(BackendData.objects.get)(user_id=user_id, task_id=task_id)
-            data = pickle.loads(data.dataset)
+        # check if a cached version of the data exists and load it if it does
+        if cache.has_key(f'{user_id}_{task_id}_data'):
+            data = cache.get(f'{user_id}_{task_id}_data')
+            data = pickle.loads(data)
+            print("Loaded data from cache")
+        else:
+            data = None
+            print("No data in cache, about to load it")
 
         network, data, training_set, test_set = building.build_nn(input_list, tag, data)
         print("Network initiated, starting training")
@@ -156,15 +132,13 @@ async def process(req):
         
         levels.data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
 
-        # save the network and data to pickle files and store them back in the BackendData model
+        print("About to save network and data to cache...")
+        # save the network and data to pickle files and store them in the cache
         network = pickle.dumps(network)
         data = pickle.dumps(data)
-        if backend_data is not None:
-            backend_data.dataset = data
-            backend_data.nn = network
-        else:
-            backend_data = BackendData(user_id=user_id, task_id=task_id, nn=network, dataset=data)  # store the network and the data
-        await sync_to_async(backend_data.save)()
+        cache.set(f'{user_id}_{task_id}_network', network, 10*60)  # cache the network for 10 minutes
+        cache.set(f'{user_id}_{task_id}_data', data, 10*60)  # cache the data for 10 minutes
+        print("Network and data successfully saved to cache!")
         
         d['progress'] = 1
         d['error_list'] = e  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
@@ -183,10 +157,12 @@ async def process(req):
 
 
     elif req['action'] == 2:  # classify a given input
-        if await sync_to_async(BackendData.objects.filter(user_id=user_id, task_id=task_id).exists)():
-            backend_data = await sync_to_async(BackendData.objects.get)(user_id=user_id, task_id=task_id)
-            nn = pickle.loads(backend_data.nn)
-            data = pickle.loads(backend_data.dataset)
+        # check if a cached version of the network and data exist and load them if they do
+        if cache.has_key(f'{user_id}_{task_id}_network') and cache.has_key(f'{user_id}_{task_id}_data'):
+            nn = cache.get(f'{user_id}_{task_id}_network')
+            nn = pickle.loads(nn)
+            data = cache.get(f'{user_id}_{task_id}_data')
+            data = pickle.loads(data)
 
             input_vector = json.loads(req['network_input'])
             if len(input_vector) != data.n_inputs:

@@ -9,8 +9,8 @@ decorator==5.1.1
 dj-database-url==2.1.0
 Django==4.2.6
 django-cors-headers==4.3.0
-# django-eventstream==4.5.0
 django-heroku==0.3.1
+django-redis==5.3.0
 django-webpack-loader==2.0.1
 djangorestframework==3.14.0
 filelock==3.12.4
