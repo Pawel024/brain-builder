@@ -359,14 +359,14 @@ class Building extends React.Component {
           
           {this.props.normalizationVisibility ? (
           <Text as="label" size="2">
-            <Flex style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.7 * (window.innerWidth * 0.97)), width: Math.round(0.27 * (window.innerWidth * 0.97)), justifyContent:"flex-start", alignItems:"flex-start"}} gap="2">          
+            <Flex style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)-20), left: Math.round(0.7 * (window.innerWidth * 0.97)), width: Math.round(0.27 * (window.innerWidth * 0.97)), justifyContent:"flex-start", alignItems:"flex-start"}} gap="2">          
               <Checkbox disabled = { this.props.isTraining===1 } />
               Normalize training data
             </Flex>
           </Text>):(<div></div>)}
 
           {/* make the position of the box shift down if normalization is true */}
-          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)) + (this.props.normalizationVisibility ? 50 : 0), left: Math.round(0.7 * (window.innerWidth * 0.97)), alignItems: 'center', justifyContent: 'start', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
+          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)) + (this.props.normalizationVisibility ? 30 : 0), left: Math.round(0.7 * (window.innerWidth * 0.97)), alignItems: 'center', justifyContent: 'start', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
             <div id="/api-data">
               {this.props.isTraining===2 ? (
                 <Flex direction='column' >
