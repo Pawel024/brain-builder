@@ -117,6 +117,7 @@ class DataFromExcel(Dataset):
             self.feature_names = self.data.columns[~self.data.columns.str.contains('Target')]
             self.feature_names = [x.replace(' ', '_') for x in self.feature_names]
             self.feature_names = [x.replace('/', '_') for x in self.feature_names]
+            self.feature_names = np.array(self.feature_names)
             self.n_features = len(self.feature_names)
             self.n_objects = len(self.data)
 
