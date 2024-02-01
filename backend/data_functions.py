@@ -319,7 +319,7 @@ class DataFromExcel(Dataset):
                 # point in the mesh.
                 inp = np.array(inp)
                 Z = np.array(model.predict(inp.reshape(self.n_features, -1).T))
-                Z = Z[:, 0]
+                print("First 5 predictions: ", Z[:5])
 
                 
                 plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]], color=(4/255, 151/255, 185/255))
