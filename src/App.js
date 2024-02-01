@@ -865,6 +865,7 @@ function App() {
               const url = URL.createObjectURL(blob);
               // now images can be accessed with <img src={url} />
               newImgs[index] = url
+              return newImgs;
             });
           }
         }
@@ -1223,7 +1224,7 @@ function App() {
                 progress={null}
                 featureNames={null}
                 errorList={null}
-                imgs={null}
+                img={null}
                 loadData={null}
                 normalization={null}
                 normalizationVisibility={true}
