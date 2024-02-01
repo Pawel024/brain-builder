@@ -604,6 +604,7 @@ function App() {
     taskIds.forEach((taskId, index) => {
       console.log("apiData:", apiData);
       console.log("weights:", weights);
+      console.log(`cytoLayers[${index}] before running generateCytoElements:`, cytoLayers[index]);
       const {currentCytoElements, currentXPositions} = generateCytoElements(cytoLayers[index], apiData[index], isTraining[index], weights[index], biases[index]);
       newListXPositions.push(currentXPositions);
       console.log("newXPositions: ", currentXPositions);  // for debugging
