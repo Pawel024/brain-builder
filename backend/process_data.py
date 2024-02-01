@@ -72,6 +72,7 @@ async def process(req):
             backend_data.dataset = data
         else:
             backend_data = BackendData(user_id=user_id, task_id=task_id, dataset=data, nn=None)
+            print("model created")
         await sync_to_async(backend_data.save)()
         print("Data stored, sending to coach")
 
