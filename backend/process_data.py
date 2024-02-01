@@ -166,7 +166,7 @@ async def process(req):
             data = pickle.loads(data)
 
             input_vector = json.loads(req['network_input'])
-            if len(input_vector) != data.n_inputs:
+            if len(input_vector) != data.n_features:
                 print("Wrong Network")
                 output_value = "Wrong Network"
             else:
