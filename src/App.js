@@ -197,6 +197,9 @@ function App() {
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
 
+    normalization = true;  // TODO: make this an actual variable
+    if (taskId === 11) {normalization = false}
+
     const dataData = {
       action: 0,
       user_id: userId,
@@ -204,7 +207,7 @@ function App() {
       progress_pk: null,
       learning_rate: 0,
       epochs: 0,
-      normalization: true, // TODO: replace this with the actual normalization value
+      normalization: normalization, // TODO: replace this with the actual normalization value
       network_input: JSON.stringify([]),
       games_data: gamesData,
     };
