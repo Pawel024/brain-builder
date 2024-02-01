@@ -1015,7 +1015,7 @@ function App() {
         onValueChange={(value) => handleIterationChange(index, value)}
         max={maxEpochs[index] / 2}
         step={0.5}
-        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
+        style={{ width: Math.round(0.27 * (window.innerWidth * 0.97)) }}
       >
         <Slider.Track className="SliderTrack" style={{ height: 3 }}>
           <Slider.Range className="SliderRange" />
@@ -1034,7 +1034,7 @@ function App() {
         onValueChange={(value) => handleLearningRateChange(index, value)}
         max={70}
         step={10}
-        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
+        style={{ width: Math.round(0.27 * (window.innerWidth * 0.97)) }}
       >
         <Slider.Track className="SliderTrack" style={{ height: 3 }}>
           <Slider.Range className="SliderRange" />

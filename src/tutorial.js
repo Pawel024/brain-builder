@@ -68,7 +68,7 @@ function Tutorial({ nOfInputs,
         defaultValue={[50]}
         max={100}
         step={0.5}
-        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
+        style={{ width: Math.round(0.27 * (window.innerWidth * 0.97)) }}
       >
         <Slider.Track className="SliderTrack" style={{ height: 3 }}>
           <Slider.Range className="SliderRange" />
@@ -83,7 +83,7 @@ function Tutorial({ nOfInputs,
         defaultValue={[35]}
         max={70}
         step={10}
-        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
+        style={{ width: Math.round(0.27 * (window.innerWidth * 0.97)) }}
       >
         <Slider.Track className="SliderTrack" style={{ height: 3 }}>
           <Slider.Range className="SliderRange" />
