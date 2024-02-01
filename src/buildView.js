@@ -294,7 +294,7 @@ class Building extends React.Component {
                 size="0"
                 disabled={this.props.cytoLayers.length>this.props.maxLayers-1}
                 style={{top: window.innerHeight*0.285, 
-                        left: window.innerWidth*0.64, 
+                        left: window.innerWidth*0.60, 
                         position: 'absolute',
                         zIndex: 9999,
                         borderRadius: 'var(--radius-5)',
@@ -314,7 +314,7 @@ class Building extends React.Component {
                 size="0"
                 disabled={this.props.cytoLayers.length<3}
                 style= {{ top: window.innerHeight*0.285, 
-                          left: window.innerWidth*0.60,
+                          left: window.innerWidth*0.56,
                           position: 'absolute',
                           zIndex: 9999,
                           borderRadius: 'var(--radius-5)',
@@ -334,23 +334,23 @@ class Building extends React.Component {
           
           <Separator orientation='vertical' style = {{ position:"absolute", top: Math.round(0.03 * (window.innerHeight-140)), left: Math.round(0.67 * (window.innerWidth * 0.97)), height: 0.96 * (window.innerHeight-140) }}/>
 
-          {this.props.iterationsSliderVisibility ? (<Box style={{ position:"absolute", top: 0.14 * (window.innerHeight-140), left: Math.round(0.7 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', fontFamily:'monospace'  }}>
+          {this.props.iterationsSliderVisibility ? (<Box style={{ position:"absolute", top: 0.14 * (window.innerHeight-140), left: Math.round(0.71 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', fontFamily:'monospace'  }}>
             <div className="iterationsSlider">
               {this.props.iterationsSlider}
             </div>
-            <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.135 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Epochs: {this.props.iterations}</div>
+            <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.125 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Epochs: {this.props.iterations}</div>
           </Box>) : (<div></div>)}
 
-          {this.props.lrSliderVisibility ? (<Box style={{ position:"absolute", top: Math.round(0.26 * (window.innerHeight-140)), left: Math.round(0.7 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', fontFamily:'monospace'  }}>
+          {this.props.lrSliderVisibility ? (<Box style={{ position:"absolute", top: Math.round(0.26 * (window.innerHeight-140)), left: Math.round(0.71 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', fontFamily:'monospace'  }}>
             <div className="learningRateSlider">
               {this.props.learningRateSlider}
             </div>
-            <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.135 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Learning rate: {this.props.learningRate}</div>
+            <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.125 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Learning rate: {this.props.learningRate}</div>
           </Box>) : (<div></div>)}
           
           {this.props.normalizationVisibility ? (
           <Text as="label" size="2">
-            <Flex style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.7 * (window.innerWidth * 0.97))}} gap="2">          
+            <Flex style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.71 * (window.innerWidth * 0.97))}} gap="2">          
               <Checkbox/>
               Normalize training data
             </Flex>
