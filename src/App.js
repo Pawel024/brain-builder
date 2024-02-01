@@ -810,7 +810,7 @@ function App() {
               return newProgress;
             });
 
-            if (data.progress === 1 ) {
+            if (data.progress >= 0.991 ) {
               clearTimeout(timeoutId);
               setTimeout(() => {
                 ws.close();
@@ -1130,7 +1130,7 @@ function App() {
                 <Link to="custom11" style={{ color: 'inherit', textDecoration: 'none' }}>
                   <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                      <label>Visualization</label>
+                      <label>The Perceptron</label>
                       <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                   </ChallengeButton>

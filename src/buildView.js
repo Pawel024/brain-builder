@@ -286,7 +286,7 @@ class Building extends React.Component {
               <img src={color_scale_pic} alt='Color scale from purple for negative to red for positive' width='20' height='auto' style={{ position: 'absolute', top: 15, left: 15 }}/>
 
               {((this.props.img && this.props.isTraining===1) &&
-                <img src={this.props.img} alt={`No plots yet`} onLoad={() => URL.revokeObjectURL(this.props.img)} style={{ position: 'absolute', bottom: 200, left: 500, height: '150px', width: 'auto' }}/>
+                <img src={this.props.img} alt={`No plots yet`} onLoad={() => URL.revokeObjectURL(this.props.img)} style={{ position: 'absolute', bottom: 250, left: 660, height: '200px', width: 'auto' }}/>
               )}
 
               {((this.props.img && this.props.isTraining===2) &&

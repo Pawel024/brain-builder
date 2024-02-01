@@ -219,9 +219,18 @@ class DataFromExcel(Dataset):
                         if type(self.data.iloc[0, j]) is not str and self.data.columns[j] != 'Target':
                             row = k // n_cols
                             col = k % n_cols
-                            scatter = ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
-                            ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
-                            ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
+                            if n_plots == 1:
+                                ax.scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
+                                ax.set_xlabel(self.data.columns[i].replace('_', ' '))
+                                ax.set_ylabel(self.data.columns[j].replace('_', ' '))
+                            elif n_rows == 1:
+                                ax[col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
+                                ax[col].set_xlabel(self.data.columns[i].replace('_', ' '))
+                                ax[col].set_ylabel(self.data.columns[j].replace('_', ' '))
+                            else: 
+                                scatter = ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
+                                ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
+                                ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
                             k += 1
             # Create a legend
             cmap = scatter.get_cmap()
@@ -245,7 +254,11 @@ class DataFromExcel(Dataset):
                         if type(self.data.iloc[0, j]) is not str:
                             row = k // n_cols
                             col = k % n_cols
-                            if n_rows == 1:
+                            if n_plots == 1:
+                                ax.scatter(self.data.iloc[:, i], self.data.iloc[:, j])
+                                ax.set_xlabel(self.data.columns[i].replace('_', ' '))
+                                ax.set_ylabel(self.data.columns[j].replace('_', ' '))
+                            elif n_rows == 1:
                                 ax[col].scatter(self.data.iloc[:, i], self.data.iloc[:, j])
                                 ax[col].set_xlabel(self.data.columns[i].replace('_', ' '))
                                 ax[col].set_ylabel(self.data.columns[j].replace('_', ' '))
