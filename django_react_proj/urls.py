@@ -14,15 +14,29 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from backend import views
 from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index),
+#    path('events/', include('django_eventstream.urls')),
     re_path(r'^api/backend$', views.query_list),
     re_path(r'^api/backend/$', views.query_list),
     re_path(r'^api/backend/(?P<pk>[0-9]+)$', views.query_detail),
-    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
+    re_path(r'^api/all_tasks$', views.all_tasks),
+    re_path(r'^api/all_tasks/$', views.all_tasks),
+    re_path(r'^api/tasks$', views.task_description_detail),
+    re_path(r'^api/tasks/$', views.task_description_detail),
+    re_path(r'^api/all_quizzes$', views.all_quizzes),
+    re_path(r'^api/all_quizzes/$', views.all_quizzes),
+    re_path(r'^api/quizzes$', views.quiz_description_detail),
+    re_path(r'^api/quizzes/$', views.quiz_description_detail),
+    re_path(r'^api/progress$', views.q_list),
+    re_path(r'^api/progress/$', views.q_list),
+    re_path(r'^api/progress/(?P<pk>[0-9]+)$', views.q_detail),
+
+    # catch-all pattern
+    re_path(r'^.*$', views.index),
 ]

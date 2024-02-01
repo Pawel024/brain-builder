@@ -1,8 +1,10 @@
 @import '@radix-ui/colors/gray.css';
 @import '@radix-ui/colors/tomato.css';
+@import '@radix-ui/colors/black-alpha.css';
 
 .App {
-  text-align: center;
+  max-height: 100vh;
+  overflow: hidden;
 }
 
 .App-logo {
@@ -262,10 +264,10 @@ button {
   line-height: 1;
   font-weight: 500;
   height: 35px;
-  width: 100%;
+  width: 450px;
 
   background-color: white;
-  color: var(--violet-11);
+  color: var(--cyan-11);
   box-shadow: 0 2px 10px var(--black-a7);
 }
 .FormButton:hover {
@@ -290,8 +292,83 @@ button {
 .readme h5,
 .readme h6 {
   font-size: inherit;
+  font-family: inherit;
 }
 
 .react-joyride__beacon {
   visibility: hidden;
+}
+
+button {
+  all: unset;
+}
+
+.RadioGroupRoot {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.RadioGroupItem {
+  background-color: white;
+  width: 17px;
+  height: 17px;
+  border-radius: 100%;
+  border:solid;
+  border-color: var(--slate-7);
+}
+.RadioGroupItem:hover {
+  background-color: var(--cyan-2);
+}
+
+.RadioGroupIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.RadioGroupIndicator::after {
+  content: '';
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: var(--cyan-10);
+}
+
+.Label {
+  color: var(--slate-12);
+  font-size: 15px;
+  line-height: 1;
+  padding-left: 15px;
+}
+
+.ProgressRoot {
+  position: relative;
+  overflow: hidden;
+  background: var(--black-a9);
+  border-radius: 99999px;
+  width: 300px;
+  height: 10px;
+
+  /* Fix overflow clipping in Safari */
+  /* https://gist.github.com/domske/b66047671c780a238b51c51ffde8d3a0 */
+  transform: translateZ(0);
+}
+
+.ProgressIndicator {
+  background-color: var(--cyan-10);
+  width: 100%;
+  height: 100%;
+  transition: transform 660ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
 }

@@ -1,6 +1,6 @@
 import React from 'react'
 import './App.css';
-import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator } from '@radix-ui/themes';
+import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator, Checkbox, Text } from '@radix-ui/themes';
 import * as Form from '@radix-ui/react-form';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
@@ -21,12 +21,67 @@ import {
   Tooltip, 
   Legend 
 } from 'chart.js';
+import axios from 'axios';
+import { interpolate } from 'chroma-js';
+import { PrismAsync } from 'react-syntax-highlighter';
 
 function BuildingWrapper(props) {
   const navigate = useNavigate();
 
   return <Building {...props} navigate={navigate} />;
 }
+
+{/*
+// ------- EVENTSOURCE -------
+// this listens to the backend and updates the progress, error list, data plots and feature names
+function ProgressComponent(setProgress, setFeatureNames) {
+  const [errorList, setErrorList] = useState([]);
+  const [dataPlots, setDataPlots] = useState([]);
+
+  useEffect(() => {
+    const source = new EventSource('/progress');
+
+    source.onmessage = function(event) {
+      const progress = JSON.parse(event.data);
+      const errorList = JSON.parse(event.data);
+      const featureNames = JSON.parse(event.data);
+      
+      // COMMENT THESE OUT
+      const dataPlots = JSON.parse(event.data["dataplots"]).map(base64String => {  
+        const binaryString = atob(base64String);  // decode from base64 to binary string
+        const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+        }
+        const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+        const url = URL.createObjectURL(blob);
+        // now images can be accessed with <img src={url} />
+        return url;
+      })
+      setDataPlots(dataPlots);
+    // END OF COMMENT
+
+      setProgress(progress);
+      setErrorList(errorList);
+      setFeatureNames(featureNames);
+    };
+
+    source.onerror = function(event) {
+      if (source.readyState === EventSource.CLOSED) {
+        console.log("SSE connection was lost. Attempting to reconnect...");
+        source = new EventSource('/progress');
+      }
+    };
+
+    // Clean up the event source when the component is unmounted
+    return () => {
+      source.close();
+    };
+  }, []);
+
+  return null;
+}
+*/}
 
 Chart.register(
   CategoryScale, 
@@ -75,9 +130,7 @@ class Building extends React.Component {
   };
 
   componentDidMount() {
-    this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.currentGameNumber);
-    this.props.updateCytoLayers(this.props.setCytoLayers, this.props.nOfInputs, this.props.nOfOutputs);
-    if (this.props.currentGameNumber === 0) {
+    if (this.props.taskId === 0) {
       this.setState({ runTutorial: true }, () => {
         // Delay the click on the beacon until after the Joyride component has been rendered
         setTimeout(() => {
@@ -89,41 +142,73 @@ class Building extends React.Component {
         }, 0);
       });
     }
-    this.typeWriter(this.props.taskDescription);
+    else {
+    this.props.loadData(this.props.taskId, this.props.index)  // let the backend load the data, then set the images and feature names
+    this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.taskId, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs);
+    this.props.updateCytoLayers(this.props.setCytoLayers, this.props.nOfInputs, this.props.nOfOutputs, this.props.index);
+    }
+
+    axios.get(window.location.origin + '/api/tasks/?task_id=' + this.props.taskId)
+    .then(response => {
+      this.typeWriter(response.data.description);
+    })
+    .catch(error => {
+      console.error('Task description error:', error);
+    });
   }
 
   chartRef = React.createRef();
   chartInstance = null;
 
-  componentDidUpdate() {
-    if (this.props.isTraining === 2 && this.chartRef.current) {
+  componentDidUpdate(prevProps) {
+    if (this.cy) {this.cy.resize();console.log("Resizing cytoscape");} // this seems to do nothing
+    if (this.props.taskId !== 0 && this.chartRef.current) {
       const ctx = this.chartRef.current.getContext('2d');
 
-      // Destroy the old chart if it exists
-      if (this.chartInstance) {
-        this.chartInstance.destroy();
+      if (this.chartInstance && (JSON.stringify(this.props.errorList[0].slice(0, prevProps.errorList[0].length)) === JSON.stringify(prevProps.errorList[0]) && this.props.errorList[0].length > prevProps.errorList[0].length)) {
+        // Update the chart if the error list has changed and is longer than before
+        console.log("Updating chart")
+        this.chartInstance.data.labels = this.props.errorList[0].map((_, i) => i + 1);
+        this.chartInstance.data.datasets[0].data = this.props.errorList[0];
+        this.chartInstance.update();
+      } else {
+        // Destroy the old chart if a different error list was received and a chart exists
+        if (JSON.stringify(this.props.errorList[0].slice(0, prevProps.errorList[0].length)) !== JSON.stringify(prevProps.errorList[0])) {
+          // If an old chart exists, destroy it
+          if (this.chartInstance) {
+            console.log("Destroying old chart")
+            this.chartInstance.destroy();
+            this.chartInstance = null;
+          }
+        } 
       }
-
-      // Create a new chart and save a reference to it
-      this.chartInstance = new Chart(ctx, {
+      // Create a new chart if there is no chart
+      if (this.chartInstance === null) {
+        // create a new chart
+        console.log("Creating new chart")
+        this.chartInstance = new Chart(ctx, {
           type: 'line',
           data: {
-              labels: JSON.parse(this.props.apiData["error_list"])[0].map((_, i) => i + 1), // Generate labels based on error array length
-              datasets: [{
-                  label: 'Errors',
-                  data: JSON.parse(this.props.apiData["error_list"])[0],
-                  borderColor: 'rgba(7, 151, 185, 1)',
-                  backgroundColor: 'rgba(7, 151, 185, 0.2)',
-              }]
+            labels: this.props.errorList[0].map((_, i) => i + 1), // Generate labels based on error array length
+            datasets: [{
+                label: 'Errors',
+                data: this.props.errorList[0],
+                borderColor: 'rgba(7, 151, 185, 1)',
+                backgroundColor: 'rgba(7, 151, 185, 0.2)',
+            }]
           },
           options: {
-              scales: {
-                  y: {
-                      beginAtZero: true
-                  }
-              }
-          }
-      });
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            animation: {
+              duration: 1000 // general animation time
+            }
+          }  
+        });
+      }
     }
   }
 
@@ -144,7 +229,7 @@ class Building extends React.Component {
       <Theme accentColor="cyan" grayColor="slate" panelBackground="solid" radius="large" appearance='light'>
       <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
         <Grid columns='3' mt='1'>
-        <Box ml='3' style={{display:"flex"}}>  
+          <Box ml='3' style={{display:"flex"}}>  
             <Link to="/">
               <IconButton aria-label="navigate to home" width='auto' height='21' style={{ marginLeft: 'auto', color: 'inherit', textDecoration: 'none' }}>
                 <HomeIcon color="white" width='auto' height='18' style={{ marginTop: 2 }} />
@@ -152,7 +237,7 @@ class Building extends React.Component {
             </Link>
           </Box>
           <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
-            <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
+          <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily:'monospace, Courier New, Courier' }}>brAIn builder</Heading>
           </Link>
           <Box align='end' mr='3' >
             <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
@@ -161,10 +246,8 @@ class Building extends React.Component {
           </Box>
         </Grid>
       </Box>
-      
-      
 
-      <Tabs.Root defaultValue="task" style={{ fontFamily:'monospace' }}>
+      <Tabs.Root defaultValue={this.props.taskId === 0 ? "building" : "task"} style={{ fontFamily:'monospace' }}>
 
         <Tabs.List size="2">
           <Tabs.Trigger value="task" >Your Task</Tabs.Trigger>
@@ -175,29 +258,52 @@ class Building extends React.Component {
 
         <Box px="4" pt="3" pb="0">
         <Tabs.Content value="task">
+          {this.props.taskId !== 0 && (
           <Box style={{ padding: '20px 300px', fontFamily:'monospace' }}>
           <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Task Description </Heading>
           <div style={{ textAlign:'justify' }}>{this.state.printedDescription}</div>
+          {/* a little below this, plot the dataset */}
+          {this.props.initPlot && (
+            <>
+              {/*
+              <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginTop: 20, marginBottom:7 }}>&gt;_The Dataset</Heading>	
+              <div style={{ textAlign:'justify' }}>
+                This dataset contains {this.props.nOfObjects}, each with {this.props.nOfInputs} features. There are {this.props.nOfOutputs} targets. The features are: {this.props.featureNames.join(', ')}.
+              </div>
+              */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}></div>
+              <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}/*URL.revokeObjectURL(this.props.initPlot)*/}/>
+            </>
+          )}
           </Box>
+          )}
         </Tabs.Content>
-        <Tabs.Content value="building">
-          <Box style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', height: '100vh' }}>
-            <div className='cytoscape'style={{top: 5, left: 3, position: 'absolute', width: window.innerWidth*0.77, height: window.innerHeight-130}}></div>
-            <Flex direction="column" gap="2" height={'100vh'} style={{ alignItems: 'center', justifyContent: 'center'}}>
-              <CytoscapeComponent elements={this.props.cytoElements} stylesheet={this.props.cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } />
+        <Tabs.Content value="building">          
+          <Box style={{ display: 'flex', height: '100vh' }}>
+            <div className='cytoscape'style={{top: 5, left: 3, position: 'absolute', width: window.innerWidth*0.65, height: window.innerHeight-130}}></div>
+            <Flex direction="column" gap="2" height={'100vh'}>
+              <CytoscapeComponent elements={this.props.cytoElements} stylesheet={this.props.cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } onCy={(cy) => {this.cy = cy;}}/>
               
               <img src={color_scale_pic} alt='Color scale from purple for negative to red for positive' width='20' height='auto' style={{ position: 'absolute', top: 15, left: 15 }}/>
 
-              {this.props.generateFloatingButtons(window.innerHeight - 223, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, true, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.currentGameNumber)}                    
-              {this.props.generateFloatingButtons(window.innerHeight - 178, 0.08 * (window.innerWidth * 0.97) - 10, 0.7 * (window.innerWidth * 0.97)/this.props.cytoLayers.length, false, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.currentGameNumber)}
+              {((this.props.taskId === 11 && this.props.img && this.props.img !== '' && this.props.isTraining===1) &&
+                <img src={this.props.img} alt={`No plots yet`} onLoad={() => {}/*URL.revokeObjectURL(this.props.img)*/} style={{ position: 'absolute', bottom: 250, left: 660, height: '200px', width: 'auto' }}/>
+              )}
+
+              {((this.props.taskId === 11 && this.props.img && this.props.img !== '' && this.props.isTraining===2) &&
+                <img src={this.props.img} alt={`No plots yet`} style={{ position: 'absolute', bottom: 50, left: 660, height: '200px', width: 'auto' }}/>
+              )}
+
+              {this.props.generateFloatingButtons(window.innerHeight - 223, 0.1 * (window.innerWidth * 0.97) - 16.5, 0.4 * (window.innerWidth * 0.97)/Math.max(this.props.cytoLayers.length-1,1), true, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}                    
+              {this.props.generateFloatingButtons(window.innerHeight - 178, 0.1 * (window.innerWidth * 0.97) - 16.5, 0.4 * (window.innerWidth * 0.97)/Math.max(this.props.cytoLayers.length-1,1), false, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}
 
               <this.props.FloatingButton
                 variant="outline"
-                onClick = {() => this.props.addLayer(this.props.setCytoLayers, this.props.nOfOutputs)}
+                onClick = {this.props.taskId !== 0 ? () => this.props.addLayer(this.props.setCytoLayers, this.props.nOfOutputs, this.props.index, this.props.maxLayers) : () => {}}
                 size="0"
-                disabled={this.props.cytoLayers.length>this.props.maxLayers-1}
+                disabled={this.props.cytoLayers.length>this.props.maxLayers-1 || this.props.isTraining===1}
                 style={{top: window.innerHeight*0.285, 
-                        left: window.innerWidth*0.74, 
+                        left: window.innerWidth*0.60, 
                         position: 'absolute',
                         zIndex: 9999,
                         borderRadius: 'var(--radius-5)',
@@ -213,11 +319,11 @@ class Building extends React.Component {
 
               <this.props.FloatingButton
                 variant="outline"
-                onClick = {() => this.props.removeLayer(this.props.setCytoLayers)}
+                onClick = {this.props.taskId !== 0 ? () => this.props.removeLayer(this.props.setCytoLayers, this.props.index) : () => {}}
                 size="0"
-                disabled={this.props.cytoLayers.length<3}
+                disabled={this.props.cytoLayers.length<3 || this.props.isTraining===1}
                 style= {{ top: window.innerHeight*0.285, 
-                          left: window.innerWidth*0.70,
+                          left: window.innerWidth*0.56,
                           position: 'absolute',
                           zIndex: 9999,
                           borderRadius: 'var(--radius-5)',
@@ -235,130 +341,194 @@ class Building extends React.Component {
             </Flex>
           </Box>
           
-          <Separator orientation='vertical' style = {{ position:"absolute", top: Math.round(0.03 * (window.innerHeight-140)), left: Math.round(0.8 * (window.innerWidth * 0.97)), height: 0.96 * (window.innerHeight-140) }}/>
+          <Separator orientation='vertical' style = {{ position:"absolute", top: Math.round(0.03 * (window.innerHeight-140)), left: Math.round(0.67 * (window.innerWidth * 0.97)), height: 0.96 * (window.innerHeight-140) }}/>
 
-          <Box style={{ position:"absolute", top: 0.14 * (window.innerHeight-140), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontFamily:'monospace'  }}>
+          {this.props.iterationsSliderVisibility ? (<Box style={{ position:"absolute", top: 0.14 * (window.innerHeight-140), left: Math.round(0.74 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', fontFamily:'monospace'  }}>
             <div className="iterationsSlider">
               {this.props.iterationsSlider}
             </div>
-            <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Epochs: {this.props.iterations}</div>
-          </Box>
+            <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.095 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Epochs: {this.props.iterations}</div>
+          </Box>) : (<div></div>)}
 
-          <Box style={{ position:"absolute", top: Math.round(0.26 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontFamily:'monospace'  }}>
+          {this.props.lrSliderVisibility ? (<Box style={{ position:"absolute", top: Math.round(0.26 * (window.innerHeight-140)), left: Math.round(0.74 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', fontFamily:'monospace'  }}>
             <div className="learningRateSlider">
               {this.props.learningRateSlider}
             </div>
-            <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.08 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Learning rate: {this.props.learningRate}</div>
-          </Box>
+            <div style={{ position:"absolute", zIndex: 9999, top: -30, left: 0.095 * (window.innerWidth * 0.97), transform: 'translateX(-50%)', fontSize: '14px', color: 'var(--slate-11)', whiteSpace: 'nowrap' }}>Learning rate: {this.props.learningRate}</div>
+          </Box>) : (<div></div>)}
           
-          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.82 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
+          {this.props.normalizationVisibility ? (
+          <Text as="label" size="2">
+            <Flex style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)), left: Math.round(0.7 * (window.innerWidth * 0.97)), width: Math.round(0.27 * (window.innerWidth * 0.97)), justifyContent:"flex-start", alignItems:"flex-start"}} gap="2">          
+              <Checkbox disabled = { this.props.isTraining===1 } />
+              Normalize training data
+            </Flex>
+          </Text>):(<div></div>)}
+
+          {/* make the position of the box shift down if normalization is true */}
+          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)) + (this.props.normalizationVisibility ? 50 : 0), left: Math.round(0.7 * (window.innerWidth * 0.97)), alignItems: 'center', justifyContent: 'start', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
             <div id="/api-data">
               {this.props.isTraining===2 ? (
                 <Flex direction='column' >
-                  <div style={{ color: this.props.accuracyColor, fontFamily:'monospace' }}><b>Accuracy: {(parseFloat(JSON.parse(this.props.apiData["error_list"])[1])*100).toFixed(2)}%</b></div>
-                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:20 }}></canvas>
+                  {(this.props.taskId < 20 &&
+                  <div style={{ color: this.props.accuracyColor, fontFamily:'monospace' }}><b>R^2: {parseFloat(this.props.errorList[1]).toFixed(2)}</b></div>
+                  )}
+                  {(this.props.taskId >= 20 &&
+                  <div style={{ color: this.props.accuracyColor, fontFamily:'monospace' }}><b>Accuracy: {(parseFloat(this.props.errorList[1])*100).toFixed(2)}%</b></div>
+                  )}
+                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.27 * (window.innerWidth * 0.97)), height: Math.round(0.3 * (window.innerHeight-140)), marginTop:10 }}></canvas>
                 </Flex>
               ) : (this.props.isTraining===1 ? (
-                <div style={{ fontFamily:'monospace' }}><b>Training...</b></div>
+                <Flex direction= 'column'>
+                  <div style={{ fontFamily:'monospace' }}><b>Training... </b></div>
+                  <div style={{ fontFamily:'monospace' }}><b>Progress: {Math.round((parseFloat(this.props.progress))*100)}%</b></div>
+                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.27 * (window.innerWidth * 0.97)), height: Math.round(0.3 * (window.innerHeight-140)), marginTop:10 }}></canvas>
+                </Flex>
               ) : (
-                <div style={{ textAlign:'justify', width: Math.round(0.16 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
+                <div style={{ textAlign:'justify', width: Math.round(0.27 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
                   {this.props.taskDescription}
                 </div>
               )
               )}
+
             </div>
           </Box>
 
-          <IconButton onClick={(event) => this.props.postRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations)} variant="solid" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.9 * (window.innerHeight-140)), left: Math.round(0.9 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.16 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}>
-            <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
-              <PlayIcon width="18" height="18" />Start training!
-            </Flex>
+          <IconButton
+            onClick={this.props.taskId !== 0 ? (event) => this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs, this.props.normalization) : () => {}}
+            variant="solid"
+            style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.92 * (window.innerHeight-140)), left: Math.round(0.835 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.12 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}
+            disabled = { this.props.isTraining===1 }>
+              <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
+                <PlayIcon width="18" height="18" />Start training!
+              </Flex>
           </IconButton>
-
         </Tabs.Content>
       
         <Tabs.Content value="stuff">
-          <Flex direction="column" gap="2">
-          
-          <Form.Root className="FormRoot" onSubmit={(event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData)} style={{ fontFamily:'monospace' }}>
-            <Form.Field className="FormField" name="s-m_axis">
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                <Form.Label className="FormLabel">Semi-Major Axis [km]</Form.Label>
-                <Form.Message className="FormMessage" match="valueMissing">
-                  Please enter the semi-major axis
-                </Form.Message>
-                <Form.Message className="FormMessage" match="typeMismatch">
-                  Please provide a valid semi-major axis
-                </Form.Message>
-              </div>
-              <Form.Control asChild>
-                <input className="FormInput" type="number" required />
-              </Form.Control>
-            </Form.Field>
+        {this.props.taskId !== 0 && (
+          <Flex direction="row" gap = "2">
+            <Flex direction="column" gap="2">
+            
+            {/* This will render the form with the feature names received from the backend, if it exists */}
+            <Form.Root className="FormRoot" onSubmit={this.props.taskId !== 0 ? (event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData, this.props.taskId, this.props.index) : () => {}} style={{ fontFamily:'monospace' }}>
+              {this.props.featureNames.length > 0 && this.props.featureNames.map((featureName, index) => (
+                <Form.Field className="FormField" name={featureName} key={index}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                    <Form.Label className="FormLabel">{featureName}</Form.Label>
+                    <Form.Message className="FormMessage" match="valueMissing">
+                      Please enter the {featureName}
+                    </Form.Message>
+                    <Form.Message className="FormMessage" match="typeMismatch">
+                      Please provide a valid {featureName}
+                    </Form.Message>
+                  </div>
+                  <Form.Control asChild>
+                    <input className="FormInput" type="number" required />
+                  </Form.Control>
+                </Form.Field>
+              ))}
+              {this.props.featureNames.length > 0 &&
+              <Form.Submit asChild>
+                <button className="FormButton" style={{ marginTop: 10 }}>
+                  Predict!
+                </button>
+              </Form.Submit>}
+            </Form.Root>
+            
+            {/*  // This is the old form
+            <Form.Root className="FormRoot" onSubmit={(event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData, this.props.taskId, this.props.index)} style={{ fontFamily:'monospace' }}>
+              <Form.Field className="FormField" name="s-m_axis">
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                  <Form.Label className="FormLabel">Semi-Major Axis [km]</Form.Label>
+                  <Form.Message className="FormMessage" match="valueMissing">
+                    Please enter the semi-major axis
+                  </Form.Message>
+                  <Form.Message className="FormMessage" match="typeMismatch">
+                    Please provide a valid semi-major axis
+                  </Form.Message>
+                </div>
+                <Form.Control asChild>
+                  <input className="FormInput" type="number" required />
+                </Form.Control>
+              </Form.Field>
 
-            <Form.Field className="FormField" name="inclination">
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                <Form.Label className="FormLabel">Inclination [degrees]</Form.Label>
-                <Form.Message className="FormMessage" match="valueMissing">
-                  Please enter the inclination
-                </Form.Message>
-                <Form.Message className="FormMessage" match="typeMismatch">
-                  Please provide a valid inclination
-                </Form.Message>
-              </div>
-              <Form.Control asChild>
-                <input className="FormInput" type="number" required />
-              </Form.Control>
-            </Form.Field>
+              <Form.Field className="FormField" name="inclination">
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                  <Form.Label className="FormLabel">Inclination [degrees]</Form.Label>
+                  <Form.Message className="FormMessage" match="valueMissing">
+                    Please enter the inclination
+                  </Form.Message>
+                  <Form.Message className="FormMessage" match="typeMismatch">
+                    Please provide a valid inclination
+                  </Form.Message>
+                </div>
+                <Form.Control asChild>
+                  <input className="FormInput" type="number" required />
+                </Form.Control>
+              </Form.Field>
 
-            <Form.Field className="FormField" name="expected_life">
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                <Form.Label className="FormLabel">Expected Life [years]</Form.Label>
-                <Form.Message className="FormMessage" match="valueMissing">
-                  Please enter the expected life
-                </Form.Message>
-                <Form.Message className="FormMessage" match="typeMismatch">
-                  Please provide a valid expected life
-                </Form.Message>
-              </div>
-              <Form.Control asChild>
-                <input className="FormInput" type="number" required />
-              </Form.Control>
-            </Form.Field>
+              <Form.Field className="FormField" name="expected_life">
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                  <Form.Label className="FormLabel">Expected Life [years]</Form.Label>
+                  <Form.Message className="FormMessage" match="valueMissing">
+                    Please enter the expected life
+                  </Form.Message>
+                  <Form.Message className="FormMessage" match="typeMismatch">
+                    Please provide a valid expected life
+                  </Form.Message>
+                </div>
+                <Form.Control asChild>
+                  <input className="FormInput" type="number" required />
+                </Form.Control>
+              </Form.Field>
 
-            <Form.Field className="FormField" name="launch_mass">
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                <Form.Label className="FormLabel">Launch Mass [kg]</Form.Label>
-                <Form.Message className="FormMessage" match="valueMissing">
-                  Please enter the launch mass
-                </Form.Message>
-                <Form.Message className="FormMessage" match="typeMismatch">
-                  Please provide a valid launch mass
-                </Form.Message>
-              </div>
-              <Form.Control asChild>
-                <input className="FormInput" type="number" required />
-              </Form.Control>
-            </Form.Field>
+              <Form.Field className="FormField" name="launch_mass">
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                  <Form.Label className="FormLabel">Launch Mass [kg]</Form.Label>
+                  <Form.Message className="FormMessage" match="valueMissing">
+                    Please enter the launch mass
+                  </Form.Message>
+                  <Form.Message className="FormMessage" match="typeMismatch">
+                    Please provide a valid launch mass
+                  </Form.Message>
+                </div>
+                <Form.Control asChild>
+                  <input className="FormInput" type="number" required />
+                </Form.Control>
+              </Form.Field>
 
-            <Form.Submit asChild>
-              <button className="FormButton" style={{ marginTop: 10 }}>
-                Post query
-              </button>
-            </Form.Submit>
-          </Form.Root>
-          
-          <div id="query-response" style={{ fontFamily:'monospace' }}>
-              {this.props.isResponding===2 ? (
-                <div>Output: {this.props.apiData["nn_input"]}</div>
-              ) : (this.props.isResponding===1 ? (
-                <div>Getting your reply...</div>
+              <Form.Submit asChild>
+                <button className="FormButton" style={{ marginTop: 10 }}>
+                  Predict!
+                </button>
+              </Form.Submit>
+            </Form.Root>
+            */}
+            
+            <div id="query-response" style={{ fontFamily:'monospace' }}>
+                {this.props.isResponding===2 ? (
+                  <div>Output: {this.props.apiData["network_input"]}</div>
+                ) : (this.props.isResponding===1 ? (
+                  <div>Getting your reply...</div>
+                ) : (
+                  <div></div>
+                )
+                )}
+              </div>
+            </Flex>
+            
+            {/* This will render the images, if they exist */}
+            <Flex direction="column" gap="2">
+              {this.props.img ? (
+                <img src={this.props.img} alt={`No plots yet`} onLoad={() => {}/*URL.revokeObjectURL(this.props.img)*/}/>
               ) : (
-                <div></div>
-              )
+                <div>No image available. Try reloading the page? If this problem persists, please contact us.</div>
               )}
-            </div>
+            {/* TODO: Turn this into a pretty animation */}
+            </Flex>
           </Flex>
+        )}
         </Tabs.Content>
 
 
@@ -394,51 +564,3 @@ class Building extends React.Component {
 }
 
 export default BuildingWrapper;
-
-/*
-tooltipComponent={(props) => <CustomTooltip {...props} steps={this.state.steps} />}
-*/
-
-/*
-class Game1 extends Building {
-    render() {
-      const inputs = 5;
-      const outputs = 10;
-  
-      return (
-        <div>
-          <h1>Game1</h1>
-          {super.render({ inputs, outputs })}
-        </div>
-      );
-    }
-  }
-  
-  class Game2 extends Building {
-    render() {
-      const inputs = 10;
-      const outputs = 20;
-  
-      return (
-        <div>
-          <h1>Game2</h1>
-          {super.render({ inputs, outputs })}
-        </div>
-      );
-    }
-  }
-  
-  class Game3 extends Building {
-    render() {
-      const inputs = 15;
-      const outputs = 30;
-  
-      return (
-        <div>
-          <h1>Game3</h1>
-          {super.render({ inputs, outputs })}
-        </div>
-      );
-    }
-  }
-  */

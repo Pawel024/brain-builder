@@ -1,23 +1,24 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+/* eslint-disable no-lone-blocks */
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './App.css';
 import { Theme, Flex, Box, Heading, Grid, IconButton, Button } from '@radix-ui/themes';
 import * as Slider from '@radix-ui/react-slider';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { PlusIcon, MinusIcon, RocketIcon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, RocketIcon, HomeIcon, DrawingPinIcon, Pencil2Icon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
-import * as Switch from '@radix-ui/react-switch';
 import axios from 'axios';
 import BuildView from './buildView';
-import Tutorial from './tutorial';
 import chroma from 'chroma-js';
 import Readme from './readme';
 import Introduction from './introduction';
+import QuizApp from './quiz';
+import CustomBlock from './customBlocks';
+import Tutorial from './tutorial';
 
 
 const colorScale = chroma.scale(['#49329b', '#5e5cc2', '#8386d8', '#afb0e1', '#dddddd', '#e3a692', '#d37254', '#b64124', '#8f0500']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
-
 
 // ------- STYLED COMPONENTS -------
 
@@ -31,68 +32,46 @@ const FloatingButton = styled(IconButton, {
 });
 
 const ChallengeButton = styled(Button, {
-  width: 120,
-  height: 80,
+  width: 136,   
+  height: 84,
   fontSize: 'var(--font-size-2)',
   fontWeight: '500',
   boxShadow: '0 1px 3px var(--slate-a11)'
 });
 
-// ------- CSRF TOKEN -------
-/*
+// ------- COOKIE FUNCTION -------
 function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length === 2) return parts.pop().split(";").shift();
 }
-
-const csrftoken = getCookie('csrftoken');
-
-axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
-*/
 
 // ------- CYTOSCAPE FUNCTIONS -------
 
 // function to generate cytoscape elements
-function useGenerateCytoElements(list = [], apiData, isTraining) {
-  const memoizedList = useMemo(() => list, [list]);
+export function generateCytoElements(list, apiData, isTraining, weights, biases) {
   const cElements = [];
 
   // Generate nodes
-  memoizedList.forEach((nodesPerLayer, i) => {
+  list.forEach((nodesPerLayer, i) => {
     for (let j = 0; j < nodesPerLayer; j++) {
-      const id = memoizedList.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
+      const id = list.slice(0, i).reduce((acc, curr) => acc + curr, 0) + j;
       const label = `Node ${id}`;
+      const wAvailable = 0.4 * (window.innerWidth * 0.97);
       const hAvailable = window.innerHeight - 326;
-      const wAvailable = 0.7 * (window.innerWidth * 0.97);
-      const xDistBetweenNodes = wAvailable/memoizedList.length;
-      const yDistBetweenNodes = hAvailable/Math.max(...memoizedList);
-      const position = { x: Math.round((0.78 * window.innerWidth * 0.97) + (i-memoizedList.length) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes - 65 + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
+      const xDistBetweenNodes = wAvailable/Math.max(list.length-1, 1);
+      const yDistBetweenNodes = hAvailable/Math.max(...list);
+      const position = { x: Math.round((0.5 * window.innerWidth * 0.97) + (i-list.length+1) * xDistBetweenNodes), y: Math.round( 0.5 * (window.innerHeight-140) - 0.5*yDistBetweenNodes - 65 + (-nodesPerLayer) * 0.5 * yDistBetweenNodes + yDistBetweenNodes + j * yDistBetweenNodes) };
       cElements.push({ data: { id, label }, position });
     }
   });
 
   // Generate lines between nodes
-  let weights;
+  // let weights;
   let max;
   let min;
   let absMax;
-  if (apiData && apiData["network_weights"]) {
-    try {
-      weights = JSON.parse(apiData["network_weights"]);
-    } catch (error) {
-      console.error("Error parsing JSON:", error);
-    }
+  if (apiData && weights) {
     try {
     max = weights.reduce((max, part) => Math.max(max, part.reduce((subMax, arr) => Math.max(subMax, ...arr.map(Number)), 0)), 0);
     min = weights.reduce((min, part) => Math.min(min, part.reduce((subMin, arr) => Math.min(subMin, ...arr.map(Number)), Infinity)), Infinity);
@@ -103,12 +82,12 @@ function useGenerateCytoElements(list = [], apiData, isTraining) {
     }
   }
 
-  let cumulativeSums = memoizedList.reduce((acc, curr, i) => {
+  let cumulativeSums = list.reduce((acc, curr, i) => {
     acc[i] = (acc[i-1] || 0) + curr;
     return acc;
   }, []);
 
-  memoizedList.forEach((nodesPerLayer, i) => {
+  list.forEach((nodesPerLayer, i) => {
     for (let j = 0; j < nodesPerLayer; j++) {
       let source;
       if (i > 0) {
@@ -116,11 +95,11 @@ function useGenerateCytoElements(list = [], apiData, isTraining) {
       } else {
         source = j;
       }
-      for (let k = 0; k < memoizedList[i+1]; k++) {
+      for (let k = 0; k < list[i+1]; k++) {
         const target = cumulativeSums[i] + k;
         if (target <= cElements.length) {
           let weight = 5;
-          if (apiData && apiData["network_weights"] && isTraining === 2) { 
+          if (apiData && weights.length > 0 && isTraining !== 0) { 
             try {
               weight = parseFloat(weights[i][k][j])/absMax;
             }
@@ -134,18 +113,21 @@ function useGenerateCytoElements(list = [], apiData, isTraining) {
     }
   });
 
+  console.log('cElements before return:', cElements)
   return cElements;
 }
 
 // function to generate cytoscape style
-function useGenerateCytoStyle(list = []) {
+export function generateCytoStyle(list = []) {
+  const nodeSize = 180/Math.max(...list) < 90 ? 180/Math.max(...list) : 90;
+
   const cStyle = [ // the base stylesheet for the graph
     {
       selector: 'node',
       style: {
         'background-color': '#666',
-        'width': 180/Math.max(...list),
-        'height': 180/Math.max(...list)
+        'width': nodeSize,
+        'height': nodeSize,
       }
     },
 
@@ -182,6 +164,13 @@ function NotFound() {
 
 function App() {
 
+    // Setting the interval- and timing-related states
+  const cancelTokenSourceRef = useRef(null);
+  const intervalIdRef = useRef(null);
+  const intervalTimestep = 1000;  // in milliseconds, the time between each progress check -> low values mean low latency but high server load
+  const intervalTimeout = 60000;  // in milliseconds, the time to wait before ending the interval
+  const pendingTime = 2000;  // in milliseconds, the time to wait when putting or posting a request -> set this close to 0 in production, but higher for debugging
+
   // ------- WINDOW RESIZING -------
 
   function getWindowSize() {
@@ -204,88 +193,351 @@ function App() {
     };
   }, []);
 
-  const [apiData1, setApiData1] = useState(null);
-  const [isTraining1, setIsTraining1] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
-  const [isResponding1, setIsResponding1] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
-  const [accuracy1, setAccuracy1] = useState(null);
+  const loadData = (taskId, index, normalization) => {
+    var userId = getCookie('user_id');
+    var csrftoken = getCookie('csrftoken');
 
-  const [apiData2, setApiData2] = useState(null);
-  const [isTraining2, setIsTraining2] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
-  const [isResponding2, setIsResponding2] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
-  const [accuracy2, setAccuracy2] = useState(null);
+    normalization = true;  // TODO: make this an actual variable
+    if (taskId === 11) {normalization = false}
 
-  const [apiData3, setApiData3] = useState(null);
-  const [isTraining3, setIsTraining3] = useState(0); // 0 means no model exists, 1 means model is training, 2 means model is trained
-  const [isResponding3, setIsResponding3] = useState(0); // 0 means no response, 1 means response is pending, 2 means response is received
-  const [accuracy3, setAccuracy3] = useState(null);
+    const dataData = {
+      action: 0,
+      user_id: userId,
+      task_id: taskId,
+      progress_pk: null,
+      learning_rate: 0,
+      epochs: 0,
+      normalization: normalization, // TODO: replace this with the actual normalization value
+      network_input: JSON.stringify([]),
+      games_data: gamesData,
+    };
+    // first, set up the websocket
+    const ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
 
-  // Define the API endpoint
-  const apiEndpoint = window.location.origin + "/api/backend/?limit=1";
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
 
-  // Define the functions to fetch API data
-  const fetchTrainingData = (apiData, setApiData, setAccuracy, setIsTraining) => {
-    axios.get(apiEndpoint)
+    ws.onopen = () => {
+      console.log('WebSocket connection opened');
+
+      // now, check if there is an entry in /api/backend:
+      axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
+      }).then((response) => {
+        if (response.data.length > 0) {
+          // If the record exists, update it
+          let pk = response.data[0].pk;
+          axios.put(window.location.origin + `/api/backend/${pk}`, dataData, {
+            headers: {
+              'X-CSRFToken': csrftoken
+            }, 
+            timeout: pendingTime
+          }).catch((error) => {
+            console.log(error);
+          });
+        } else {
+          // If the record does not exist, throw an error
+          throw new Error('No Record in /api/backend');
+        };
+      }).catch((error) => {
+        console.log(error);
+        if (error.message === 'No Record in /api/backend' || error.code === 'ECONNABORTED') {
+          // If the record doesn't exist or the GET times out, post a new record
+          console.log('No record found, creating a new one'); 
+          axios.post(window.location.origin + "/api/backend/", dataData, {
+            headers: {
+              'X-CSRFToken': csrftoken
+            }, 
+            timeout: pendingTime
+          }).catch((error) => {
+            console.log(error);
+          })
+        }
+      });
+    };
+    let timeoutId = setTimeout(() => {
+      ws.close();
+      console.log('Failed to load data for challenge ' + taskId);
+      alert("Failed to load data for challenge " + taskId + ". Try reloading the page, if the problem persists, please contact us.");
+    }, intervalTimeout); // stop after n milliseconds
+
+    ws.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      if (data.title === "data") { 
+
+        setFeatureNames(prevFeatureNames => {
+          const newFeatureNames = [...prevFeatureNames];
+          newFeatureNames[index] = data.feature_names;
+          return newFeatureNames;
+        });
+
+        setNObjects(prevNObjects => {
+          const newNObjects = [...prevNObjects];
+          newNObjects[index] = data.n_objects;
+          return newNObjects;
+        });
+
+        // decompress and parse the images in 'plot'
+        setInitPlots(prevInitPlots => {
+          const newInitPlots = [...prevInitPlots];
+          const binaryString = atob(data.plot);  // decode from base64 to binary string
+          const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+          for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+          }
+          const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+          const url = URL.createObjectURL(blob);
+          // now images can be accessed with <img src={url} />
+          newInitPlots[index] = url;
+          return newInitPlots;
+        });
+        console.log(`Data for challenge ${taskId} loaded`)
+        ws.close();
+        clearTimeout(timeoutId);
+      } else {
+        console.log("Received unexpected message from backend: ", data);
+      }
+    };
+
+    ws.onerror = function(event) {
+      console.error('Error:', event);
+    };
+    };
+
+  const fetchQueryResponse = (setApiData, setIsResponding, taskId, index) => {  // updates the apiData state with the response from the backend
+    var userId = getCookie('user_id');
+    var csrftoken = getCookie('csrftoken');
+
+    axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+      headers: {
+        'X-CSRFToken': csrftoken
+      }
+    })
       .then((response) => {
-        setApiData(response.data[0]);
-        setAccuracy(parseFloat(JSON.parse(response.data[0]["error_list"])[1]))
+        setApiData(prevApiData => {
+          const newApiData = [...prevApiData];
+          newApiData[index] = response.data[0];
+          return newApiData;
+        });
         console.log(response.data[0]);
       })
       .catch((error) => {
         console.log(`Error fetching API data: ${error}`);
       });
-    setTimeout(() => {
-      setIsTraining(2);
-      console.log("Training finished")
-    }, 1000);
-  };
-
-  const fetchQueryResponse = (setApiData, setIsResponding) => {
-    axios.get(apiEndpoint)
-      .then((response) => {
-        setApiData(response.data[0]);
-        console.log(response.data[0]);
-      })
-      .catch((error) => {
-        console.log(`Error fetching API data: ${error}`);
+    setIsResponding(prevIsResponding => {
+        const newIsResponding = [...prevIsResponding];
+        newIsResponding[index] = 2;
+        return newIsResponding;
       });
-    setIsResponding(2);
-    console.log("Training finished")
+    console.log("Response received")
   };
 
   let accuracyColor = 'var(--slate-11)';
+  const [taskData, setTaskData] = useState([]);
+  const [taskNames, setTaskNames] = useState({})
+  const [taskIds, setTaskIds] = useState([]);
+  const [gamesData, setGamesData] = useState([[]]);
+  const [initPlots, setInitPlots] = useState([[]]);
+  const [nInputs, setNInputs] = useState([]);
+  const [nOutputs, setNOutputs] = useState([]);
+  const [nObjects, setNObjects] = useState([]);
+  const [maxEpochs, setMaxEpochs] = useState([]);
+  const [maxLayers, setMaxLayers] = useState([]);
+  const [maxNodes, setMaxNodes] = useState([]);
+  const [normalization, setNormalization] = useState([true]);
+  const [normalizationVisibility, setNormalizationVisibility] = useState([false]);
+  const [iterationsSliderVisibility, setIterationsSliderVisibility] = useState([false]);
+  const [lrSliderVisibility, setLRSliderVisibility] = useState([false]);
+  const [cytoLayers, setCytoLayers] = useState([]);
+  const [isTraining, setIsTraining] = useState([]);
+  const [apiData, setApiData] = useState([]);
+  const [accuracy, setAccuracy] = useState([]);
+  const [isResponding, setIsResponding] = useState([]);
+  // Setting default values for the network-related states
+  const [progress, setProgress] = useState(-1);
+  const [errorList, setErrorList] = useState([[], null]);
+  const [featureNames, setFeatureNames] = useState([]);
+  const [weights, setWeights] = useState([]);
+  const [biases, setBiases] = useState([]);
+  const [imgs, setImgs] = useState([[], [], []]);
+
+  // this is for the quizzes
+  const [quizIds, setQuizIds] = useState([]);
+  const [quizData, setQuizData] = useState([]);
 
   // ------- CYTOSCAPE EDITING -------
-
-  const [cytoLayers1, setCytoLayers1] = useState([]);
+  const [loadedTasks, setLoadedTasks] = useState(false);
   useEffect(() => {
-    localStorage.setItem('cytoLayers1', JSON.stringify(cytoLayers1));
-    setIsTraining1(0);
-  }, [cytoLayers1]);
+    axios.get('/api/all_tasks/')
+      .then(response => {
+        const currentTaskData = response.data;
+        currentTaskData.sort((a, b) => a.task_id - b.task_id)// sort the taskData by taskIds
+        setTaskData(currentTaskData);
+        console.log(currentTaskData);
+        
+        const currentNInputs = [];
+        const currentNOutputs = [];
+        const currentMaxEpochs = [];
+        const currentMaxLayers = [];
+        const currentMaxNodes = [];
+        const currentTaskIds = [];
+        const currentWeights = [];
+        const currentTaskNames = {};
 
-  const [cytoLayers2, setCytoLayers2] = useState([]);
-  useEffect(() => {
-    localStorage.setItem('cytoLayers2', JSON.stringify(cytoLayers2));
-    setIsTraining2(0);
-  }, [cytoLayers2]);
+        currentTaskData.forEach(entry => {
+          currentNInputs.push(entry.n_inputs);
+          currentNOutputs.push(entry.n_outputs);
+          currentMaxEpochs.push(entry.max_epochs);
+          currentMaxLayers.push(entry.max_layers);
+          currentMaxNodes.push(entry.max_nodes);
+          currentTaskIds.push(entry.task_id);
+          currentWeights.push([]);
+          currentTaskNames[entry.task_id] = entry.name;
+        });
 
-  const [cytoLayers3, setCytoLayers3] = useState([]);
-  useEffect(() => {
-    localStorage.setItem('cytoLayers3', JSON.stringify(cytoLayers3));
-    setIsTraining3(0);
-  }, [cytoLayers3]);
+        setTaskIds(currentTaskIds);
+        setGamesData(JSON.stringify(currentTaskData));
+        setNInputs(currentNInputs);
+        setNOutputs(currentNOutputs);
+        setNObjects(currentTaskIds.map(() => 0));
+        setMaxEpochs(currentMaxEpochs);
+        setMaxLayers(currentMaxLayers);
+        setMaxNodes(currentMaxNodes);
+        setWeights(currentWeights);
+        setTaskNames(currentTaskNames);
+        setNormalizationVisibility(currentTaskData.map(entry => entry.normalization_visibility));
+        setIterationsSliderVisibility(currentTaskData.map(entry => entry.iterations_slider_visibility));
+        setLRSliderVisibility(currentTaskData.map(entry => entry.lr_slider_visibility));
+        setCytoLayers(currentTaskIds.map(() => []));
+        setIsTraining(currentTaskIds.map(() => false));
+        setApiData(currentTaskIds.map(() => null));
+        setAccuracy(currentTaskIds.map(() => 0));
+        setIsResponding(currentTaskIds.map(() => false));
+        setProgress(currentTaskIds.map(() => 0));
+        setErrorList(currentTaskIds.map(() => [[], null]));
+        setFeatureNames(currentTaskIds.map(() => []));  // TODO: load these somewhere else
+        setBiases(currentTaskIds.map(() => []));
+        setImgs(currentTaskIds.map(() => []));
+        setInitPlots(currentTaskIds.map(() => []));
+        setLoadedTasks(true)
+      })
+      .catch(error => {
+        console.error('Error fetching tasks:', error);
+        const defaultTaskIds = [11, 12];
+        setTaskIds(defaultTaskIds);
+        setGamesData(JSON.stringify([{task_id: 11, n_inputs: 4, n_outputs: 3, type: 1, dataset: 'Clas2.csv'}, {task_id: 12, n_inputs: 4, n_outputs: 3, type: 1, dataset: 'load_iris()'}]));
+        setNInputs(defaultTaskIds.map(() => 4));  // TODO: set a default value for this
+        setNOutputs(defaultTaskIds.map(() => 3));  // TODO: set a default value for this
+        setNObjects(defaultTaskIds.map(() => 0));
+        setMaxEpochs(defaultTaskIds.map(() => 200));
+        setMaxLayers(defaultTaskIds.map(() => 10));
+        setMaxNodes(defaultTaskIds.map(() => 16));
+        setCytoLayers(defaultTaskIds.map(() => []));
+        setIsTraining(defaultTaskIds.map(() => false));
+        setApiData(defaultTaskIds.map(() => null));
+        setAccuracy(defaultTaskIds.map(() => 0));
+        setIsResponding(defaultTaskIds.map(() => false));
+        setProgress(defaultTaskIds.map(() => 0));
+        setErrorList(defaultTaskIds.map(() => [[], null]));
+        setFeatureNames(defaultTaskIds.map(() => []));  // TODO: load these somewhere else
+        setWeights(defaultTaskIds.map(() => []));
+        setBiases(defaultTaskIds.map(() => []));
+        setImgs(defaultTaskIds.map(() => []));
+        console.log("Setting default states instead.")
+      });
+
+    axios.get('/api/all_quizzes/')
+      .then(response => {
+        const currentQuizData = response.data;
+        currentQuizData.sort((a, b) => a.quiz_id - b.quiz_id)// sort the quizData by quizIds
+        setQuizData(currentQuizData);
+        console.log(currentQuizData);
+        
+        const currentQuizIds = [];
+
+        currentQuizData.forEach(entry => {
+          currentQuizIds.push(entry.quiz_id);
+        });
+        setQuizIds(currentQuizIds);
+      })
+      .catch(error => {
+        console.error('Error fetching quizzes:', error);
+        const defaultQuizIds = [];
+        setQuizIds(defaultQuizIds);
+        console.log("Setting default states instead.")
+      });
+
+    /*
+    axios.get('/api/all_intros/')
+      .then(response => {
+        const currentQuizData = response.data;
+        currentQuizData.sort((a, b) => a.quiz_id - b.quiz_id)// sort the quizData by quizIds
+        setQuizData(currentQuizData);
+        console.log(currentQuizData);
+        
+        const currentQuizIds = [];
+
+        currentQuizData.forEach(entry => {
+          currentQuizIds.push(entry.quiz_id);
+        });
+        setQuizIds(currentQuizIds);
+      })
+      .catch(error => {
+        console.error('Error fetching quizzes:', error);
+        const defaultQuizIds = [];
+        setQuizIds(defaultQuizIds);
+        console.log("Setting default states instead.")
+      });
+    */
+  }, []);
+  
+  useEffect(() => {  // TODO: figure out what this is doing and if it's necessary
+    if (cytoLayers.every(subArray => subArray.length === 0)) {
+      console.log("cytoLayers is empty, setting [4, 8, 8, 3]");
+      // cytoLayers is empty, set it to a default value
+      taskIds.forEach((taskId, index) => {
+        localStorage.setItem(`cytoLayers${taskId}`, JSON.stringify([nInputs[index], 8, 8, nOutputs[index]]));
+      });
+    } else {
+      // cytoLayers is not empty, proceed as usual
+      cytoLayers.forEach((cytoLayer, index) => {
+        localStorage.setItem(`cytoLayers${taskIds[index]}`, JSON.stringify(cytoLayer));
+        setIsTraining(prevIsTraining => {
+        const newIsTraining = [...prevIsTraining];
+        newIsTraining[index] = 0;
+        return newIsTraining;
+      });
+    });
+    }
+  }, [cytoLayers, taskIds, nInputs, nOutputs]);
 
   
-  const loadLastCytoLayers = (setCytoLayers, apiData, setApiData, propertyName) => {
+  const loadLastCytoLayers = (setCytoLayers, apiData, setApiData, propertyName, taskId, index, nInputs, nOutputs) => {
     // Check localStorage for a saved setting
     const savedSetting = localStorage.getItem(propertyName);
     let goToStep2 = false;
-  
-    if (savedSetting && savedSetting !== '[]') {
+
+    if (savedSetting && savedSetting !== '[]' && JSON.parse(savedSetting).some(element => element === undefined)) {
         try {
             // If a saved setting is found, try to parse it from JSON
             const cytoLayersSetting = JSON.parse(savedSetting);
             // try to set the cytoLayers to the saved setting, if there is an error, set it to default
-            setCytoLayers(cytoLayersSetting);
+            setCytoLayers(prevCytoLayers => {
+              const newCytoLayers = [...prevCytoLayers];
+              console.log(nInputs)  // for debugging
+              console.log("setting cytoLayers to saved setting"); 
+              console.log(localStorage.getItem(propertyName));  // for debugging
+              newCytoLayers[index] = cytoLayersSetting;
+              console.log("saved setting:", cytoLayersSetting);
+              // make the number of nodes in the first and last layer match the number of inputs and outputs
+              newCytoLayers[index][0] = nInputs;  
+              newCytoLayers[index][newCytoLayers[index].length - 1] = nOutputs;
+              console.log("new setting: ", newCytoLayers)  // for debugging
+              return newCytoLayers;
+            });
         }
         catch (error) {
             console.log(error);
@@ -294,137 +546,349 @@ function App() {
     }
     else {goToStep2 = true;};
 
+    var userId = getCookie('user_id');
+    var csrftoken = getCookie('csrftoken');
+
     if (goToStep2) {
-        axios.get(window.location.origin + "/api/backend/?limit=1")
-        .then((response) => {
-            try {
-                setApiData(response.data[0]);
-                console.log("apiData:");
-                console.log(response.data[0]);
-                setCytoLayers(JSON.parse(response.data[0]["network_setup"]));
+      axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
+      })
+      .then((response) => {
+            setApiData(prevApiData => {
+              const newApiData = [...prevApiData];
+              newApiData[index] = response.data[0];
+              return newApiData;
+            });
+            console.log("apiData:");
+            console.log(response.data[0]);
+            if (typeof response.data[0] === 'undefined' || !response.data[0]["network_input"] || response.data[0]["network_input"].length === 0) {
+              throw new Error('response.data[0] is undefined or network_input is empty');
             }
-            catch (error) {
-                setCytoLayers([4, 7, 7, 3]);
-                console.log(error);
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-        });
+            setCytoLayers(prevCytoLayers => {
+              const newCytoLayers = [...prevCytoLayers];
+              newCytoLayers[index] = JSON.parse(response.data[0]["network_input"]);
+              // make the number of nodes in the first and last layer match the number of inputs and outputs
+              newCytoLayers[index][0] = nInputs;
+              newCytoLayers[index][newCytoLayers[index].length - 1] = nOutputs;
+              return newCytoLayers;
+            });
+      })
+      .catch((error) => {
+        console.log(error);
+        console.log("setting cytoLayers to default");  // for debugging
+            setCytoLayers(prevCytoLayers => {
+              const newCytoLayers = [...prevCytoLayers];
+              newCytoLayers[index] = [4, 8, 8, 3];
+              // make the number of nodes in the first and last layer match the number of inputs and outputs
+              newCytoLayers[index][0] = nInputs;
+              newCytoLayers[index][newCytoLayers[index].length - 1] = nOutputs;
+              return newCytoLayers;
+            });
+            console.log("done doing that, this is what cytoLayers are now: ", cytoLayers);
+      });
     }
   };
-  
-  /*
+
+  const [cytoElements, setCytoElements] = useState([]);
+  const [cytoStyle, setCytoStyle] = useState([]);
+
+  // Update the state when the dependencies change
   useEffect(() => {
-    loadLastCytoLayers(setCytoLayers1, apiData1, setApiData1, 'cytoLayers1');
-  }, [apiData1]);
-  
-  useEffect(() => {
-    loadLastCytoLayers(setCytoLayers2, apiData2, setApiData2, 'cytoLayers2');
-  }, [apiData2]);
+    setCytoElements(taskIds.map((taskId, index) => {
+      console.log("apiData:", apiData);
+      console.log("weights:", weights);
+      console.log(`cytoLayers[${index}] before running generateCytoElements:`, cytoLayers[index]);
+      return generateCytoElements(cytoLayers[index], apiData[index], isTraining[index], weights[index], biases[index])
+    }
+    ));
+  }, [taskIds, cytoLayers, apiData, isTraining, weights, biases]);
 
   useEffect(() => {
-    loadLastCytoLayers(setCytoLayers3, apiData3, setApiData3, 'cytoLayers3');
-  }, [apiData3]);
-  */
-
-  const cytoElements1 = useGenerateCytoElements(cytoLayers1, apiData1, isTraining1);
-  const cytoStyle1 = useGenerateCytoStyle(cytoLayers1);
-
-  const cytoElements2 = useGenerateCytoElements(cytoLayers2, apiData2, isTraining2);
-  const cytoStyle2 = useGenerateCytoStyle(cytoLayers2);
-
-  const cytoElements3 = useGenerateCytoElements(cytoLayers3, apiData3, isTraining3);
-  const cytoStyle3 = useGenerateCytoStyle(cytoLayers3);
+    setCytoStyle(taskIds.map((taskId, index) => 
+      generateCytoStyle(cytoLayers[index])
+    ));
+  }, [taskIds, cytoLayers]);
 
   // function to add a layer
-  const addLayer = useCallback((setCytoLayers, nOfOutputs) => {
+  const addLayer = useCallback((setCytoLayers, nOfOutputs, index, max_layers) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      if (newLayers.length < 10) {newLayers.push(nOfOutputs)};
+      console.log("max_layers: ", max_layers);  // for debugging");
+      if (newLayers[index].length < max_layers) {newLayers[index].push(nOfOutputs)};
       return newLayers;
     });
   }, []);
 
   // function to remove a layer
-  const removeLayer = useCallback((setCytoLayers) => {
+  const removeLayer = useCallback((setCytoLayers, index) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      if (newLayers.length > 2) {newLayers.splice(-2, 1)}
+      if (newLayers[index].length > 2) {newLayers[index].splice(-2, 1)}
       return newLayers;
     });
   }, []);
 
   // function to add a node to a layer
-  const addNode = useCallback((column, setCytoLayers, currentGameNumber) => {
+  const addNode = useCallback((column, setCytoLayers, taskId, index, max_nodes) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      newLayers[column] < 16 ? newLayers[column] += 1 : newLayers[column] = 16;
-      document.getElementById(currentGameNumber + "-input" + column).value = newLayers[column];
+      newLayers[index][column] < max_nodes ? newLayers[index][column] += 1 : newLayers[index][column] = max_nodes;
+      document.getElementById(taskId + "-input" + column).value = newLayers[index][column];
       return newLayers;
     });
   }, []);
 
   // function to remove a node from a layer
-  const removeNode = useCallback((column, setCytoLayers, currentGameNumber) => {
+  const removeNode = useCallback((column, setCytoLayers, taskId, index) => {
     setCytoLayers(prevLayers => {
       const newLayers = [...prevLayers];
-      newLayers[column] > 1 ? newLayers[column] -= 1 : newLayers[column] = 1;
-      document.getElementById(currentGameNumber + "-input" + column).value = newLayers[column];
+      newLayers[index][column] > 1 ? newLayers[index][column] -= 1 : newLayers[index][column] = 1;
+      document.getElementById(taskId + "-input" + column).value = newLayers[index][column];
       return newLayers;
     });
   }, []);
 
   // function to set a custom number of nodes for a layer
-  const setNodes = useCallback((column, setCytoLayers, currentGameNumber) => {
-    var nodeInput = Number(document.getElementById(currentGameNumber + "-input" + column).value)
+  const setNodes = useCallback((column, cytoLayers, setCytoLayers, taskId, index) => {
+    var nodeInput = Number(document.getElementById(taskId + "-input" + column).value)
     if (nodeInput && Number.isInteger(nodeInput)) {
       if (nodeInput < 1) {
         nodeInput = 1;
-      } else if (nodeInput > 16) {
-        nodeInput = 16;
+      } else if (nodeInput > maxNodes[index]) {
+        nodeInput = maxNodes[index];
       }
       setCytoLayers(prevLayers => {
         const newLayers = [...prevLayers];
-        newLayers[column] = nodeInput;
+        newLayers[index][column] = nodeInput;
         return newLayers;
       });
     } else {
-      nodeInput = cytoLayers1[column];
+      nodeInput = cytoLayers[index][column];
     }
-    document.getElementById(currentGameNumber + "-input" + column).value = nodeInput;
-  }, [cytoLayers1]);
-
-
+    document.getElementById(taskId + "-input" + column).value = nodeInput;
+  }, [maxNodes]);
 
   // ------- POST REQUEST -------
-  const postRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations) => {
+  const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs, normalization) => {
     e.preventDefault();
-    console.log("learningRate:");
-    console.log(learningRate);
+    if (!learningRate) {learningRate = 0.01};  // set learning rate to default if it's undefined
+    normalization = true;  // TODO: replace this with the actual normalization value
+    if (taskId === 11){
+      learningRate = 0.0005;
+      normalization = false;
+    }
+    var userId = getCookie('user_id');
+    var csrftoken = getCookie('csrftoken');
+
+    setProgress(prevProgress => {
+      const newProgress = [...prevProgress]; // create a copy of the old progress array
+      newProgress[index] = 0; // update the specific element
+      return newProgress; // return the new array
+    });
+    setErrorList(prevErrorList => {
+      const newErrorList = [...prevErrorList];
+      newErrorList[index] = [[], null];
+      return newErrorList;
+    });
+    setWeights(prevWeights => {
+      const newWeights = [...prevWeights];
+      newWeights[index] = [];
+      return newWeights;
+    });
+    setBiases(prevBiases => {
+      const newBiases = [...prevBiases];
+      newBiases[index] = [];
+      return newBiases;
+    });
+
+    setImgs(prevImgs => {
+      const newImgs = [...prevImgs];
+      newImgs[index] = [];
+      return newImgs;
+    });
+
+    {/*
+    let flatdata = pako.deflate(jsondata, { to: 'string' });
+    // let bs = Array.prototype.reduce.call(flatdata, (acc, byte) => acc + String.fromCharCode(byte), '');
+    let b64s = btoa(flatdata);
+    console.log("b64s: ", b64s);  // for debugging
+    */}
+    // make sure the cytoLayers have the right input and output nodes
+    cytoLayers[0] = nOfInputs;
+    cytoLayers[cytoLayers.length - 1] = nOfOutputs;
     const trainingData = {
+      action: 1,
+      user_id: userId,
+      task_id: taskId,
+      progress_pk: null,
       learning_rate: learningRate,
       epochs: iterations,
-      network_setup: JSON.stringify(cytoLayers),
-      network_weights: JSON.stringify([]),
-      network_biases: JSON.stringify([]),
-      nn_input: JSON.stringify([]),
-      action: 1,
-      error_list: JSON.stringify([]),
+      normalization: normalization,
+      network_input: JSON.stringify(cytoLayers),
+      games_data: gamesData,  
     };
-    setAccuracy(null);
-    setIsTraining(1);
-    axios.put(window.location.origin + "/api/backend/1", trainingData).then((response) => {
-      console.log(response.status);
-      fetchTrainingData(apiData, setApiData, setAccuracy, setIsTraining);
+    console.log("trainingData: ", trainingData);  // for debugging
+    setApiData(prevApiData => {
+      const newApiData = [...prevApiData];
+      newApiData[index] = trainingData;
+      return newApiData;
     });
+    setAccuracy(prevAccuracy => {
+      const newAccuracy = [...prevAccuracy];
+      newAccuracy[index] = null;
+      return newAccuracy;
+    });
+    setIsTraining(prevIsTraining => {
+      const newIsTraining = [...prevIsTraining];
+      newIsTraining[index] = 1;
+      return newIsTraining;
+    });
+
+    // first, set up the websocket
+    if (ws && ws.readyState !== WebSocket.CLOSED) {
+      ws.close();
+    }    
+    const ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
+
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    ws.onerror = function(event) {
+      console.error('Error:', event);
+    };
+
+    let timeoutId = null;
+
+    ws.onopen = () => {
+      console.log('WebSocket connection opened');
+
+      axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+        headers: {
+          'X-CSRFToken': csrftoken
+        },
+        timeout: pendingTime
+      }).then((response) => {
+        if (response.data.length > 0) {
+            // If the record exists, update it
+            let pk = response.data[0].pk;
+            axios.put(window.location.origin + `/api/backend/${pk}`, trainingData, {
+              headers: {
+                'X-CSRFToken': csrftoken
+              }, 
+              timeout: pendingTime
+            }).catch((error) => {
+                console.log(error);
+          });
+        } else {
+            // If the record does not exist, throw an error
+            throw new Error('No Record');
+        }
+      }).catch((error) => {
+          console.log(error);
+          if (axios.isCancel(error) || error.message === 'No Record' || error.code === 'ECONNABORTED') {
+            console.log('No record found, creating a new one');
+            axios.post(window.location.origin + "/api/backend/", trainingData, {
+              headers: {
+                'X-CSRFToken': csrftoken
+              }, 
+              timeout: pendingTime
+            }).catch((error) => {
+                console.log(error);
+            })
+          }
+      })
+
+      timeoutId = setTimeout(() => {
+        ws.close();
+        setIsTraining(prevIsTraining => {
+          const newIsTraining = [...prevIsTraining];
+          newIsTraining[index] = 0;
+          return newIsTraining;
+        });
+        console.log("Training failed")
+        alert("Training failed. Please try again. If the problem persists, please contact us.");
+      }, intervalTimeout); // stop after n milliseconds
+    };
+
+    ws.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      if (data.title === 'progress') {  // every 1%; includes progress, error_list, and network_weights
+
+        if (JSON.stringify(data.progress) !== JSON.stringify(progress[index])) {
+          setProgress(prevProgress => {
+            const newProgress = [...prevProgress];
+            newProgress[index] = data.progress;
+            return newProgress;
+          });
+
+          if (data.progress >= 0.98 ) {
+            ws.close();
+            clearTimeout(timeoutId);
+            setIsTraining(prevIsTraining => {
+              const newIsTraining = [...prevIsTraining];
+              newIsTraining[index] = 2;
+              return newIsTraining;
+            });
+            console.log("Training finished")
+          }
+
+          // update the error list if it changed
+          if (data.error_list[0].length !== errorList[index][0].length || data.error_list[1] !== errorList[index][1]) {
+            console.log("updating error list");  // for debugging
+            setErrorList(prevErrorList => {
+              const newErrorList = [...prevErrorList];
+              newErrorList[index] = data.error_list;
+              return newErrorList;
+            });
+          }
+          
+          // update the weights if they changed 
+          if (weights[index].length === 0 || data.network_weights[0][0] !== weights[index][0][0]) {
+            setWeights(prevWeights => {
+              const newWeights = [...prevWeights];
+              newWeights[index] = data.network_weights;
+              return newWeights;
+            });
+          }
+        }
+      } else if (data.title === 'update') {  // every 10%; includes network_biases and plots
+        // update the biases if it changed
+        if (data.network_biases.length !== biases[index].length) {
+          setBiases(prevBiases => {
+            const newBiases = [...prevBiases];
+            newBiases[index] = data.network_biases;
+            return newBiases;
+          });
+        }
+
+        // decompress and parse the images in 'plots', but only if it's not empty or the same as the current imgs
+        if (data.plot.length > 0 && data.plot.length !== imgs[index].length) {
+          setImgs(prevImgs => {
+            const newImgs = [...prevImgs];
+            const binaryString = atob(data.plot);  // decode from base64 to binary string
+            const bytes = new Uint8Array(binaryString.length);  // convert from binary string to byte array
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i);  // now bytes contains the binary image data
+            }
+            const blob = new Blob([bytes.buffer], { type: 'image/jpeg' });
+            const url = URL.createObjectURL(blob);
+            // now images can be accessed with <img src={url} />
+            newImgs[index] = url
+            return newImgs;
+          });
+        }
+      }
+    };
   };
 
 
   // ------- FLOATING BUTTONS -------
 
   // function to generate floating buttons
-  function generateFloatingButtons(top, left, dist, isItPlus, nLayers, cytoLayers, setCytoLayers, currentGameNumber) {
+  function generateFloatingButtons(top, left, dist, isItPlus, nLayers, cytoLayers, setCytoLayers, taskId, index) {
     const buttons = [];
     const icon = isItPlus ? <PlusIcon /> : <MinusIcon />;
     for (let i = 1; i < nLayers-1; i++) {
@@ -433,8 +897,8 @@ function App() {
         <div>
           <FloatingButton
             variant="outline"
-            disabled={(isItPlus && cytoLayers[i] >= 16) | (!isItPlus && cytoLayers1[i] < 2)}
-            onClick = {isItPlus ? () => addNode(i, setCytoLayers, currentGameNumber) : () => removeNode(i, setCytoLayers, currentGameNumber)}
+            disabled={(isItPlus && cytoLayers[i] >= 16) | (!isItPlus && cytoLayers[i] < 2) | isTraining[index] === 1}
+            onClick = {taskId !== 0 ? (isItPlus ? () => addNode(i, setCytoLayers, taskId, index, maxNodes[index]) : () => removeNode(i, setCytoLayers, taskId, index)) : () => {}}
             style={{...style}}
             key={i}
           >
@@ -443,7 +907,7 @@ function App() {
           {isItPlus &&
           <form>
             <input
-            id={currentGameNumber + "-input" + i}
+            id={taskId + "-input" + i}
             type="text"
             defaultValue={cytoLayers[i]}
             style={{
@@ -458,11 +922,11 @@ function App() {
               color: 'var(--cyan-12)',
               fontWeight: 'bold'
             }}
-            onBlur={() => setNodes(i, setCytoLayers, currentGameNumber)}
+            onBlur={taskId !== 0 ? () => setNodes(i, setCytoLayers, taskId, index) : () => {}}
             onKeyDown={(event) => {
-              if (event.key === "Enter") {
+              if (event.key === "Enter" && taskId !== 0) {
                 event.preventDefault();
-                setNodes(i, setCytoLayers, currentGameNumber);
+                setNodes(i, setCytoLayers, taskId, index);
               }
             }}
             />
@@ -477,38 +941,55 @@ function App() {
 
   // ------- FORMS -------
 
-  const handleSubmit = (event, setIsResponding, setApiData) => {
-    event.preventDefault();
-    setIsResponding(1);
-    axios.get(window.location.origin + "/api/backend/?limit=1")
-      .then((response) => {
-        const networkData = response.data[0];
-        const formData = new FormData(event.target);
-        const values = Array.from(formData.values()).map((value) => Number(value));
-        console.log("values");
-        console.log(values);
-        networkData.nn_input = JSON.stringify(values);
-        networkData.action = 2;
-        console.log("updated network data");
-        console.log(networkData);
-        axios.put(window.location.origin + "/api/backend/1", networkData)
-          .then((response) => {
-            console.log(response.status);
-            fetchQueryResponse(setApiData, setIsResponding);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+  const handleSubmit = (event, setIsResponding, setApiData, taskId, index) => {
+  event.preventDefault();
+  setIsResponding(prevIsResponding => {
+    const newIsResponding = [...prevIsResponding];
+    newIsResponding[index] = 1;
+    return newIsResponding;
+  });
+
+  var userId = getCookie('user_id');
+  var csrftoken = getCookie('csrftoken');
+
+  axios.get(window.location.origin + `/api/backend/?user_id=${userId}&task_id=${taskId}`, {
+    headers: {
+      'X-CSRFToken': csrftoken
+    }
+  })
+    .then((response) => {
+      const networkData = response.data[0];
+      const formData = new FormData(event.target);
+      const values = Array.from(formData.values()).map((value) => Number(value));
+      console.log("values");
+      console.log(values);
+      networkData.network_input = JSON.stringify(values);
+      networkData.action = 2;
+      networkData.games_data = gamesData;
+      console.log("updated network data");
+      console.log(networkData);
+      axios.put(window.location.origin + `/api/backend/${networkData.pk}`, networkData, {
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
       })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+        .then((response) => {
+          console.log(response.status);
+          fetchQueryResponse(setApiData, setIsResponding, taskId, index);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
 
 
 
   // ------- SWITCHES -------
-
+/*
   const [isMontyPythonLover, setIsMontyPythonLover] = useState(false);
 
   const MontyPythonSwitch = () => {
@@ -518,31 +999,42 @@ function App() {
       </Switch.Root>
     )
   }
-
+*/
 
 
   // ------- SLIDERS -------
 
-  // initiate iterations and learning rate as variables with a useState hook
-  const [iterations1, setIterations1] = useState(200);
-  const [learningRate1, setLearningRate1] = useState(0.01);
+  // initialize an array to store the state for each slider
+  const [iterations, setIterations] = useState(Array(taskIds.length).fill(100));
+  const [learningRate, setLearningRate] = useState(Array(taskIds.length).fill(0.01));
 
-  const [iterations2, setIterations2] = useState(200);
-  const [learningRate2, setLearningRate2] = useState(0.01);
+  const handleIterationChange = (index, value) => {
+    setIterations(prev => {
+      const newIterations = [...prev];
+      newIterations[index] = value[0] * 2;
+      return newIterations;
+    });
+  };
+  
+  const handleLearningRateChange = (index, value) => {
+    setLearningRate(prev => {
+      const newLearningRates = [...prev];
+      newLearningRates[index] = (10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20));
+      return newLearningRates;
+    });
+  };
 
-  const [iterations3, setIterations3] = useState(200);
-  const [learningRate3, setLearningRate3] = useState(0.01);
-
-  // create a slider for iterations for each game
-  const iterationsSlider1 = useMemo(() => {
+  const iterationsSliders = taskIds.map((taskId, index) => {
     return (
       <Slider.Root
+        key={index}
         className="SliderRoot"
-        defaultValue={[iterations1]}
-        onValueChange={(value) => setIterations1(value[0]*2)}
-        max={100}
+        defaultValue={[iterations[index]/2]}
+        onValueChange={(value) => handleIterationChange(index, value)}
+        max={maxEpochs[index] / 2}
         step={0.5}
-        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
+        style={{ width: Math.round(0.19 * (window.innerWidth * 0.97)) }}
+        disabled={isTraining[index] === 1}
       >
         <Slider.Track className="SliderTrack" style={{ height: 3 }}>
           <Slider.Range className="SliderRange" />
@@ -550,117 +1042,69 @@ function App() {
         <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
       </Slider.Root>
     );
-  }, [iterations1, setIterations1]);
+  });
 
-  const iterationsSlider2 = useMemo(() => {
+  const learningRateSliders = taskIds.map((challenge, index) => {
     return (
       <Slider.Root
+        key={index}
         className="SliderRoot"
-        defaultValue={[iterations2]}
-        onValueChange={(value) => setIterations2(value[0]*2)}
-        max={100}
-        step={0.5}
-        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
-      >
-        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
-          <Slider.Range className="SliderRange" />
-        </Slider.Track>
-        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
-      </Slider.Root>
-    );
-  }, [iterations2, setIterations2]);
-
-  const iterationsSlider3 = useMemo(() => {
-    return (
-      <Slider.Root
-        className="SliderRoot"
-        defaultValue={[iterations3]}
-        onValueChange={(value) => setIterations3(value[0]*2)}
-        max={100}
-        step={0.5}
-        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
-      >
-        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
-          <Slider.Range className="SliderRange" />
-        </Slider.Track>
-        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
-      </Slider.Root>
-    );
-  }, [iterations3, setIterations3]);
-
-
-  // create a slider for learning rate
-  const learningRateSlider1 = useMemo(() => {
-    return (
-      <Slider.Root id="learningRateSlider1"
-        className="SliderRoot"
-        defaultValue={[30]}
-        onValueChange={(value) => setLearningRate1((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
+        defaultValue={[Math.round((-20 * (Math.log10(learningRate) + 0.33)) / 10) * 10]}
+        onValueChange={(value) => handleLearningRateChange(index, value)}
         max={70}
         step={10}
-        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
+        style={{ width: Math.round(0.19 * (window.innerWidth * 0.97)) }}
+        disabled={isTraining[index] === 1}
       >
         <Slider.Track className="SliderTrack" style={{ height: 3 }}>
           <Slider.Range className="SliderRange" />
         </Slider.Track>
-        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
+        <Slider.Thumb className="SliderThumb" aria-label="Learning Rate" />
       </Slider.Root>
     );
-  }, []);
-
-  const learningRateSlider2 = useMemo(() => {
-    return (
-      <Slider.Root id="learningRateSlider2"
-        className="SliderRoot"
-        defaultValue={[30]}
-        onValueChange={(value) => setLearningRate2((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
-        max={70}
-        step={10}
-        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
-      >
-        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
-          <Slider.Range className="SliderRange" />
-        </Slider.Track>
-        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
-      </Slider.Root>
-    );
-  }, []);
-
-  const learningRateSlider3 = useMemo(() => {
-    return (
-      <Slider.Root id="learningRateSlider3"
-        className="SliderRoot"
-        defaultValue={[30]}
-        onValueChange={(value) => setLearningRate3((10 ** ((value[0]/-20)-0.33)).toFixed(Math.round((value[0]+10) / 20)))}
-        max={70}
-        step={10}
-        style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
-      >
-        <Slider.Track className="SliderTrack" style={{ height: 3 }}>
-          <Slider.Range className="SliderRange" />
-        </Slider.Track>
-        <Slider.Thumb className="SliderThumb" aria-label="Iterations" />
-      </Slider.Root>
-    );
-  }, []);
+  });
 
 
-  const updateCytoLayers = (setCytoLayers, nOfInputs, nOfOutputs) => {
+  const updateCytoLayers = (setCytoLayers, nOfInputs, nOfOutputs, index) => {
     setCytoLayers(prevCytoLayers => {
-      const newCytoLayers = prevCytoLayers.map((layer, index) => {
-        if (index === 0) {
+      const newCytoLayers = [...prevCytoLayers];
+      newCytoLayers[index] = newCytoLayers[index].map((layer, i) => {
+        if (i === 0) {
           return nOfInputs;
-        } else if (index === prevCytoLayers.length - 1) {
+        } else if (i === newCytoLayers[index].length - 1) {
           return nOfOutputs;
         } else {
           return layer;
         }
       });
-
+  
       return newCytoLayers;
     });
   };
 
+  const tasksByLevel = taskIds.reduce((acc, taskId) => {
+    const level = Math.floor(taskId / 10);
+    const challenge = taskId % 10;
+    if (!acc[level]) {
+      acc[level] = [];
+    }
+    acc[level].push(challenge);
+    return acc;
+  }, {});
+
+  const quizzesByLevel = quizIds.reduce((acc, quizId) => {
+    const level = Math.floor(quizId / 10);
+    const challenge = quizId % 10;
+    if (!acc[level]) {
+      acc[level] = [];
+    }
+    acc[level].push(challenge);
+    return acc;
+  }, {});
+
+
+  const [levelNames, setLevelNames] = useState(["Linear Regression", "Classification", "Hyperparameters", "Preprocessing"]);
+  const [tutorialDescription, setTutorialDescription] = useState("This would normally be a task description, but we are in a tutorial, so instead you can read a few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries.");
 
   // ------- RETURN THE APP CONTENT -------
   return (
@@ -672,30 +1116,22 @@ function App() {
           <div>
             <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
             <Grid columns='3' mt='1'>
-                <Box/>
-                <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
-                <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
+                <Box style={{ flex:1 }}/>
+                <Link to={window.location.origin} style={{ flex:1, textDecoration: 'none' }}>
+                <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily:'monospace, Courier New, Courier' }}><b>brAIn builder</b></Heading>
                 </Link>
-                <Box align='end' mr='3' >
+                <Box align='end' mr='3' style={{ flex:1 }}>
                     <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
                     <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
                     </Link>
                 </Box>
             </Grid>
             </Box>
-            <Flex direction='row' gap='3' style={{padding:'10px 10px', alignItems: 'flex-start'}}>
-            <Flex direction='column' gap='3' style={{ flex: 1 }}>
-              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+            <Flex direction='row' gap='3' style={{padding:'10px 10px', alignItems: 'flex-start' }}>
+            <Flex direction='column' gap='3' style={{ flex:1 }}>
+              <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Get Started</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
-                <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <ChallengeButton size="1" variant="outline">
-                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                        <label>Introduction</label>
-                        <div><RocketIcon width="27" height="27" /></div>
-                    </Flex>
-                    </ChallengeButton>
-                </Link>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(136px, 136px))', gap: '15px', alignItems: 'start', justifyContent: 'start'}}>
                 <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
@@ -704,261 +1140,217 @@ function App() {
                     </Flex>
                     </ChallengeButton>
                 </Link>
+                <Link to="custom11" style={{ color: 'inherit', textDecoration: 'none' }}>
+                  <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                      <label>The Perceptron</label>
+                      <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                  </ChallengeButton>
+                </Link>  
                 </Box>
               </Box>
-              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 1</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
-                <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <ChallengeButton size="1" variant="outline">
-                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                        <label>Challenge 1</label>
-                        <div><RocketIcon width="27" height="27" /></div>
-                    </Flex>
-                    </ChallengeButton>
-                </Link>
-                <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <ChallengeButton size="1" variant="outline">
-                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}> 
-                        <label>Challenge 2</label>
-                        <div><RocketIcon width="27" height="27" /></div>
-                    </Flex>
-                    </ChallengeButton>
-                </Link>
-                <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <ChallengeButton size="1" variant="outline">
-                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                        <label>Challenge 3</label>
-                        <div><RocketIcon width="27" height="27" /></div>
-                    </Flex>
-                    </ChallengeButton>
-                </Link>
+              {Object.entries(tasksByLevel).map(([level, challenges]) => (
+                <Box key={level} style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+                  <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level {level} - {levelNames[level-1]}</Heading>
+                  <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(136px, 136px))', gap: '15px', alignItems: 'start', justifyContent: 'start'}}>
+                    <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
+                      <ChallengeButton size="1" variant="outline">
+                      <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                          <label>Key Concepts</label>
+                          <div><DrawingPinIcon width="30" height="30" /></div>
+                      </Flex>
+                      </ChallengeButton>
+                    </Link>
+                    {challenges.map((challenge, index) => (
+                      <Link key={index} to={`challenge${level}${challenge}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                        <ChallengeButton size="1" variant="outline">
+                          <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                            <label>{taskNames[`${level}${challenge}`]}</label>
+                            <div><RocketIcon width="27" height="27" /></div>
+                          </Flex>
+                        </ChallengeButton>
+                      </Link>
+                    ))}
+
+                    {quizzesByLevel[level] && quizzesByLevel[level].map((quiz, index) => (
+                      <Link key={index} to={`quiz${level}${quiz}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                        <ChallengeButton size="1" variant="outline">
+                          <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                            <label>Quiz</label>
+                            <div><Pencil2Icon width="27" height="27" /></div>
+                          </Flex>
+                        </ChallengeButton>
+                      </Link>
+                    ))}
+                  </Box>
                 </Box>
-              </Box>
-              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 2</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
-                <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <ChallengeButton size="1" variant="outline">
-                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                        <label>Challenge 1</label>
-                        <div><RocketIcon width="27" height="27" /></div>
-                    </Flex>
-                    </ChallengeButton>
-                </Link>
-                <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <ChallengeButton size="1" variant="outline">
-                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                        <label>Challenge 2</label>
-                        <div><RocketIcon width="27" height="27" /></div>
-                    </Flex>
-                    </ChallengeButton>
-                </Link>
-                <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <ChallengeButton size="1" variant="outline">
-                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                        <label>Challenge 3</label>
-                        <div><RocketIcon width="27" height="27" /></div>
-                    </Flex>
-                    </ChallengeButton>
-                </Link>
-                </Box>
-              </Box>
-              <Box style={{ border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 3</Heading>
-                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px', alignItems: 'start', justifyContent: 'center'}}>
-                <Link to="challenge1" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <ChallengeButton size="1" variant="outline">
-                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                        <label>Challenge 1</label>
-                        <div><RocketIcon width="27" height="27" /></div>
-                    </Flex>
-                    </ChallengeButton>
-                </Link>
-                <Link to="challenge2" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <ChallengeButton size="1" variant="outline">
-                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                        <label>Challenge 2</label>
-                        <div><RocketIcon width="27" height="27" /></div>
-                    </Flex>
-                    </ChallengeButton>
-                </Link>
-                <Link to="challenge3" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <ChallengeButton size="1" variant="outline">
-                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                        <label>Challenge 3</label>
-                        <div><RocketIcon width="27" height="27" /></div>
-                    </Flex>
-                    </ChallengeButton>
-                </Link>
-                </Box>
-              </Box>
-
-
-            {/* NOTE THAT THE 3 LEVELS ARE NOT YET INDEPENDENT AT ALL!!!!!! */}
-
-
+              ))} 
             </Flex>
-            <Box style={{ flex: 1, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
-            <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Readme</Heading>
-            <Box>
-                <Readme />
-            </Box>
-            </Box>
+            <Flex direction='column' gap='3' style={{ flex: 1 }}>
+              <Box style={{ flex: 1, border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Readme</Heading>
+                <Box>
+                    <Readme />
+                </Box>
+              </Box>
+            </Flex>
             </Flex>
           </div>
           } />
+          
           <Route path="/introduction" element={
             <Introduction/>
           } />
+
           <Route path="/tutorial" element={
-            <Tutorial 
-            nOfInputs={4}
-            nOfOutputs={3}
-            maxLayers={10}
-            taskDescription={"This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
-            cytoElements={cytoElements1}
-            cytoStyle={cytoStyle1}
-            generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers1}
-            setCytoLayers={setCytoLayers1}
-            updateCytoLayers={updateCytoLayers}
-            loadLastCytoLayers={loadLastCytoLayers}
-            FloatingButton={FloatingButton}
-            addLayer={addLayer}
-            removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider1}
-            iterations={iterations1}
-            setIterations={setIterations1}
-            learningRateSlider={learningRateSlider1}
-            learningRate={learningRate1}
-            setLearningRate={setLearningRate1}
-            isTraining={isTraining1}
-            setIsTraining={setIsTraining1}
-            apiData={apiData1}
-            setApiData={setApiData1}
-            postRequest={postRequest}
-            accuracy={accuracy1}
-            setAccuracy={setAccuracy1}
-            accuracyColor={accuracyColor}
-            handleSubmit={handleSubmit}
-            isResponding={isResponding1}
-            setIsResponding={setIsResponding1}
-            MontyPythonSwitch={MontyPythonSwitch}
-          />
+            <Tutorial
+              nOfInputs={4}
+              nOfOutputs={3}
+              maxLayers={10}
+              taskId={0}
+              index={null}
+              generateFloatingButtons={generateFloatingButtons}
+              updateCytoLayers={null}
+              loadLastCytoLayers={null}
+              FloatingButton={FloatingButton}
+              addLayer={null}
+              removeLayer={null}
+              iterations={null}
+              setIterations={null}
+              learningRate={null}
+              setLearningRate={null}
+              isTraining={0}
+              setIsTraining={null}
+              apiData={null}
+              setApiData={null}
+              taskData={null}
+              setTaskData={null}
+              putRequest={null}
+              accuracy={null}
+              setAccuracy={null}
+              accuracyColor={accuracyColor}
+              handleSubmit={null}
+              isResponding={null}
+              setIsResponding={null}
+              progress={null}
+              featureNames={null}
+              errorList={null}
+              img={null}
+              loadData={null}
+              normalization={null}
+              normalizationVisibility={true}
+              iterationsSliderVisibility={true}
+              lrSliderVisibility={true}
+              initPlot={null}
+              setProgress={null}
+              setErrorList={null}
+              setWeights={null}
+              setBiases={null}
+            />
+          }/>
+
+          <Route path="/custom11" element={
+            <CustomBlock
+            host = {window.location.host}
+            customId = {11}
+            userId = {getCookie('user_id')}
+            />
           } />
-          <Route path="/challenge1" element={
-            <BuildView
-            currentGameNumber={1} 
-            nOfInputs={4}
-            nOfOutputs={3}
-            maxLayers={10}
-            taskDescription={"DRAFT: This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
-            cytoElements={cytoElements1}
-            cytoStyle={cytoStyle1}
-            generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers1}
-            setCytoLayers={setCytoLayers1}
-            updateCytoLayers={updateCytoLayers}
-            loadLastCytoLayers={loadLastCytoLayers}
-            FloatingButton={FloatingButton}
-            addLayer={addLayer}
-            removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider1}
-            iterations={iterations1}
-            setIterations={setIterations1}
-            learningRateSlider={learningRateSlider1}
-            learningRate={learningRate1}
-            setLearningRate={setLearningRate1}
-            isTraining={isTraining1}
-            setIsTraining={setIsTraining1}
-            apiData={apiData1}
-            setApiData={setApiData1}
-            postRequest={postRequest}
-            accuracy={accuracy1}
-            setAccuracy={setAccuracy1}
-            accuracyColor={accuracyColor}
-            handleSubmit={handleSubmit}
-            isResponding={isResponding1}
-            setIsResponding={setIsResponding1}
-            MontyPythonSwitch={MontyPythonSwitch}
-          />
-          } />
-          <Route path="/challenge2" element={
-            <BuildView
-            currentGameNumber={2} 
-            nOfInputs={2}
-            nOfOutputs={5}
-            maxLayers={10}
-            taskDescription={"DRAFT: This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
-            cytoElements={cytoElements2}
-            cytoStyle={cytoStyle2}
-            generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers2}
-            setCytoLayers={setCytoLayers2}
-            updateCytoLayers={updateCytoLayers}
-            loadLastCytoLayers={loadLastCytoLayers}
-            FloatingButton={FloatingButton}
-            addLayer={addLayer}
-            removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider2}
-            iterations={iterations2}
-            setIterations={setIterations2}
-            learningRateSlider={learningRateSlider2}
-            learningRate={learningRate2}
-            setLearningRate={setLearningRate2}
-            isTraining={isTraining2}
-            setIsTraining={setIsTraining2}
-            apiData={apiData2}
-            setApiData={setApiData2}
-            postRequest={postRequest}
-            accuracy={accuracy2}
-            setAccuracy={setAccuracy2}
-            accuracyColor={accuracyColor}
-            handleSubmit={handleSubmit}
-            isResponding={isResponding2}
-            setIsResponding={setIsResponding2}
-            MontyPythonSwitch={MontyPythonSwitch}
-          />
-          } />
-          <Route path="/challenge3" element={
-            <BuildView
-            currentGameNumber={3} 
-            nOfInputs={10}
-            nOfOutputs={1}
-            maxLayers={10}
-            taskDescription={"DRAFT: This would normally be a\xa0task description, but we are in a\xa0tutorial, so instead you can read a\xa0few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries."}
-            cytoElements={cytoElements3}
-            cytoStyle={cytoStyle3}
-            generateFloatingButtons={generateFloatingButtons}
-            cytoLayers={cytoLayers3}
-            setCytoLayers={setCytoLayers3}
-            updateCytoLayers={updateCytoLayers}
-            loadLastCytoLayers={loadLastCytoLayers}
-            FloatingButton={FloatingButton}
-            addLayer={addLayer}
-            removeLayer={removeLayer}
-            iterationsSlider={iterationsSlider3}
-            setIterations={setIterations3}
-            iterations={iterations3}
-            learningRateSlider={learningRateSlider3}
-            learningRate={learningRate3}
-            setLearningRate={setLearningRate3}
-            isTraining={isTraining3}
-            setIsTraining={setIsTraining3}
-            apiData={apiData3}
-            setApiData={setApiData3}
-            postRequest={postRequest}
-            accuracy={accuracy3}
-            setAccuracy={setAccuracy3}
-            accuracyColor={accuracyColor}
-            handleSubmit={handleSubmit}
-            isResponding={isResponding3}
-            setIsResponding={setIsResponding3}
-            MontyPythonSwitch={MontyPythonSwitch}
-          />
-          } />
+
+          {taskIds.map((taskId, index) => (
+            <Route
+              key={taskId}
+              path={`/challenge${taskId}`}
+              element={
+                <>
+                <BuildView
+                  nOfInputs={nInputs[index]}
+                  nOfOutputs={nOutputs[index]}
+                  nOfObjects={nObjects[index]}
+                  maxLayers={maxLayers[index]}
+                  taskId={taskId}
+                  index={index}
+                  cytoElements={cytoElements[index]}
+                  cytoStyle={cytoStyle[index]}
+                  generateFloatingButtons={generateFloatingButtons}
+                  cytoLayers={cytoLayers[index]}
+                  setCytoLayers={setCytoLayers}
+                  updateCytoLayers={updateCytoLayers}
+                  loadLastCytoLayers={loadLastCytoLayers}
+                  FloatingButton={FloatingButton}
+                  addLayer={addLayer}
+                  removeLayer={removeLayer}
+                  iterationsSlider={iterationsSliders[index]}
+                  iterations={iterations[index]}
+                  setIterations={setIterations}
+                  learningRateSlider={learningRateSliders[index]}
+                  learningRate={learningRate[index]}
+                  setLearningRate={setLearningRate}
+                  isTraining={isTraining[index]}
+                  setIsTraining={setIsTraining}
+                  apiData={apiData[index]}
+                  setApiData={setApiData}
+                  taskData={taskData}
+                  setTaskData={setTaskData}
+                  putRequest={putRequest}
+                  accuracy={accuracy[index]}
+                  setAccuracy={setAccuracy}
+                  accuracyColor={accuracyColor}
+                  handleSubmit={handleSubmit}
+                  isResponding={isResponding[index]}
+                  setIsResponding={setIsResponding}
+                  progress={progress[index]}
+                  featureNames={featureNames[index]}
+                  errorList={errorList[index]}
+                  img={imgs[index]}
+                  initPlot={initPlots[index]}
+                  loadData={loadData}
+                  normalization={true}
+                  normalizationVisibility={normalizationVisibility[index]}
+                  iterationsSliderVisibility={iterationsSliderVisibility[index]}
+                  lrSliderVisibility={lrSliderVisibility[index]}
+                  setProgress={setProgress}
+                  setErrorList={setErrorList}
+                  setWeights={setWeights}
+                  setBiases={setBiases}
+                />
+                </>
+              }
+            />
+          ))}
+          {quizIds.map((quizId, index) => (
+            <Route
+            key={quizId}
+            path={`/quiz${quizId}`}
+            element={
+              <div className="App">
+                <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
+                <Grid columns='3' mt='1'>
+                  <Box ml='3' style={{display:"flex"}}>  
+                    <Link to="/">
+                      <IconButton aria-label="navigate to home" width='auto' height='21' style={{ marginLeft: 'auto', color: 'inherit', textDecoration: 'none' }}>
+                        <HomeIcon color="white" width='auto' height='18' style={{ marginTop: 2 }} />
+                      </IconButton>
+                    </Link>
+                  </Box>
+                  <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
+                  <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily:'monospace, Courier New, Courier' }}>brAIn builder</Heading>
+                  </Link>
+                  <Box align='end' mr='3' >
+                      <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
+                      <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
+                      </Link>
+                  </Box>
+                </Grid>
+                </Box>
+                <QuizApp quizId={quizId} />
+              </div>
+            }/>
+          ))}
+            
           <Route path="*" element={<NotFound />} />
+          
         </Routes>
       </Router>
       </Theme>
@@ -1004,3 +1396,115 @@ export default App;
   </DropdownMenu.Content>
 </DropdownMenu.Root>
 */
+
+
+/*
+            <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Get Started</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '8px', alignItems: 'start', justifyContent: 'center'}}>
+                <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                        <label>Introduction</label>
+                        <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                    </ChallengeButton>
+                </Link>
+                <Link to="tutorial" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                        <label>Tutorial</label>
+                        <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                    </ChallengeButton>
+                </Link>
+                </Box>
+              </Box>
+              <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 1</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '8px', alignItems: 'start', justifyContent: 'center'}}>
+                <Link to="challenge11" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 1</label>
+                        <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                    </ChallengeButton>
+                </Link>
+                <Link to="challenge12" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}> 
+                        <label>Challenge 2</label>
+                        <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                    </ChallengeButton>
+                </Link>
+                <Link to="challenge13" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 3</label>
+                        <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                    </ChallengeButton>
+                </Link>
+                </Box>
+              </Box>
+              <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 2</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '8px', alignItems: 'start', justifyContent: 'center'}}>
+                <Link to="challenge11" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 1</label>
+                        <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                    </ChallengeButton>
+                </Link>
+                <Link to="challenge12" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 2</label>
+                        <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                    </ChallengeButton>
+                </Link>
+                <Link to="challenge13" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 3</label>
+                        <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                    </ChallengeButton>
+                </Link>
+                </Box>
+              </Box>
+              <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level 3</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '8px', alignItems: 'start', justifyContent: 'center'}}>
+                <Link to="challenge11" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 1</label>
+                        <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                    </ChallengeButton>
+                </Link>
+                <Link to="challenge12" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 2</label>
+                        <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                    </ChallengeButton>
+                </Link>
+                <Link to="challenge13" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                        <label>Challenge 3</label>
+                        <div><RocketIcon width="27" height="27" /></div>
+                    </Flex>
+                    </ChallengeButton>
+                </Link>
+                </Box>
+              </Box>
+            */

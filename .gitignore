@@ -2,6 +2,7 @@
 
 # dependencies
 brain_builder_env/
+bb_env/
 /node_modules
 /.pnp
 .pnp.js

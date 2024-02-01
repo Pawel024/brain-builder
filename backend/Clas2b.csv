@@ -1,4 +1,4 @@
-﻿Label,Semi-Major Axis,Inclination,Expected Life,Dry Mass,Power
+﻿Target,Semi-Major_Axis_[km],Inclination_[deg],Expected_Life_[years],Dry_Mass_[kg],Power_[W]
 0,0.999463133,0.000504541,0.818181818,0.33,0.24
 0,0.997796019,0.000201816,0.818181818,0.790215454,0.564388783
 0,0.997767763,0.000908174,0.393939394,0.213510449,0.131227879

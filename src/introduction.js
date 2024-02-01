@@ -19,7 +19,7 @@ function Introduction() {
             </Link>
             </Box>
             <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
-            <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none'}}>brAIn builder</Heading>
+            <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily:'monospace, Courier New, Courier' }}>brAIn builder</Heading>
             </Link>
             <Box align='end' mr='3' >
             <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
@@ -29,7 +29,7 @@ function Introduction() {
         </Grid>
         </Box>
         <Box style={{ padding: '30px 300px' }}>
-        <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Background Information About Neural Networks </Heading>
+        <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Linear Regression: Key Concepts </Heading>
         <body style={{ textAlign:'justify' }}>
         <p>We are in the middle of an AI revolution: image recognition, large language models such as chatgpt and image generation are fundamentally changing the way we organize our lives, and learning to understand and work with these systems will soon become an indispensable skill.</p>
         <p>But what is an AI actually? And how does it work? An 'AI' is actually any system or machine which shows signs of 'intelligence'. It is a pretty vaguely defined term, so there are many different types of AI, some more complex than others.</p>
