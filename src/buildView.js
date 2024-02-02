@@ -407,7 +407,7 @@ class Building extends React.Component {
       
         <Tabs.Content value="stuff">
         {this.props.taskId !== 0 && (
-          <Flex direction="row" gap = "2">
+          <Flex direction="row" gap = "3">
             <Flex direction="column" gap="2">
             
             {/* This will render the form with the feature names received from the backend, if it exists */}
