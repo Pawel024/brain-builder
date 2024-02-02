@@ -156,7 +156,7 @@ class CustomBlock extends Component {
                             {biasSlider}
                         </div>
                         <div>Bias: {this.state.bias}</div>
-                        <img src={this.state.img} alt="No plot available" style={{ marginTop:20 }}/>
+                        <img src={this.state.img} alt="No plot available" style={{ marginTop:0 }}/>
                         </Flex>
                     </Box>
                     <Separator orientation='vertical' style = {{ height: window.innerHeight-110 }}/>
