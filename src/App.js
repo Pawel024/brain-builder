@@ -1320,6 +1320,8 @@ function App() {
             />
           ))}
           {quizIds.map((quizId, index) => (
+            <>
+            { quizData[index].visibility &&
             <Route
             key={quizId}
             path={`/quiz${quizId}`}
@@ -1347,6 +1349,8 @@ function App() {
                 <QuizApp quizId={quizId} />
               </div>
             }/>
+            }
+            </>
           ))}
             
           <Route path="*" element={<NotFound />} />
