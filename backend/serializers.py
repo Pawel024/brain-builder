@@ -25,7 +25,7 @@ class QuizSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quiz
         fields = [
-            'quiz_id', 
+            'quiz_id', 'visibility',
             'question_1', 'code_1', 'option_1_a', 'option_1_b', 'option_1_c', 'option_1_d', 'answer_1',
             'question_2', 'code_2', 'option_2_a', 'option_2_b', 'option_2_c', 'option_2_d', 'answer_2',
             'question_3', 'code_3', 'option_3_a', 'option_3_b', 'option_3_c', 'option_3_d', 'answer_3',

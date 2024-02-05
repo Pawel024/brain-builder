@@ -58,6 +58,7 @@ class Progress(models.Model):
     
 class Quiz(models.Model):
     quiz_id = models.IntegerField(unique=True)
+    visibility = models.BooleanField(default=False)
     
     question_1 = models.TextField(null=True, blank=True)
     code_1 = models.TextField(null=True, blank=True)
