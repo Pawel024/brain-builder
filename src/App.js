@@ -1174,6 +1174,8 @@ function App() {
                     ))}
 
                     {quizzesByLevel[level] && quizzesByLevel[level].map((quiz, index) => (
+                      <>
+                      { quizData.find(entry => entry.quizId === 10*level+quiz).visibility &&
                       <Link key={index} to={`quiz${level}${quiz}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                         <ChallengeButton size="1" variant="outline">
                           <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
@@ -1182,6 +1184,8 @@ function App() {
                           </Flex>
                         </ChallengeButton>
                       </Link>
+                      }
+                      </>
                     ))}
                   </Box>
                 </Box>
