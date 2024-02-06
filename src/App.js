@@ -563,7 +563,7 @@ function App() {
             });
             console.log("apiData:");
             console.log(response.data[0]);
-            if (typeof response.data[0] === 'undefined' || !response.data[0]["network_input"] || response.data[0]["network_input"].length === 0) {
+            if (typeof response.data[0] === 'undefined' || !response.data[0]["network_input"] || JSON.parse(response.data[0]["network_input"]).length === 0) {
               throw new Error('response.data[0] is undefined or network_input is empty');
             }
             setCytoLayers(prevCytoLayers => {
@@ -580,7 +580,7 @@ function App() {
         console.log("setting cytoLayers to default");  // for debugging
             setCytoLayers(prevCytoLayers => {
               const newCytoLayers = [...prevCytoLayers];
-              newCytoLayers[index] = [4, 8, 8, 3];
+              newCytoLayers[index] = [4, 3];
               // make the number of nodes in the first and last layer match the number of inputs and outputs
               newCytoLayers[index][0] = nInputs;
               newCytoLayers[index][newCytoLayers[index].length - 1] = nOutputs;
