@@ -1307,6 +1307,8 @@ function App() {
                   progress={progress[index]}
                   featureNames={featureNames[index]}
                   errorList={errorList[index]}
+                  weights={weights[index]}
+                  biases={biases[index]}
                   img={imgs[index]}
                   initPlot={initPlots[index]}
                   loadData={loadData}

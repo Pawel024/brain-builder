@@ -36,9 +36,9 @@ from . import levels
 # epochs = 200
 
 
-def build_nn(input_list, tag, norma=False, dat=None):
+def build_nn(input_list, tag, dat=None):
     # convert the input list to usable values
-    structure, learning_rate, epochs = levels.convert_input(input_list, tag)
+    structure, learning_rate, epochs, norma = levels.convert_input(input_list, tag)
 
     # now separate into training and testing data:
     batch_size = 1  # feed small amounts of data to adjust gradient with, usually between 8 and 64

@@ -97,6 +97,7 @@ class Building extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      description: [],
       printedDescription: '',
       runTutorial: false,
       steps: [
@@ -150,7 +151,11 @@ class Building extends React.Component {
 
     axios.get(window.location.origin + '/api/tasks/?task_id=' + this.props.taskId)
     .then(response => {
+      if (Array.isArray(response.data.description)) {
+        this.setState({ description: response.data.description });
+      } else {
       this.typeWriter(response.data.description);
+      }
     })
     .catch(error => {
       console.error('Task description error:', error);
@@ -257,11 +262,22 @@ class Building extends React.Component {
         </Tabs.List>
 
         <Box px="4" pt="3" pb="0">
-        <Tabs.Content value="task">
+        <Tabs.Content value="background info">
           {this.props.taskId !== 0 && (
           <Box style={{ padding: '20px 300px', fontFamily:'monospace' }}>
-          <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Task Description </Heading>
-          <div style={{ textAlign:'justify' }}>{this.state.printedDescription}</div>
+            {this.state.description.length > 0 ? (
+            this.state.description.map(([subtitle, text], index) => (
+                <div key={index}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_{subtitle} </Heading>
+                <p>{text}</p>s
+                </div>
+            ))
+             ) : (
+              <div style={{ textAlign:'justify' }}>
+              <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Task Description </Heading>
+              {this.state.printedDescription}
+              </div>
+             )}
           {/* a little below this, plot the dataset */}
           {this.props.initPlot && (
             <>
@@ -384,7 +400,12 @@ class Building extends React.Component {
                 <div style={{ textAlign:'justify', width: Math.round(0.27 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
                   {this.props.taskDescription}
                 </div>
-              )
+              ))}
+              { this.props.taskId === 11 && (
+                  <div style={{ textAlign:'justify', width: Math.round(0.27 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
+                    Weight: {this.props.weights[0]}
+                    Bias: {this.props.biases[0]}
+                  </div>
               )}
 
             </div>

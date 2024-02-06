@@ -81,7 +81,7 @@ async def process(req):
             data = None
             print("No data in cache, about to load it")
 
-        network, data, training_set, test_set = building.build_nn(input_list, tag, normalization, data)
+        network, data, training_set, test_set = building.build_nn(input_list, tag, data)
         print("Network initiated, starting training")
         d['title'] = 'progress'
         d['progress'] = 0  # just update the progress
