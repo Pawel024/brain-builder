@@ -1175,6 +1175,8 @@ function App() {
 
                     {quizzesByLevel[level] && quizzesByLevel[level].map((quiz, index) => (
                       <>
+                      {console.log(10*level+quiz)}
+                      {console.log(quizData.find(entry => entry.quizId === 10*level+quiz).visibility)}
                       { quizData.find(entry => entry.quizId === 10*level+quiz).visibility &&
                       <Link key={index} to={`quiz${level}${quiz}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                         <ChallengeButton size="1" variant="outline">
