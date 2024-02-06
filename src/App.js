@@ -499,7 +499,7 @@ function App() {
       console.log("cytoLayers is empty, setting [4, 8, 8, 3]");
       // cytoLayers is empty, set it to a default value
       taskIds.forEach((taskId, index) => {
-        localStorage.setItem(`cytoLayers${taskId}`, JSON.stringify([nInputs[index], 8, 8, nOutputs[index]]));
+        localStorage.setItem(`cytoLayers${taskId}`, JSON.stringify([nInputs[index], nOutputs[index]]));
       });
     } else {
       // cytoLayers is not empty, proceed as usual
