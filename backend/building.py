@@ -35,20 +35,14 @@ import os
 # learning_rate = 0.005
 # epochs = 200
 
-n_inputs = 0
-n_outputs = 0
-errors = []
 
-
-def build_nn(input_list, tag, dat=None):
-    global n_inputs, n_outputs
+def build_nn(input_list, tag, norma=False, dat=None):
     # convert the input list to usable values
     structure, learning_rate, epochs = levels.convert_input(input_list, tag)
-    n_inputs, n_outputs = structure[0][0], structure[-1][0]
 
     # now separate into training and testing data:
     batch_size = 1  # feed small amounts of data to adjust gradient with, usually between 8 and 64
-    data, (training_set, test_set) = levels.get_data(tag, dat)
+    data, (training_set, test_set) = levels.get_data(tag, norma, dat)
     training_set = torch.utils.data.DataLoader(training_set, batch_size=batch_size, shuffle=True)
     test_set = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=True)
     # shuffle: always turn on if dataset is ordered!
@@ -73,8 +67,7 @@ def build_nn(input_list, tag, dat=None):
     return nn, data, training_set, test_set
 
 
-def train_nn_epoch(nn, training_set, test_set, current_epoch, epochs, learning_rate, tag):
-    global errors
+def train_nn_epoch(nn, training_set, test_set, current_epoch, epochs, learning_rate, tag, errors):
     accuracy, weights, biases = None, None, None
     optimizer = torch.optim.SGD(nn.parameters(), lr=learning_rate)  # optimizer has to be defined outside the network module, idk why
     typ = levels.find_type(tag)
@@ -103,12 +96,11 @@ def get_parameters(nn):
 
 
 def predict(x, nn, tag, data, normalization=False, name=False):
-    global n_inputs, n_outputs
     if levels.find_type(tag) == 1:
         if normalization:
             x = data.normalize(x)
             x = torch.tensor(x, dtype=torch.float32)
-        output = torch.argmax(nn(x.view(-1, n_inputs))[0]).item()
+        output = torch.argmax(nn(x.view(-1, data.n_features))[0]).item()
         if name:
             output = data.label_name(output)
         return output
@@ -117,7 +109,7 @@ def predict(x, nn, tag, data, normalization=False, name=False):
         if normalization:
             x = data.normalize(x)
             x = torch.tensor(x, dtype=torch.float32)
-        output = nn(x.view(-1, n_inputs))[0]
+        output = nn(x.view(-1, data.n_features))[0]
         if normalization:
             output = data.denormalize(output.tolist())
         return output

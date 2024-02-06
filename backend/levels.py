@@ -23,8 +23,6 @@ import pandas as pd
 import pickle
 import numpy as np
 
-normalization = False
-data = None
 games = None
 
 
@@ -38,7 +36,6 @@ def find_type(tag):
 
 
 def convert_input(lst, tag):
-    global normalization
     # basic settings
     other, nodes = lst
     structure = [[nodes[0]]]
@@ -55,13 +52,11 @@ def convert_input(lst, tag):
     elif games.loc[tag, 'type'] == 2:
         structure[-1][2] = ''
 
-    return structure, learning_rate, epochs
+    return structure, learning_rate, epochs, normalization
 
 
-def get_data(tag, dat=None):
-    global normalization, data
+def get_data(tag, normalization=False, data=None):
     magic_box = {'df': df, 'datasets': datasets, 'normalization': normalization}
-    data, train, test = dat, None, None
     if games.loc[tag, 'dataset'] is None:
         print("No dataset found for tag ", tag)
     

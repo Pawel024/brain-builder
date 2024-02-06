@@ -43,8 +43,9 @@ async def process(req):
     if req['action'] == 0:  # load the data and send the feature names and images to the frontend
         d = {}
         tag = int(req['task_id'])
+        normalization = bool(req['normalization'])
 
-        data, (training_set, test_set) = levels.get_data(tag)
+        data, (training_set, test_set) = levels.get_data(tag, normalization)
         cache.set(f'{user_id}_data', pickle.dumps(data), 10*60)  # cache the data for 10 minutes
         print("Data loaded and stored in cache")
 
@@ -66,9 +67,9 @@ async def process(req):
 
     elif req['action'] == 1:  # create and train a network
         d, u = {}, {}
-        building.errors = []
-        epochs, learning_rate = int(req['epochs']), float(req['learning_rate'])
-        input_list = ((learning_rate, epochs, bool(req['normalization'])), json.loads(req['network_input']))  # TODO: remove the learning rate and epochs from this path
+        errors = []
+        epochs, learning_rate, normalization = int(req['epochs']), float(req['learning_rate']), bool(req['normalization'])
+        input_list = ((learning_rate, epochs, normalization), json.loads(req['network_input']))  # TODO: remove the learning rate and epochs from this path
         tag = int(req['task_id'])
 
         # check if a cached version of the data exists and load it if it does
@@ -80,7 +81,7 @@ async def process(req):
             data = None
             print("No data in cache, about to load it")
 
-        network, data, training_set, test_set = building.build_nn(input_list, tag, data)
+        network, data, training_set, test_set = building.build_nn(input_list, tag, normalization, data)
         print("Network initiated, starting training")
         d['title'] = 'progress'
         d['progress'] = 0  # just update the progress
@@ -92,7 +93,7 @@ async def process(req):
         
         for epoch in range(epochs):
             print("Epoch: ", epoch)
-            errors, accuracy, we, bi = building.train_nn_epoch(network, training_set, test_set, epoch, epochs, learning_rate, tag)
+            errors, accuracy, we, bi = building.train_nn_epoch(network, training_set, test_set, epoch, epochs, learning_rate, tag, errors)
             if we is not None:
                 w = we
                 b = bi
@@ -108,7 +109,7 @@ async def process(req):
                 if epoch % (epochs // 50 if epochs >= 50 else 1) == 0:  # every 10% of the total epochs:
                     print("Updating all the stuff")
                     data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
-                    u['plot'] = b64encode(levels.data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data (potentially with decision boundary)
+                    u['plot'] = b64encode(data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data (potentially with decision boundary)
                     u['network_biases'] = b  # list of lists of floats representing the biases
 
                     print("Epoch: ", epoch, ", Error: ", errors[-1])
@@ -123,7 +124,7 @@ async def process(req):
                     print('Sending data to coach')
                     await coach.send_data(d)
         
-        levels.data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
+        data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
 
         print("About to save network and data to cache...")
         # save the network and data to pickle files and store them in the cache
@@ -138,7 +139,7 @@ async def process(req):
         d['network_weights'] = w  # list of lists of floats representing the weights
         
         u['network_biases'] = b  # list of lists of floats representing the biases
-        u['plot'] = b64encode(levels.data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data (potentially with decision boundary)
+        u['plot'] = b64encode(data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data (potentially with decision boundary)
         
         coach = Coach.connections.get((str(user_id), str(task_id)))
         if coach is not None:

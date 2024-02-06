@@ -563,6 +563,7 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
         if len(self.targets.shape) == 1:
             self.targets = self.targets.reshape(-1, 1)
         
+        self.normalization = normalize
         self.n_targets = len(self.targets[0])
         self.n_features = len(self.data[0])
         self.n_objects = len(self.data)
@@ -581,7 +582,7 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
         self.target_minima = np.min(self.targets, axis=0)
         self.target_maxima = np.max(self.targets, axis=0)
 
-        if normalize:
+        if self.normalization:
             for i in range(self.n_features):
                 self.data[:, i] = ((self.data[:, i] - self.minima[i]) / (self.maxima[i] - self.minima[i]))
             if self.data_type == 2:
