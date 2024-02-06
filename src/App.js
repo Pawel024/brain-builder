@@ -520,7 +520,7 @@ function App() {
     const savedSetting = localStorage.getItem(propertyName);
     let goToStep2 = false;
 
-    if (savedSetting && savedSetting !== '[]' && JSON.parse(savedSetting).some(element => element === undefined)) {
+    if (savedSetting && savedSetting !== '[]' && !JSON.parse(savedSetting).some(element => element === undefined)) {
         try {
             // If a saved setting is found, try to parse it from JSON
             const cytoLayersSetting = JSON.parse(savedSetting);
