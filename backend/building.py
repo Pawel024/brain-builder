@@ -99,7 +99,7 @@ def predict(x, nn, tag, data, normalization=False, name=False):
     if levels.find_type(tag) == 1:
         if normalization:
             x = data.normalize(x)
-            x = torch.tensor(x, dtype=torch.float32)
+        x = torch.tensor(x, dtype=torch.float32)
         output = torch.argmax(nn(x.view(-1, data.n_features))[0]).item()
         if name:
             output = data.label_name(output)
@@ -108,7 +108,7 @@ def predict(x, nn, tag, data, normalization=False, name=False):
     elif levels.find_type(tag) == 2:
         if normalization:
             x = data.normalize(x)
-            x = torch.tensor(x, dtype=torch.float32)
+        x = torch.tensor(x, dtype=torch.float32)
         output = nn(x.view(-1, data.n_features))[0]
         if normalization:
             output = data.denormalize(output.tolist())
