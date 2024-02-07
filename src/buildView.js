@@ -152,9 +152,12 @@ class Building extends React.Component {
     axios.get(window.location.origin + '/api/tasks/?task_id=' + this.props.taskId)
     .then(response => {
       console.log("Data.description: ", response.data.description);
+      console.log("Data.description type: ", typeof(response.data.description));
       if (Array.isArray(response.data.description)) {
         this.setState({ description: response.data.description });
+        console.log("Attempting to set the array")
       } else {
+      console.log("Attempting to set the string")
       this.typeWriter(response.data.description);
       }
     })
@@ -266,6 +269,7 @@ class Building extends React.Component {
         <Tabs.Content value="background info">
           {this.props.taskId !== 0 && (
           <Box style={{ padding: '20px 300px', fontFamily:'monospace' }}>
+            {this.state.description.length > 0 && console.log("Printing array")}
             {this.state.description.length > 0 ? (
             this.state.description.map(([subtitle, text], index) => (
                 <div key={index}>
@@ -277,6 +281,7 @@ class Building extends React.Component {
               <div style={{ textAlign:'justify' }}>
               <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Task Description </Heading>
               {this.state.printedDescription}
+              {console.log("Printing typewriter")}
               </div>
              )}
           {/* a little below this, plot the dataset */}

@@ -112,6 +112,8 @@ def predict(x, nn, tag, data, normalization=False, name=False):
         output = nn(x.view(-1, data.n_features))[0]
         if normalization:
             output = data.denormalize(output.tolist())
+        else:
+            output = output.tolist()
         return output
 
     else:
