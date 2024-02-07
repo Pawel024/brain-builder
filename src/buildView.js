@@ -305,12 +305,12 @@ class Building extends React.Component {
               {((this.props.taskId < 20 && this.props.img && this.props.img !== '' && this.props.isTraining===1) &&
                 <Flex direction="column" gap="1" style={{ position: 'absolute', bottom: 150, left: 660 }}>
                 <img src={this.props.img} alt={`No plots yet`} onLoad={() => {}/*URL.revokeObjectURL(this.props.img)*/} style={{ height: '200px', width: 'auto' }}/>
-                this.props.taskId === 11 && (
-                  <Flex direction="column" gap="1">
-                  Weight: {this.props.weights[0]}
-                  Bias: {this.props.biases[0]}
+                {this.props.taskId === 11 && (
+                  <Flex direction="column" gap="0">
+                  <p>Weight: {this.props.weights[0]}</p>
+                  <p>Bias: {this.props.biases[0]}</p>
                   </Flex>
-                )
+                )}
                 </Flex>
               )}
 
