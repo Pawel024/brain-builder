@@ -151,10 +151,10 @@ class Building extends React.Component {
 
     axios.get(window.location.origin + '/api/tasks/?task_id=' + this.props.taskId)
     .then(response => {
-      console.log("Data.description: ", response.data.description);
-      console.log("Data.description type: ", typeof(response.data.description));
-      if (Array.isArray(response.data.description)) {
-        this.setState({ description: response.data.description });
+      console.log("Data.description: ", JSON.parse(response.data.description));
+      console.log("Data.description type: ", typeof(JSON.parse(response.data.description)));
+      if (Array.isArray(JSON.parse(response.data.description))) {
+        this.setState({ description: JSON.parse(response.data.description) });
         console.log("Attempting to set the array")
       } else {
       console.log("Attempting to set the string")
@@ -281,7 +281,7 @@ class Building extends React.Component {
               <div style={{ textAlign:'justify' }}>
               <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Task Description </Heading>
               {this.state.printedDescription}
-              {console.log("Printing typewriter")}
+              {console.log("Printing typewriter: ", this.state.printedDescription)}
               </div>
              )}
           {/* a little below this, plot the dataset */}
@@ -444,11 +444,11 @@ class Building extends React.Component {
                       Please enter the {featureName}
                     </Form.Message>
                     <Form.Message className="FormMessage" match="typeMismatch">
-                      Please provide a valid {featureName}
+                      Please provide a valid number.
                     </Form.Message>
                   </div>
                   <Form.Control asChild>
-                    <input className="FormInput" type="number" required />
+                    <input className="FormInput" type="text" pattern="^-?[0-9]*[.,]?[0-9]+" required />
                   </Form.Control>
                 </Form.Field>
               ))}

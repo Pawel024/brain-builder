@@ -1140,7 +1140,7 @@ function App() {
                 <Link to="custom11" style={{ color: 'inherit', textDecoration: 'none' }}>
                   <ChallengeButton size="1" variant="outline">
                     <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                      <label>The Perceptron</label>
+                      <label>The Perceptron 1</label>
                       <div><RocketIcon width="27" height="27" /></div>
                     </Flex>
                   </ChallengeButton>
