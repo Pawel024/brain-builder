@@ -151,6 +151,7 @@ class Building extends React.Component {
 
     axios.get(window.location.origin + '/api/tasks/?task_id=' + this.props.taskId)
     .then(response => {
+      console.log("Data.description: ", response.data.description);
       if (Array.isArray(response.data.description)) {
         this.setState({ description: response.data.description });
       } else {

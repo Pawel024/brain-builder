@@ -580,10 +580,7 @@ function App() {
         console.log("setting cytoLayers to default");  // for debugging
             setCytoLayers(prevCytoLayers => {
               const newCytoLayers = [...prevCytoLayers];
-              newCytoLayers[index] = [4, 3];
-              // make the number of nodes in the first and last layer match the number of inputs and outputs
-              newCytoLayers[index][0] = nInputs;
-              newCytoLayers[index][newCytoLayers[index].length - 1] = nOutputs;
+              newCytoLayers[index] = [nInputs, nOutputs];
               return newCytoLayers;
             });
             console.log("done doing that, this is what cytoLayers are now: ", cytoLayers);
