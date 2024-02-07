@@ -303,7 +303,15 @@ class Building extends React.Component {
               <img src={color_scale_pic} alt='Color scale from purple for negative to red for positive' width='20' height='auto' style={{ position: 'absolute', top: 15, left: 15 }}/>
 
               {((this.props.taskId < 20 && this.props.img && this.props.img !== '' && this.props.isTraining===1) &&
-                <img src={this.props.img} alt={`No plots yet`} onLoad={() => {}/*URL.revokeObjectURL(this.props.img)*/} style={{ position: 'absolute', bottom: 150, left: 660, height: '200px', width: 'auto' }}/>
+                <Flex direction="column" gap="1" style={{ position: 'absolute', bottom: 150, left: 660 }}>
+                <img src={this.props.img} alt={`No plots yet`} onLoad={() => {}/*URL.revokeObjectURL(this.props.img)*/} style={{ height: '200px', width: 'auto' }}/>
+                this.props.taskId === 11 && (
+                  <Flex direction="column" gap="1">
+                  Weight: {this.props.weights[0]}
+                  Bias: {this.props.biases[0]}
+                  </Flex>
+                )
+                </Flex>
               )}
 
               {this.props.generateFloatingButtons(window.innerHeight - 223, 0.1 * (window.innerWidth * 0.97) - 16.5, 0.4 * (window.innerWidth * 0.97)/Math.max(this.props.cytoLayers.length-1,1), true, this.props.cytoLayers.length, this.props.cytoLayers, this.props.setCytoLayers, this.props.taskId, this.props.index)}                    
@@ -401,13 +409,6 @@ class Building extends React.Component {
                   {this.props.taskDescription}
                 </div>
               ))}
-              { this.props.taskId === 11 && (
-                  <div style={{ textAlign:'justify', width: Math.round(0.27 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
-                    Weight: {this.props.weights[0]}
-                    Bias: {this.props.biases[0]}
-                  </div>
-              )}
-
             </div>
           </Box>
 
