@@ -367,8 +367,8 @@ class DataFromExcel(Dataset):
                     ax.set_xlim([0, 1])
                     ax.set_ylim([0, 1])
                 else:
-                    ax.xlim(mini, maxi)
-                    ax.ylim(mini, maxi)
+                    ax.set_xlim(mini, maxi)
+                    ax.set_ylim(mini, maxi)
                 
                 img = BytesIO()
                 fig.tight_layout()
