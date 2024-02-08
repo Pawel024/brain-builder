@@ -269,12 +269,12 @@ class Building extends React.Component {
         <Tabs.Content value="background info">
           {this.props.taskId !== 0 && (
           <Box style={{ padding: '20px 300px', fontFamily:'monospace' }}>
-            {this.state.description.length > 0 && console.log("Printing array")}
+            {this.state.description.length > 0 && console.log("Printing array", this.state.description)}
             {this.state.description.length > 0 ? (
             this.state.description.map(([subtitle, text], index) => (
                 <div key={index}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_{subtitle} </Heading>
-                <p>{text}</p>s
+                <p>{text}</p>
                 </div>
             ))
              ) : (

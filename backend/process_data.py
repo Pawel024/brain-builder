@@ -126,6 +126,13 @@ async def process(req):
         
         data.plot_decision_boundary(network)  # plot the current decision boundary (will be ignored if the dataset has too many dimensions)
 
+        d['progress'] = 1
+        d['error_list'] = e  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
+        d['network_weights'] = w  # list of lists of floats representing the weights
+        
+        u['network_biases'] = b  # list of lists of floats representing the biases
+        u['plot'] = b64encode(data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data (potentially with decision boundary)
+
         print("About to save network and data to cache...")
         # save the network and data to pickle files and store them in the cache
         network = pickle.dumps(network, -1)
@@ -133,13 +140,6 @@ async def process(req):
         cache.set(f'{user_id}_nn', network, 10*60)  # cache the network for 10 minutes
         cache.set(f'{user_id}_data', data, 10*60)  # cache the data for 10 minutes
         print("Network and data successfully saved to cache!")
-        
-        d['progress'] = 1
-        d['error_list'] = e  # list of 2 entries: first one is list of errors for plotting, second one is accuracy on test set
-        d['network_weights'] = w  # list of lists of floats representing the weights
-        
-        u['network_biases'] = b  # list of lists of floats representing the biases
-        u['plot'] = b64encode(data.images[-1]).decode()  # base64 encoded image, showing pyplot of the data (potentially with decision boundary)
         
         coach = Coach.connections.get((str(user_id), str(task_id)))
         if coach is not None:

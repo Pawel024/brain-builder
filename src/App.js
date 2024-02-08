@@ -1100,7 +1100,7 @@ function App() {
   }, {});
 
 
-  const [levelNames, setLevelNames] = useState(["Linear Regression", "Classification", "Hyperparameters", "Preprocessing"]);
+  const [levelNames, setLevelNames] = useState(["Regression", "Classification", "Hyperparameters", "Preprocessing"]);
   const [tutorialDescription, setTutorialDescription] = useState("This would normally be a task description, but we are in a tutorial, so instead you can read a few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries.");
 
   // ------- RETURN THE APP CONTENT -------

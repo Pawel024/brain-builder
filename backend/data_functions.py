@@ -20,7 +20,8 @@ import math
 import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
+import matplotlib.figure as mf
 from matplotlib.lines import Line2D
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
@@ -33,7 +34,8 @@ def create_plot11(x=None, y=None, a=None, b=None):
     Returns the plot as the value of a BytesIO object.
     """
     
-    fig, ax = plt.subplots()
+    fig = mf.Figure()
+    ax = fig.add_subplot(111)
     if x is not None and y is not None:
         ax.scatter(x, y, color=(4/255, 151/255, 185/255))
         if a is not None and b is not None:
@@ -46,7 +48,7 @@ def create_plot11(x=None, y=None, a=None, b=None):
         img = BytesIO()
         fig.savefig(img, format='png')
         img.seek(0)
-        plt.close(fig)
+        fig.clear()
         return img.getvalue()
 
     else: 
@@ -210,7 +212,8 @@ class DataFromExcel(Dataset):
             if n_plots == 1:
                 n_cols = 1
                 n_rows = 1
-            fig, ax = plt.subplots(n_rows, n_cols)
+            fig = mf.Figure()
+            ax = fig.subplots(n_rows, n_cols)
             k = 0
 
             for i in range(self.n_features):
@@ -246,7 +249,8 @@ class DataFromExcel(Dataset):
             if n_plots == 1:
                 n_cols = 1
                 n_rows = 1
-            fig, ax = plt.subplots(n_rows, n_cols)
+            fig = mf.Figure()
+            ax = fig.subplots(n_rows, n_cols)
             k = 0
             for i in range(self.n_features + self.n_targets - 1):
                 if type(self.data.iloc[0, i]) is not str:
@@ -272,7 +276,7 @@ class DataFromExcel(Dataset):
         fig.savefig(img, format='png')
         img.seek(0)
         self.images.append(img.getvalue())
-        plt.clf()
+        fig.clear()
         print("Plot created.")
 
     # This function is based on a CSE2510 Notebook and plots the decision boundary of a classifier
@@ -295,7 +299,8 @@ class DataFromExcel(Dataset):
                 n_plots = self.n_features * (self.n_features - 1) // 2
                 n_cols = 2
                 n_rows = int(np.ceil(n_plots / n_cols))
-                fig, ax = plt.subplots(n_rows, n_cols)
+                fig = mf.Figure()
+                ax = fig.subplots(n_rows, n_cols)
                 k = 0
 
                 for i in range(self.n_features):
@@ -332,7 +337,7 @@ class DataFromExcel(Dataset):
                 fig.savefig(img, format='png')
                 img.seek(0)
                 self.images.append(img.getvalue())
-                plt.clf()
+                fig.clear()
                                 
 
         elif self.data_type == 2:
@@ -349,24 +354,28 @@ class DataFromExcel(Dataset):
                 Z = np.array(model.predict(inp.reshape(self.n_features, -1).T, typ=2))
                 Z = Z[:, 0]
                 print("First 5 predictions: ", Z[:5])
-
                 
-                plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]], color=(4/255, 151/255, 185/255))
-                plt.plot(inp, Z, color=(185/255,38/255,4/255))
-                plt.xlabel(self.feature_names[0].replace('_', ' '))
+                fig = mf.Figure()
+                ax = fig.subplots(1, 1)
+
+                ax.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]], color=(4/255, 151/255, 185/255))
+                ax.plot(inp, Z, color=(185/255,38/255,4/255))
+                ax.set_xlabel(self.feature_names[0].replace('_', ' '))
+                ax.set_ylabel(self.target_names[0].replace('_', ' '))
+
                 if self.normalization:
-                    plt.xlim(0, 1)
-                    plt.ylim(0, 1)
+                    ax.set_xlim([0, 1])
+                    ax.set_ylim([0, 1])
                 else:
-                    plt.xlim(mini, maxi)
-                    plt.ylim(mini, maxi)
-                plt.ylabel(self.target_names[0].replace('_', ' '))
+                    ax.xlim(mini, maxi)
+                    ax.ylim(mini, maxi)
+                
                 img = BytesIO()
-                plt.tight_layout()
-                plt.savefig(img, format='png')
+                fig.tight_layout()
+                fig.savefig(img, format='png')
                 img.seek(0)
                 self.images.append(img.getvalue())
-                plt.clf()
+                fig.clear()
 
 
 
@@ -463,7 +472,8 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
         if n_plots == 1:
             n_cols = 1
             n_rows = 1
-        fig, ax = plt.subplots(n_rows, n_cols)
+        fig = mf.Figure()
+        ax = fig.subplots(n_rows, n_cols)
         k = 0
 
         for i in range(self.n_features-1):
@@ -490,7 +500,7 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
         fig.savefig(img, format='png')
         img.seek(0)
         self.images.append(img.getvalue())
-        plt.clf()
+        fig.clear()
 
     def plot_decision_boundary(self, model):
         step = 0.01
@@ -513,7 +523,8 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
             if n_plots == 1:
                 n_cols = 1
                 n_rows = 1
-            fig, ax = plt.subplots(n_rows, n_cols)
+            fig = mf.Figure()
+            ax = fig.subplots(n_rows, n_cols)
             k = 0
 
             for i in range(self.n_features):
@@ -551,7 +562,7 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
             fig.savefig(img, format='png')
             img.seek(0)
             self.images.append(img.getvalue())
-            plt.clf()
+            fig.clear()
 
 
 class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise), make_regression() and make_classification()
@@ -672,7 +683,8 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
             if n_plots == 1:
                 n_cols = 1
                 n_rows = 1
-            fig, ax = plt.subplots(n_rows, n_cols)
+            fig = mf.Figure()
+            ax = fig.subplots(n_rows, n_cols)
             k = 0
 
             for i in range(self.n_features - 1):
@@ -706,7 +718,8 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
             if n_plots == 1:
                 n_cols = 1
                 n_rows = 1
-            fig, ax = plt.subplots(n_rows, n_cols)
+            fig = mf.Figure()
+            ax = fig.subplots(n_rows, n_cols)
             k = 0
 
             for i in range(self.n_features + self.n_targets - 1):
@@ -733,12 +746,15 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
         fig.savefig(img, format='png')
         img.seek(0)
         self.images.append(img.getvalue())
-        plt.clf()
+        fig.clear()
 
     def plot_decision_boundary(self, model):
+        step = 0.01
+        fig = mf.Figure()
+        ax = fig.subplots(1, 1)
+
         if self.data_type == 1:
             if self.n_features < 3 and self.n_targets < 5:
-                step = 0.01
                 if self.normalization:
                     mesh = np.meshgrid(*self.n_features * [np.arange(-0.1, 1.1, step)])
                 else:
@@ -751,11 +767,10 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
                 Z = np.array(model.predict(mesh.reshape(self.n_features, -1).T))
                 Z = Z.reshape(mesh[0].shape)
 
-                plt.contourf(mesh[0], mesh[1], Z, alpha=0.5)
+                ax.contourf(mesh[0], mesh[1], Z, alpha=0.5)
         
         elif self.data_type == 2:
             if self.n_features == 1 and self.n_targets == 1:
-                step = 0.01
                 if self.normalization:
                     inp = np.arange(-0.1, 1.1, step)
                 else:
@@ -768,18 +783,18 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
                 Z = np.array(model.predict(inp.reshape(self.n_features, -1).T, typ=2))
                 Z = Z[:, 0]
 
-                plt.plot(inp, Z, color=(185/255,38/255,4/255))
+                ax.plot(inp, Z, color=(185/255,38/255,4/255))
 
 
-        plt.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
-        plt.xlabel(self.feature_names[0].replace('_', ' '))
-        plt.ylabel(self.target_names[0].replace('_', ' '))
+        ax.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
+        ax.set_xlabel(self.feature_names[0].replace('_', ' '))
+        ax.set_ylabel(self.target_names[0].replace('_', ' '))
         img = BytesIO()
-        plt.tight_layout()
-        plt.savefig(img, format='png')
+        fig.tight_layout()
+        fig.savefig(img, format='png')
         img.seek(0)
         self.images.append(img.getvalue())
-        plt.clf()
+        fig.clear()
 
 
 class DataFromFunction(Dataset):  # this one is for one to one regression on simple functions
@@ -862,19 +877,25 @@ class DataFromFunction(Dataset):  # this one is for one to one regression on sim
 
     def plot_data(self):
         """Plots the data."""
+        fig = mf.Figure()
+        ax = fig.subplots(1, 1)
+
         img = BytesIO()
-        plt.scatter(self.data, self.targets, color=(4/255, 151/255, 185/255))
-        plt.xlabel(self.feature_names[0].replace('_', ' '))
-        plt.ylabel(self.target_names[0].replace('_', ' '))
+        ax.scatter(self.data, self.targets, color=(4/255, 151/255, 185/255))
+        ax.set_xlabel(self.feature_names[0].replace('_', ' '))
+        ax.set_ylabel(self.target_names[0].replace('_', ' '))
         
-        plt.tight_layout()
-        plt.savefig(img, format='png')
+        fig.tight_layout()
+        fig.savefig(img, format='png')
         img.seek(0)
         self.images.append(img.getvalue())
-        plt.clf()
+        fig.clear()
 
     def plot_decision_boundary(self, model):
         step = 0.01
+        fig = mf.Figure()
+        ax = fig.subplots(1, 1)
+
         if self.normalization:
             inp = np.arange(-0.1, 1.1, step)
         else:
@@ -887,13 +908,14 @@ class DataFromFunction(Dataset):  # this one is for one to one regression on sim
         Z = np.array(model.predict(inp.reshape(self.n_features, -1).T, typ=2))
         Z = Z[:, 0]
         
-        plt.scatter(self.data, self.targets, color=(4/255, 151/255, 185/255))
-        plt.plot(inp, Z, color=(185/255,38/255,4/255))
-        plt.xlabel(self.feature_names[0].replace('_', ' '))
-        plt.ylabel(self.target_names[0].replace('_', ' '))
+        ax.scatter(self.data, self.targets, color=(4/255, 151/255, 185/255))
+        ax.plot(inp, Z, color=(185/255,38/255,4/255))
+        ax.set_xlabel(self.feature_names[0].replace('_', ' '))
+        ax.set_ylabel(self.target_names[0].replace('_', ' '))
+
         img = BytesIO()
-        plt.tight_layout()
-        plt.savefig(img, format='png')
+        fig.tight_layout()
+        fig.savefig(img, format='png')
         img.seek(0)
         self.images.append(img.getvalue())
-        plt.clf()
+        fig.clear()
