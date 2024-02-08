@@ -197,7 +197,7 @@ function App() {
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
 
-    normalization = true;  // TODO: make this an actual variable
+    normalization = false;  // TODO: make this an actual variable
     if (taskId === 11) {normalization = false}
 
     const dataData = {
@@ -671,7 +671,7 @@ function App() {
   const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs, normalization) => {
     e.preventDefault();
     if (!learningRate) {learningRate = 0.01};  // set learning rate to default if it's undefined
-    normalization = true;  // TODO: replace this with the actual normalization value
+    normalization = false;  // TODO: replace this with the actual normalization value
     if (taskId === 11){
       learningRate = 0.0005;
       normalization = false;
