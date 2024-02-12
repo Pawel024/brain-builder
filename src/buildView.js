@@ -152,11 +152,11 @@ class Building extends React.Component {
     axios.get(window.location.origin + '/api/tasks/?task_id=' + this.props.taskId)
     .then(response => {
       if (response.data.description[0] === '[') {
-      console.log("Attempting to set the string")
-      this.typeWriter(response.data.description);
-      } else {
         this.setState({ description: JSON.parse(response.data.description) });
         console.log("Attempting to set the array")
+      } else {
+        console.log("Attempting to set the string")
+        this.typeWriter(response.data.description);
       }
     })
     .catch(error => {
