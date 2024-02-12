@@ -121,29 +121,28 @@ class CustomBlock extends Component {
 
             <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', fontFamily: 'monospace', height: window.innerHeight-52, width:'100vw' }}>
                 <Flex direction='row' gap="0" style={{ height: window.innerHeight-52, width:'100vw', alignItems: 'center', justifyContent: 'center' }}>
-                    {this.props.customId === 11 && (this.animation11())}
+                    {texts[this.props.customId].map(([subtitle, text], index) => (
+                        <div key={index}>
+                        <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_{subtitle} </Heading>
+                        <p>{text}</p>
+                        </div>
+                    ))}
+                    {/*
+                    <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Background </Heading>
+                    <p>The nodes of a neural network are based on the perceptron: a simple model which takes a number of inputs x1, x2, etc., multiplies them with a weight w1, w2, etc. and then adds a bias w0. 
+                        The result of this function is then put into an activation function: don’t worry too much about that for now, just know that it scales the result to a value between 0 and 1. 
+                        This scaling helps the network learn more quickly, as we will show in Level 4. 
+                        You might notice that a neuron is just a mathematical function then, and that is indeed correct: in fact, a whole neural network is just a big, complex function with many weights and biases. </p>
+                    <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Your Task </Heading>
+                    <p>Your task here is quite simple: try to set the parameters of a neuron in such a way that the function maps best matches the data. 
+                        This is actually just a linear regression, since the output of a single neuron will always be linear. 
+                        Therefore, we are simply fitting a line to the data. We will ignore the activation function for now, so you better understand how it works. </p>
+                    <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_The Data </Heading>
+                    <p>The data is generated along a line, with some random noise added.</p>
+                    */}
                     <Separator orientation='vertical' style = {{ height: window.innerHeight-110 }}/>
                     <Box style={{ flex:1, display: 'flex', flexDirection: 'column', textAlign:'justify', alignItems: 'flex-start', justifyContent: 'center', height: window.innerHeight-52, padding:'30px 50px' }}>
-                        
-                        {texts[this.props.customId].map(([subtitle, text], index) => (
-                            <div key={index}>
-                            <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_{subtitle} </Heading>
-                            <p>{text}</p>
-                            </div>
-                        ))}
-                        {/*
-                        <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Background </Heading>
-                        <p>The nodes of a neural network are based on the perceptron: a simple model which takes a number of inputs x1, x2, etc., multiplies them with a weight w1, w2, etc. and then adds a bias w0. 
-                            The result of this function is then put into an activation function: don’t worry too much about that for now, just know that it scales the result to a value between 0 and 1. 
-                            This scaling helps the network learn more quickly, as we will show in Level 4. 
-                            You might notice that a neuron is just a mathematical function then, and that is indeed correct: in fact, a whole neural network is just a big, complex function with many weights and biases. </p>
-                        <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Your Task </Heading>
-                        <p>Your task here is quite simple: try to set the parameters of a neuron in such a way that the function maps best matches the data. 
-                            This is actually just a linear regression, since the output of a single neuron will always be linear. 
-                            Therefore, we are simply fitting a line to the data. We will ignore the activation function for now, so you better understand how it works. </p>
-                        <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_The Data </Heading>
-                        <p>The data is generated along a line, with some random noise added.</p>
-                        */}
+                    {this.props.customId === 11 && (this.animation11())}
                     </Box>
                 </Flex>
             </Box>
