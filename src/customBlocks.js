@@ -198,7 +198,7 @@ class CustomBlock extends Component {
                     {biasSlider}
                 </div>
                 <div>Bias: {this.state.bias}</div>
-                <img src={this.state.img} alt="No plot available" style={{ marginBottom:30 }}/>
+                <img src={this.state.img} alt="No plot available" style={{ marginBottom:50 }}/>
                 </Flex>
             </Box>
         );
