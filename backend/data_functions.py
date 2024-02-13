@@ -831,7 +831,7 @@ class DataFromFunction(Dataset):  # this one is for one to one regression on sim
             idx = np.array(idx.tolist())
 
         target = self.targets[idx]
-        target = np.array([target], dtype=int).reshape(-1, self.n_targets)
+        target = np.array([target], dtype=float).reshape(-1, self.n_targets)
         dat = self.data[idx]
         dat = np.array([dat], dtype=float).reshape(-1, self.n_features)
         sample = {'data': dat, 'target': target}
