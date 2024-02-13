@@ -103,20 +103,20 @@ class Building extends React.Component {
       steps: [
         {
           target: '.buildBody',
-          content: 'Welcome to the Building View! This is where you can build and test your own neural networks. The next sections will contain challenges for you to solve with these tools, so make sure you pay attention! You can always come back to this tutorial if you need to refresh your memory.',
+          content: 'Welcome to the Building View! This is where you can build and test your own neural networks.',
           placement: 'center',
         },
         {
           target: '.cytoscape',
-          content: 'This is the neural network you will be building. You can add and remove layers with the buttons on the right. You can also use the + and - buttons below the network to add or remove nodes. Note: the number of nodes in the first and last layers are fixed! They correspond to the size of the input and output vectors respectively.',
+          content: 'This is the neural network you will be building. You can add and remove layers with the buttons on the right. You can also use the + and - buttons below the network to add or remove nodes.',
         },
         {
           target: '.iterationsSlider',
-          content: 'This is the slider to adjust the number of epochs.',
+          content: 'This is the slider to adjust the number of epochs. Put simply: the more epochs, the more your network will learn. But be careful, too many epochs can lead to overfitting!',
         },
         {
           target: '.learningRateSlider',
-          content: 'This is the slider to adjust the learning rate.',
+          content: 'This is the slider to adjust the learning rate. Put simply: the lower the learning rate, the less the network will adjust itself at every step.',
         },
         // Add more steps as needed
       ],
@@ -157,7 +157,12 @@ class Building extends React.Component {
         this.setState({ description: JSON.parse(response.data.description) });
         console.log("Attempting to set the array")
       } else {
-        this.typeWriter(response.data.description);  // this works
+        if (response.data.description[0] === '\n') {
+          console.log("Attempting to convert to array")
+          this.state.description = this.createDescriptionList(response.data.description)
+        } else {
+          this.typeWriter(response.data.description);  // this works
+        }
       }
     })
     .catch(error => {
@@ -226,6 +231,23 @@ class Building extends React.Component {
 
     if (action === 'skip' || status === 'finished') {
       this.props.navigate('/');
+    }
+  }
+
+  createDescriptionList = (jsonText) => {
+    try {
+      const text = JSON.parse(jsonText);
+      const splitText = text.split('\n\n');
+      const descriptionList = splitText.map(subText => {
+        const [subtitle, ...paragraphs] = subText.split('\n');
+        const formattedParagraphs = paragraphs.map(paragraph => 
+          paragraph.replace(/\*([^*]+)\*/g, '<b>$1</b>')
+        );
+        return [subtitle, ...formattedParagraphs];
+      });
+      this.setState({ description: descriptionList });
+    } catch (error) {
+      console.error('Error parsing JSON or formatting description:', error);
     }
   }
   
