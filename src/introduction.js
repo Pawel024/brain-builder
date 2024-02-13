@@ -15,6 +15,13 @@ class Introduction extends React.Component {
         }
     }
 
+    typeWriter = (txt, speed=15, i=0) => {
+        if (i < txt.length) {
+          this.setState({ printedDescription: this.state.printedDescription + txt.charAt(i)})
+          setTimeout(() => this.typeWriter(txt, speed, i + 1), speed);
+        }
+      };
+
     componentDidMount() {
         axios.get(window.location.origin + '/api/intros/?intro_id=' + this.props.introId)
         .then(response => {
