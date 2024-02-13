@@ -1046,7 +1046,7 @@ function App() {
       <Slider.Root
         key={index}
         className="SliderRoot"
-        defaultValue={[50]}
+        defaultValue={[40]}
         onValueChange={(value) => handleLearningRateChange(index, value)}
         max={70}
         step={10}
