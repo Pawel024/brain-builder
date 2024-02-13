@@ -189,8 +189,8 @@ class CustomBlock extends Component {
 
         return (
             <Box style={{ flex:1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: window.innerHeight-52, padding:'30px 50px' }}>
-                <Flex direction='column' gap="1" style={{ alignItems: 'center', justifyContent: 'center' }}>
-                <div className="weightSlider" style={{ marginTop:80 }}>
+                <Flex direction='column' gap="0" style={{ alignItems: 'center', justifyContent: 'center' }}>
+                <div className="weightSlider" style={{ marginTop:100 }}>
                     {weightSlider}
                 </div>
                 <div>Weight: {this.state.weight}</div>
