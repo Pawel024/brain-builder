@@ -193,51 +193,12 @@ def intro_description_detail(request):
     intro_id = request.GET.get('intro_id')
     try:
         intro = Intro.objects.get(intro_id=intro_id)
-        data = {
-            'questions': []
-        }
-
-        for i in range(1, 6):  # adjust the range according to the number of questions
-            question_text = getattr(intro, f'question_{i}')
-            possible_options = ['a', 'b', 'c', 'd']
-            options = [
-                getattr(intro, f'option_{i}_{option}')
-                for option in possible_options
-            ]
-
-            code = getattr(intro, f'code_{i}')
-
-            if all(not option for option in options):
-                if code:
-                    question_type = 'coding'
-                else:
-                    question_type = 'text'
-            else:
-                question_type = 'multiple choice'
-
-            if (question_type == 'multiple choice' and getattr(intro, f"answer_{i}") in possible_options): # this could be suboptimal, what if the question is open but the answer is for example "a"?
-                answer = getattr(intro, f'option_{i}_{getattr(intro, f"answer_{i}")}')
-            else:
-                answer = getattr(intro, f"answer_{i}")
-
-            question_data = {
-                'question': question_text,
-                'options': [
-                    {'optionText': option, 'isCorrect': option == answer}
-                    for option in options
-                ],
-                'question_type': question_type,
-                'code' : code,
-            }
-
-            if (question_type == 'text' or question_type == 'coding'):
-                question_data['options'] = [{'optionText': answer, 'isCorrect': True}]
-
-            data['questions'].append(question_data)
-
-        return JsonResponse(data)
     except Intro.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = IntroSerializer(intro, context={'request': request})
+        return Response(serializer.data)
 
 
 @csrf_protect
