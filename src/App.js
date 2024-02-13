@@ -368,6 +368,10 @@ function App() {
   const [quizIds, setQuizIds] = useState([]);
   const [quizData, setQuizData] = useState([]);
 
+  // this is for the intros
+  const [introIds, setIntroIds] = useState([]);
+  const [introData, setIntroData] = useState([]);
+
   // ------- CYTOSCAPE EDITING -------
   const [loadedTasks, setLoadedTasks] = useState(false);
   useEffect(() => {
@@ -467,6 +471,27 @@ function App() {
         console.error('Error fetching quizzes:', error);
         const defaultQuizIds = [];
         setQuizIds(defaultQuizIds);
+        console.log("Setting default states instead.")
+      });
+
+      axios.get('/api/all_intros/')
+      .then(response => {
+        const currentIntroData = response.data;
+        currentIntroData.sort((a, b) => a.intro_id - b.intro_id)// sort the introData by introIds
+        setIntroData(currentIntroData);
+        console.log(currentIntroData);
+        
+        const currentIntroIds = [];
+
+        currentIntroData.forEach(entry => {
+          currentIntroIds.push(entry.intro_id);
+        });
+        setIntroIds(currentIntroIds);
+      })
+      .catch(error => {
+        console.error('Error fetching intros:', error);
+        const defaultIntroIds = [];
+        setIntroIds(defaultIntroIds);
         console.log("Setting default states instead.")
       });
 
@@ -1099,6 +1124,16 @@ function App() {
     return acc;
   }, {});
 
+  const introsByLevel = introIds.reduce((acc, introId) => {
+    const level = Math.floor(introId / 10);
+    const challenge = introId % 10;
+    if (!acc[level]) {
+      acc[level] = [];
+    }
+    acc[level].push(challenge);
+    return acc;
+  }, {});
+
 
   const [levelNames, setLevelNames] = useState(["Regression", "Classification", "Hyperparameters", "Preprocessing"]);
   const [tutorialDescription, setTutorialDescription] = useState("This would normally be a task description, but we are in a tutorial, so instead you can read a few cool facts. Did you know that snails have teeth? Also, the shortest war in history lasted 38 minutes and bananas are technically berries.");
@@ -1151,7 +1186,11 @@ function App() {
                 <Box key={level} style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                   <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level {level} - {levelNames[level-1]}</Heading>
                   <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(136px, 136px))', gap: '15px', alignItems: 'start', justifyContent: 'start'}}>
-                    <Link to="introduction" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    
+                    {introsByLevel[level] && introsByLevel[level].map((intro, index) => (
+                      <>
+                      { introData.find(entry => entry.intro_id === 10*level+intro).visibility &&
+                      <Link to={`introduction${level}${intro}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                       <ChallengeButton size="1" variant="outline">
                       <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                           <label>Key Concepts</label>
@@ -1159,6 +1198,9 @@ function App() {
                       </Flex>
                       </ChallengeButton>
                     </Link>
+                      }
+                      </>
+                    ))}
                     {challenges.map((challenge, index) => (
                       <Link key={index} to={`challenge${level}${challenge}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                         <ChallengeButton size="1" variant="outline">
@@ -1173,7 +1215,7 @@ function App() {
                     {quizzesByLevel[level] && quizzesByLevel[level].map((quiz, index) => (
                       <>
                       { quizData.find(entry => entry.quiz_id === 10*level+quiz).visibility &&
-                      <Link key={index} to={`quiz${level}${quiz}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                      <Link to={`quiz${level}${quiz}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                         <ChallengeButton size="1" variant="outline">
                           <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                             <label>Quiz</label>
@@ -1200,9 +1242,15 @@ function App() {
           </div>
           } />
           
-          <Route path="/introduction" element={
-            <Introduction/>
-          } />
+          {introIds.map((introId, index) => (
+            <>
+            { introData[index].visibility &&
+              <Route path={`/introduction${introId}`} element={
+                <Introduction introId={introId}/>
+              } />
+            }
+            </>
+          ))}
 
           <Route path="/tutorial" element={
             <Tutorial

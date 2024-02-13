@@ -37,6 +37,7 @@ class TaskDescription(models.Model):
     
 class Intro(models.Model):
     intro_id = models.IntegerField(unique=True)
+    visibility = models.BooleanField(default=False)
     name = models.CharField(max_length=200)
     content = models.TextField()
 

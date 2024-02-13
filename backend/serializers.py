@@ -19,7 +19,7 @@ class ProgressSerializer(serializers.ModelSerializer):
 class IntroSerializer(serializers.ModelSerializer):
     class Meta:
         model = Intro
-        fields = ('intro_id', 'name', 'content')
+        fields = ('intro_id', 'visibility', 'name', 'content')
 
 class QuizSerializer(serializers.ModelSerializer):
     class Meta:
