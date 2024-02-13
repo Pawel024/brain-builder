@@ -9,7 +9,7 @@ class RowSerializer(serializers.ModelSerializer):
 class TaskDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskDescription
-        fields = ('pk', 'task_id', 'name', 'description', 'type', 'dataset', 'n_inputs', 'n_outputs', 'max_epochs', 'max_layers', 'max_nodes', 'normalization_visibility', 'iterations_slider_visibility', 'lr_slider_visibility')
+        fields = ('pk', 'task_id', 'name', 'short description', 'description', 'type', 'dataset', 'n_inputs', 'n_outputs', 'max_epochs', 'max_layers', 'max_nodes', 'normalization_visibility', 'iterations_slider_visibility', 'lr_slider_visibility')
 
 class ProgressSerializer(serializers.ModelSerializer):
     class Meta:

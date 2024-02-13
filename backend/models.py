@@ -19,6 +19,7 @@ class Row(models.Model):
 class TaskDescription(models.Model):
     task_id = models.IntegerField(unique=True)
     name = models.CharField(max_length=200)
+    short_description = models.TextField()
     description = models.TextField()
     dataset = models.TextField()
     type = models.IntegerField()

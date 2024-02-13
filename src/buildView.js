@@ -122,6 +122,7 @@ class Building extends React.Component {
       ],
     };
   }
+  shortDescription = 'Short description ran away : (';
 
   typeWriter = (txt, speed=15, i=0) => {
     if (i < txt.length) {
@@ -151,16 +152,17 @@ class Building extends React.Component {
 
     axios.get(window.location.origin + '/api/tasks/?task_id=' + this.props.taskId)
     .then(response => {
+      this.shortDescription = response.data.short_description;
       if (response.data.description[0] === '[') {
         this.setState({ description: JSON.parse(response.data.description) });
         console.log("Attempting to set the array")
       } else {
-        console.log("Attempting to set the string")
-        this.typeWriter(response.data.description);
+        this.typeWriter(response.data.description);  // this works
       }
     })
     .catch(error => {
       console.error('Task description error:', error);
+      this.typeWriter("There was an error loading the task description.");
     });
   }
 
@@ -226,7 +228,6 @@ class Building extends React.Component {
       this.props.navigate('/');
     }
   }
-
   
 
   render() {
@@ -254,52 +255,52 @@ class Building extends React.Component {
         </Grid>
       </Box>
 
-      <Tabs.Root defaultValue={this.props.taskId === 0 ? "building" : "task"} style={{ fontFamily:'monospace' }}>
+      <Tabs.Root defaultValue="building" style={{ fontFamily:'monospace' }}>
 
         <Tabs.List size="2">
-          <Tabs.Trigger value="task" >Your Task</Tabs.Trigger>
+          <Tabs.Trigger value="task" >Background Info</Tabs.Trigger>
           <Tabs.Trigger value="building" >Build</Tabs.Trigger>
-          <Tabs.Trigger value="stuff">Test</Tabs.Trigger>
+          <Tabs.Trigger value="stuff">Result</Tabs.Trigger>
           {/*<Tabs.Trigger value="settings">Settings</Tabs.Trigger>*/}
         </Tabs.List>
 
         <Box px="4" pt="3" pb="0">
-        <Tabs.Content value="background info">
+        <Tabs.Content value="task">
           {this.props.taskId !== 0 && (
-          <Box style={{ padding: '20px 300px', fontFamily:'monospace' }}>
-            {this.state.description.length > 0 && console.log("Printing array", this.state.description)}
+          <Flex direction="row" gap="2" >
+          <Box style={{ flex: 2, overflow: 'auto', padding: '20px 300px', fontFamily:'monospace' }}>
             {this.state.description.length > 0 ? (
-            this.state.description.map(([subtitle, text], index) => (
-                <div key={index}>
+              this.state.description.map(([subtitle, text], index) => (
+              <div key={index}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_{subtitle} </Heading>
                 <p>{text}</p>
-                </div>
-            ))
-             ) : (
-              <div style={{ textAlign:'justify' }}>
-              <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Task Description </Heading>
-              {this.state.printedDescription}
-              {console.log("Printing typewriter: ", this.state.printedDescription)}
               </div>
-             )}
-          {/* a little below this, plot the dataset */}
-          {this.props.initPlot && (
-            <>
-              {/*
-              <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginTop: 20, marginBottom:7 }}>&gt;_The Dataset</Heading>	
-              <div style={{ textAlign:'justify' }}>
-                This dataset contains {this.props.nOfObjects}, each with {this.props.nOfInputs} features. There are {this.props.nOfOutputs} targets. The features are: {this.props.featureNames.join(', ')}.
+              ))
+            ) : (
+              <div style={{ textAlign:'justify', marginBottom: '20px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Task Description </Heading>
+                {this.state.printedDescription}
               </div>
-              */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}></div>
-              <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}/*URL.revokeObjectURL(this.props.initPlot)*/}/>
-            </>
-          )}
+            )}
           </Box>
+          <Separator orientation='vertical' style = {{ height: window.innerHeight-110 }}/>
+            {/* next to this, plot the dataset */}
+            <Box style={{ flex: 1, padding: '20px 20px' }}>
+                {/*
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginTop: 20, marginBottom:7 }}>&gt;_The Dataset</Heading>	
+                <div style={{ textAlign:'justify' }}>
+                  This dataset contains {this.props.nOfObjects}, each with {this.props.nOfInputs} features. There are {this.props.nOfOutputs} targets. The features are: {this.props.featureNames.join(', ')}.
+                </div>
+                */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+                  <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}/*URL.revokeObjectURL(this.props.initPlot)*/}/>
+                </div>
+            </Box>
+          </Flex>
           )}
         </Tabs.Content>
         <Tabs.Content value="building">          
-          <Box style={{ display: 'flex', height: '100vh' }}>
+          <Box style={{ display: 'flex', flex: 3, height: '100vh' }}>
             <div className='cytoscape'style={{top: 5, left: 3, position: 'absolute', width: window.innerWidth*0.65, height: window.innerHeight-130}}></div>
             <Flex direction="column" gap="2" height={'100vh'}>
               <CytoscapeComponent elements={this.props.cytoElements} stylesheet={this.props.cytoStyle} panningEnabled={false} autoungrabify={true} style={ { width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)" } } onCy={(cy) => {this.cy = cy;}}/>
@@ -367,6 +368,8 @@ class Building extends React.Component {
           
           <Separator orientation='vertical' style = {{ position:"absolute", top: Math.round(0.03 * (window.innerHeight-140)), left: Math.round(0.67 * (window.innerWidth * 0.97)), height: 0.96 * (window.innerHeight-140) }}/>
 
+          <Box style={{ flex: 1 }}>
+
           {this.props.iterationsSliderVisibility ? (<Box style={{ position:"absolute", top: 0.14 * (window.innerHeight-140), left: Math.round(0.74 * (window.innerWidth * 0.97)), alignItems: 'start', justifyContent: 'end', fontFamily:'monospace'  }}>
             <div className="iterationsSlider">
               {this.props.iterationsSlider}
@@ -410,7 +413,7 @@ class Building extends React.Component {
                 </Flex>
               ) : (
                 <div style={{ textAlign:'justify', width: Math.round(0.27 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
-                  {this.props.taskDescription}
+                  {this.shortDescription}
                 </div>
               ))}
             </div>
@@ -425,6 +428,8 @@ class Building extends React.Component {
                 <PlayIcon width="18" height="18" />Start training!
               </Flex>
           </IconButton>
+          </Box>
+
         </Tabs.Content>
       
         <Tabs.Content value="stuff">
