@@ -157,9 +157,9 @@ class Building extends React.Component {
         this.setState({ description: JSON.parse(response.data.description) });
         console.log("Attempting to set the array")
       } else {
-        if (response.data.description[0] === '\n') {
+        if (response.data.description[0] === 't') {
           console.log("Attempting to convert to array")
-          this.state.description = this.createDescriptionList(response.data.description)
+          this.setState({ description: this.createDescriptionList(response.data.description) });
         } else {
           this.typeWriter(response.data.description);  // this works
         }
@@ -236,7 +236,15 @@ class Building extends React.Component {
 
   createDescriptionList = (jsonText) => {
     try {
-      const text = JSON.parse(jsonText);
+      const sanitizedJson = jsonText.replace(/<\/?[^>]+(>|$)/g, "")
+        .replace(/&/g, "&amp;")
+        .replace(/%/g, "&#37;")
+        .replace(/#/g, "&#35;")
+        .replace(/!/g, "&#33;")
+        .replace(/\?/g, "&#63;")
+        .replace(/'/g, "&#39;")
+        .replace(/"/g, "&quot;");
+      const text = JSON.parse(sanitizedJson);
       const splitText = text.split('\n\n');
       const descriptionList = splitText.map(subText => {
         const [subtitle, ...paragraphs] = subText.split('\n');
@@ -292,10 +300,12 @@ class Building extends React.Component {
           <Flex direction="row" gap="2" >
           <Box style={{ flex: 2, overflow: 'auto', padding: '20px 300px', fontFamily:'monospace' }}>
             {this.state.description.length > 0 ? (
-              this.state.description.map(([subtitle, text], index) => (
+              this.state.description.map(([subtitle, ...paragraphs], index) => (
               <div key={index}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_{subtitle} </Heading>
-                <p>{text}</p>
+                {paragraphs.map((paragraph, pIndex) => (
+                  <p key={pIndex} dangerouslySetInnerHTML={{ __html: paragraph }}></p>
+                ))}
               </div>
               ))
             ) : (
