@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 
-from .models import Row, TaskDescription, Progress, Quiz
+from .models import Row, TaskDescription, Progress, Quiz, Intro
 from .serializers import *
 from .process_data import process
 from django.http import JsonResponse
@@ -192,7 +192,7 @@ def all_quizzes(request):
 def intro_description_detail(request):
     intro_id = request.GET.get('intro_id')
     try:
-        intro = Quiz.objects.get(intro_id=intro_id)
+        intro = Intro.objects.get(intro_id=intro_id)
         data = {
             'questions': []
         }
@@ -236,7 +236,7 @@ def intro_description_detail(request):
             data['questions'].append(question_data)
 
         return JsonResponse(data)
-    except Quiz.DoesNotExist:
+    except Intro.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
@@ -244,8 +244,8 @@ def intro_description_detail(request):
 @api_view(['GET'])
 def all_intros(request):
     if request.method == 'GET':
-        intros = Quiz.objects.all()
-        serializer = QuizSerializer(intros, many=True, context={'request': request})
+        intros = Intro.objects.all()
+        serializer = IntroSerializer(intros, many=True, context={'request': request})
         return Response(serializer.data)
 
 
