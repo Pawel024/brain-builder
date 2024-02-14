@@ -159,7 +159,7 @@ class Building extends React.Component {
       } else {
         if (response.data.description[0] === 't') {
           console.log("Attempting to convert to array")
-          this.setState({ description: this.createDescriptionList(response.data.description) });
+          this.createDescriptionList(response.data.description);
         } else {
           this.typeWriter(response.data.description);  // this works
         }
