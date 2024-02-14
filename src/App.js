@@ -1231,7 +1231,7 @@ function App() {
               ))} 
             </Flex>
             <Flex direction='column' gap='3' style={{ flex: 1 }}>
-              <Box style={{ flex: 1, border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 30px' }}>
+              <Box style={{ flex: 1, border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 50px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Readme</Heading>
                 <Box>
                     <Readme />
