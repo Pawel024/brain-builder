@@ -1031,6 +1031,9 @@ function App() {
   const [iterations, setIterations] = useState(Array(taskIds.length).fill(100));
   const [learningRate, setLearningRate] = useState(Array(taskIds.length).fill(0.01));
 
+  console.log("iterations: ", iterations);
+  console.log("learningRate: ", learningRate);
+
   const handleIterationChange = (index, value) => {
     setIterations(prev => {
       const newIterations = [...prev];
