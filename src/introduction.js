@@ -10,14 +10,14 @@ class Introduction extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-          description: [],
-          printedDescription: '',
+          content: [],
+          printedContent: '',
         }
     }
 
     typeWriter = (txt, speed=15, i=0) => {
         if (i < txt.length) {
-          this.setState({ printedDescription: this.state.printedDescription + txt.charAt(i)})
+          this.setState({ printedContent: this.state.printedContent + txt.charAt(i)})
           setTimeout(() => this.typeWriter(txt, speed, i + 1), speed);
         }
       };
@@ -25,12 +25,11 @@ class Introduction extends React.Component {
     componentDidMount() {
         axios.get(window.location.origin + '/api/intros/?intro_id=' + this.props.introId)
         .then(response => {
-        this.shortDescription = response.data.short_description;
-        if (response.data.description[0] === '[') {
-            this.setState({ description: JSON.parse(response.data.description) });
+        if (response.data.content[0] === '[') {
+            this.setState({ content: JSON.parse(response.data.content) });
             console.log("Attempting to set the array")
         } else {
-            this.typeWriter(response.data.description);  // this works
+            this.typeWriter(response.data.content);  // this works
         }
         })
         .catch(error => {
@@ -63,8 +62,8 @@ class Introduction extends React.Component {
         {this.props.taskId !== 0 && (
           <Flex direction="row" gap="2" >
           <Box style={{ flex: 2, overflow: 'auto', padding: '30px 300px', fontFamily:'monospace' }}>
-            {this.state.description.length > 0 ? (
-              this.state.description.map(([subtitle, text], index) => (
+            {this.state.content.length > 0 ? (
+              this.state.content.map(([subtitle, text], index) => (
               <div key={index}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_{subtitle} </Heading>
                 <p>{text}</p>
@@ -73,7 +72,7 @@ class Introduction extends React.Component {
             ) : (
               <div style={{ textAlign:'justify', marginBottom: '20px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Key Concepts </Heading>
-                {this.state.printedDescription}
+                {this.state.printedContent}
               </div>
             )}
           </Box>
