@@ -1051,9 +1051,9 @@ function App() {
       <Slider.Root
         key={index}
         className="SliderRoot"
-        defaultValue={[50]}
+        defaultValue={[maxEpochs[index] ? maxEpochs[index] / 4 : 25]}
         onValueChange={(value) => handleIterationChange(index, value)}
-        max={maxEpochs[index] / 2}
+        max={maxEpochs[index] ? maxEpochs[index] / 2 : 50}
         step={0.5}
         style={{ width: Math.round(0.19 * (window.innerWidth * 0.97)) }}
         disabled={isTraining[index] === 1}
