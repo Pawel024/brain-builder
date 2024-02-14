@@ -244,7 +244,7 @@ class Building extends React.Component {
         .replace(/\?/g, "&#63;")
         .replace(/'/g, "&#39;")
         .replace(/"/g, "&quot;");
-      const splitText = sanitizedJson.split('\n\n');
+      const splitText = sanitizedJson.split('\n ');
       const descriptionList = splitText.map(subText => {
         const [subtitle, ...paragraphs] = subText.split('\n');
         const formattedParagraphs = paragraphs.map(paragraph => 
