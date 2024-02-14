@@ -696,6 +696,7 @@ function App() {
   const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs, normalization) => {
     e.preventDefault();
     if (!learningRate) {learningRate = 0.01};  // set learning rate to default if it's undefined
+    if (!iterations) {iterations = 50};  // set learning rate to default if it's undefined
     normalization = false;  // TODO: replace this with the actual normalization value
     if (taskId === 11){
       learningRate = 0.0005;
