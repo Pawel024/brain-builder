@@ -32,8 +32,8 @@ const FloatingButton = styled(IconButton, {
 });
 
 const ChallengeButton = styled(Button, {
-  width: 138,   
-  height: 85,
+  width: 136,   
+  height: 84,
   fontSize: 'var(--font-size-2)',
   fontWeight: '500',
   boxShadow: '0 1px 3px var(--slate-a11)'
@@ -1183,7 +1183,7 @@ function App() {
                 </Box>
               </Box>
               {Object.entries(tasksByLevel).map(([level, challenges]) => (
-                <Box key={level} style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '11px 24px' }}>
+                <Box key={level} style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
                   <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Level {level} - {levelNames[level-1]}</Heading>
                   <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(136px, 136px))', gap: '15px', alignItems: 'start', justifyContent: 'start'}}>
                     
@@ -1231,7 +1231,7 @@ function App() {
               ))} 
             </Flex>
             <Flex direction='column' gap='3' style={{ flex: 1 }}>
-              <Box style={{ flex: 1, border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+              <Box style={{ flex: 1, border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 30px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Readme</Heading>
                 <Box>
                     <Readme />
