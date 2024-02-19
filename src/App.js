@@ -674,20 +674,30 @@ function App() {
 
   // function to set a custom number of nodes for a layer
   const setNodes = useCallback((column, cytoLayers, setCytoLayers, taskId, index) => {
-    var nodeInput = Number(document.getElementById(taskId + "-input" + column).value)
+    try {
+      var nodeInput = Number(document.getElementById(taskId + "-input" + column).value)
+    } catch (error) {
+      console.log(`Error when getting nodeInput: ${error}`);
+      console.log(`taskId + "-input" + column: ${taskId + "-input" + column}`);
+    }
     if (nodeInput && Number.isInteger(nodeInput)) {
       if (nodeInput < 1) {
         nodeInput = 1;
       } else if (nodeInput > maxNodes[index]) {
         nodeInput = maxNodes[index];
       }
-      setCytoLayers(prevLayers => {
-        const newLayers = [...prevLayers];
-        newLayers[index][column] = nodeInput;
-        return newLayers;
-      });
+      try {
+        setCytoLayers(prevLayers => {
+          const newLayers = [...prevLayers];
+          newLayers[index][column] = nodeInput;
+          return newLayers;
+        });
+      } catch (error) {
+        console.log(`Error when setting cytoLayers (maybe wrong type?): ${error}`);
+      }
     } else {
       nodeInput = cytoLayers[index][column];
+      console.log("Invalid input: ", nodeInput);
     }
     document.getElementById(taskId + "-input" + column).value = nodeInput;
   }, [maxNodes]);
@@ -920,7 +930,7 @@ function App() {
         <div>
           <FloatingButton
             variant="outline"
-            disabled={(isItPlus && cytoLayers[i] >= 16) | (!isItPlus && cytoLayers[i] < 2) | isTraining[index] === 1}
+            disabled={(isItPlus && cytoLayers[i] >= maxNodes[index]) | (!isItPlus && cytoLayers[i] < 2) | isTraining[index] === 1}
             onClick = {taskId !== 0 ? (isItPlus ? () => addNode(i, setCytoLayers, taskId, index, maxNodes[index]) : () => removeNode(i, setCytoLayers, taskId, index)) : () => {}}
             style={{...style}}
             key={i}
@@ -929,6 +939,7 @@ function App() {
           </FloatingButton>
           {isItPlus &&
           <form>
+            {console.log(taskId + "-input" + i)}
             <input
             id={taskId + "-input" + i}
             type="text"
@@ -945,11 +956,11 @@ function App() {
               color: 'var(--cyan-12)',
               fontWeight: 'bold'
             }}
-            onBlur={taskId !== 0 ? () => setNodes(i, setCytoLayers, taskId, index) : () => {}}
+            onBlur={(taskId !== 0 && isTraining[index] !== 1) ? () => setNodes(i, cytoLayers, setCytoLayers, taskId, index) : () => {}}
             onKeyDown={(event) => {
-              if (event.key === "Enter" && taskId !== 0) {
+              if (event.key === "Enter" && taskId !== 0 && isTraining[index] !== 1) {
                 event.preventDefault();
-                setNodes(i, setCytoLayers, taskId, index);
+                setNodes(i, cytoLayers, setCytoLayers, taskId, index);
               }
             }}
             />
