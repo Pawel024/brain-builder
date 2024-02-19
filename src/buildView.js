@@ -122,7 +122,7 @@ class Building extends React.Component {
       ],
     };
   }
-  shortDescription = 'Short description ran away : (';
+  shortDescription = 'Please reload the page to load the task description';
 
   typeWriter = (txt, speed=15, i=0) => {
     if (i < txt.length) {
