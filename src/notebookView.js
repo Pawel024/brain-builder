@@ -21,7 +21,10 @@ class NotebookView extends React.Component {
         if (this.props.notebookId === 'Test') {
             fetch('Test.ipynb')
                 // store the notebook 'Test.ipynb' in the notebook state as a JSON object
-                .then(response => response.json())
+                .then(response => {
+                    console.log(response);
+                    return response;
+                })
                 .then(data => this.setState({ notebook: data }));
         } else {
             // Replace this URL with the URL of the notebook file
