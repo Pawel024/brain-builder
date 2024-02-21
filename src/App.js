@@ -6,7 +6,7 @@ import * as Slider from '@radix-ui/react-slider';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { PlusIcon, MinusIcon, RocketIcon, HomeIcon, DrawingPinIcon, Pencil2Icon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, RocketIcon, HomeIcon, DrawingPinIcon, Pencil2Icon, CodeIcon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import axios from 'axios';
 import BuildView from './buildView';
@@ -16,6 +16,7 @@ import Introduction from './introduction';
 import QuizApp from './quiz';
 import CustomBlock from './customBlocks';
 import Tutorial from './tutorial';
+import NotebookView from './notebookView';
 
 
 const colorScale = chroma.scale(['#49329b', '#5e5cc2', '#8386d8', '#afb0e1', '#dddddd', '#e3a692', '#d37254', '#b64124', '#8f0500']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
@@ -1244,6 +1245,14 @@ function App() {
                   </Box>
                 </Box>
               ))} 
+                <Link to='notebookTest' style={{ color: 'inherit', textDecoration: 'none' }}>
+                  <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                      <label>Notebook</label>
+                      <div><CodeIcon width="27" height="27" /></div>
+                    </Flex>
+                  </ChallengeButton>
+                </Link>  
             </Flex>
             <Flex direction='column' gap='3' style={{ flex: 1 }}>
               <Box style={{ flex: 1, border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 30px' }}>
@@ -1318,6 +1327,14 @@ function App() {
             <CustomBlock
             host = {window.location.host}
             customId = {11}
+            userId = {getCookie('user_id')}
+            />
+          } />
+
+          <Route path="/notebookTest" element={
+            <NotebookView
+            host = {window.location.host}
+            notebookId = {'Test'}
             userId = {getCookie('user_id')}
             />
           } />
