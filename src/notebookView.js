@@ -23,7 +23,8 @@ class NotebookView extends React.Component {
                 // store the notebook 'Test.ipynb' in the notebook state as a JSON object
                 .then(response => {
                     console.log(response);
-                    return response;
+                    console.log(response.json());
+                    return response.json();
                 })
                 .then(data => this.setState({ notebook: data }));
         } else {
