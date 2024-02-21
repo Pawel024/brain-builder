@@ -22,7 +22,13 @@ class NotebookView extends React.Component {
             fetch('Test.ipynb')
                 // store the notebook 'Test.ipynb' in the notebook state as a JSON object
                 .then(response => response.json())
-                .then(data => this.setState({ notebook: JSON.parse(data) }));
+                .then(data => {
+                    console.log(data);
+                    let parsedData = JSON.parse(data);
+                    console.log(parsedData);
+                    this.setState({ notebook: parsedData })
+                })
+                .catch(error => console.log('Fetch error:', error));
         } else {
             // Replace this URL with the URL of the notebook file
             const notebookUrl = window.location.origin + '/nb/' + this.props.notebookId;
