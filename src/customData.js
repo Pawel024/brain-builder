@@ -30,10 +30,12 @@ import { FilePond, registerPlugin } from 'react-filepond'
 // Import FilePond styles
 import 'filepond/dist/filepond.min.css'
 
+// Register the plugin
+registerPlugin(FilePondPluginFileValidateType);
+
 function BuildingWrapperWithUpload(props) {
   const navigate = useNavigate();
 
-  FilePond.registerPlugin ( FilePondPluginFileValidateType ) ;
   const [files, setFiles] = React.useState([]);
 
   return <Building {...props} files={files} setFiles={setFiles} navigate={navigate} />;
@@ -511,7 +513,7 @@ class Building extends React.Component {
             <iframe src="https://www.kaggle.com/embed/pmarcelino/comprehensive-data-exploration-with-python?kernelSessionId=94433095" height="800" style="margin: 0 auto; width: 100%; max-width: 950px;" frameborder="0" scrolling="auto" title="Comprehensive data exploration with Python"></iframe>
           </Flex>
         </Tabs.Content>
-        
+
         </Box>
         </Tabs.Root>
 
