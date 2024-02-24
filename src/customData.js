@@ -510,7 +510,7 @@ class Building extends React.Component {
 
         <Tabs.Content value="notebook">
           <Flex direction="column" gap="2" style={{ alignItems:"center" }}>
-            <iframe src="https://www.kaggle.com/embed/pmarcelino/comprehensive-data-exploration-with-python?kernelSessionId=94433095" height="800" style="margin: 0 auto; width: 100%; max-width: 950px;" frameborder="0" scrolling="auto" title="Comprehensive data exploration with Python"></iframe>
+            <iframe src="https://www.kaggle.com/embed/pmarcelino/comprehensive-data-exploration-with-python?kernelSessionId=94433095" height="800" style={{margin: "auto", width: "100%", maxWidth: 950}} frameborder="0" scrolling="auto" title="Comprehensive data exploration with Python"></iframe>
           </Flex>
         </Tabs.Content>
 
