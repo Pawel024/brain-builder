@@ -10,6 +10,7 @@ import { PlusIcon, MinusIcon, RocketIcon, HomeIcon, DrawingPinIcon, Pencil2Icon 
 import { styled } from '@stitches/react';
 import axios from 'axios';
 import BuildView from './buildView';
+import BuildViewWithUpload from './customData';
 import chroma from 'chroma-js';
 import Readme from './readme';
 import Introduction from './introduction';
@@ -339,6 +340,7 @@ function App() {
   const [taskData, setTaskData] = useState([]);
   const [taskNames, setTaskNames] = useState({})
   const [taskIds, setTaskIds] = useState([]);
+  const [customDataIds, setCustomDataIds] = useState([21]);
   const [gamesData, setGamesData] = useState([[]]);
   const [initPlots, setInitPlots] = useState([[]]);
   const [nInputs, setNInputs] = useState([]);
@@ -1227,6 +1229,17 @@ function App() {
                       </Link>
                     ))}
 
+                    {challenges.map((challenge, index) => (
+                      <Link key={index} to={`customData${level}${challenge}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                        <ChallengeButton size="1" variant="outline">
+                          <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                            <label>{taskNames[`${level}${challenge}`]}</label>
+                            <div><RocketIcon width="27" height="27" /></div>
+                          </Flex>
+                        </ChallengeButton>
+                      </Link>
+                    ))}
+
                     {quizzesByLevel[level] && quizzesByLevel[level].map((quiz, index) => (
                       <>
                       { quizData.find(entry => entry.quiz_id === 10*level+quiz).visibility &&
@@ -1323,6 +1336,7 @@ function App() {
           } />
 
           {taskIds.map((taskId, index) => (
+            <>
             <Route
               key={taskId}
               path={`/challenge${taskId}`}
@@ -1384,6 +1398,68 @@ function App() {
                 </>
               }
             />
+            <Route
+              key={taskId}
+              path={`/customData${taskId}`}
+              element={
+                <>
+                <BuildViewWithUpload
+                  nOfInputs={nInputs[index]}
+                  nOfOutputs={nOutputs[index]}
+                  nOfObjects={nObjects[index]}
+                  maxLayers={maxLayers[index]}
+                  taskId={taskId}
+                  index={index}
+                  cytoElements={cytoElements[index]}
+                  cytoStyle={cytoStyle[index]}
+                  generateFloatingButtons={generateFloatingButtons}
+                  cytoLayers={cytoLayers[index]}
+                  setCytoLayers={setCytoLayers}
+                  updateCytoLayers={updateCytoLayers}
+                  loadLastCytoLayers={loadLastCytoLayers}
+                  FloatingButton={FloatingButton}
+                  addLayer={addLayer}
+                  removeLayer={removeLayer}
+                  iterationsSlider={iterationsSliders[index]}
+                  iterations={iterations[index]}
+                  setIterations={setIterations}
+                  learningRateSlider={learningRateSliders[index]}
+                  learningRate={learningRate[index]}
+                  setLearningRate={setLearningRate}
+                  isTraining={isTraining[index]}
+                  setIsTraining={setIsTraining}
+                  apiData={apiData[index]}
+                  setApiData={setApiData}
+                  taskData={taskData}
+                  setTaskData={setTaskData}
+                  putRequest={putRequest}
+                  accuracy={accuracy[index]}
+                  setAccuracy={setAccuracy}
+                  accuracyColor={accuracyColor}
+                  handleSubmit={handleSubmit}
+                  isResponding={isResponding[index]}
+                  setIsResponding={setIsResponding}
+                  progress={progress[index]}
+                  featureNames={featureNames[index]}
+                  errorList={errorList[index]}
+                  weights={weights[index]}
+                  biases={biases[index]}
+                  img={imgs[index]}
+                  initPlot={initPlots[index]}
+                  loadData={loadData}
+                  normalization={true}
+                  normalizationVisibility={normalizationVisibility[index]}
+                  iterationsSliderVisibility={iterationsSliderVisibility[index]}
+                  lrSliderVisibility={lrSliderVisibility[index]}
+                  setProgress={setProgress}
+                  setErrorList={setErrorList}
+                  setWeights={setWeights}
+                  setBiases={setBiases}
+                />
+                </>
+              }
+            />
+            </>
           ))}
           {quizIds.map((quizId, index) => (
             <>

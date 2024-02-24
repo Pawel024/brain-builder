@@ -13,6 +13,7 @@ This project was made using:
 - [Create React App](https://github.com/facebook/create-react-app)
 - [Radix UI](https://www.radix-ui.com/)
 - [Cytoscape.js](https://js.cytoscape.org/)
+- [PQINA](https://pqina.nl)
 
 ## License
 
