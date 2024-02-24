@@ -263,6 +263,7 @@ class Building extends React.Component {
           <Tabs.Trigger value="upload" >Upload Data</Tabs.Trigger>
           <Tabs.Trigger value="building" >Build</Tabs.Trigger>
           <Tabs.Trigger value="stuff">Result</Tabs.Trigger>
+          <Tabs.Trigger value="notebook">Notebook Test</Tabs.Trigger>
         </Tabs.List>
 
         <Box px="4" pt="3" pb="0">
@@ -505,6 +506,12 @@ class Building extends React.Component {
         )}
         </Tabs.Content>
 
+        <Tabs.Content value="notebook">
+          <Flex direction="column" gap="2" style={{ alignItems:"center" }}>
+            <iframe src="https://www.kaggle.com/embed/pmarcelino/comprehensive-data-exploration-with-python?kernelSessionId=94433095" height="800" style="margin: 0 auto; width: 100%; max-width: 950px;" frameborder="0" scrolling="auto" title="Comprehensive data exploration with Python"></iframe>
+          </Flex>
+        </Tabs.Content>
+        
         </Box>
         </Tabs.Root>
 
