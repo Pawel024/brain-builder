@@ -18,32 +18,16 @@ class NotebookView extends React.Component {
     }
 
     componentDidMount() {
-        if (this.props.notebookId === 'Test') {
-            fetch('/notebooks/Test.ipynb')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json()
-                })
-                .then(data => {
-                    this.setState({ notebook: data });
-                })
-                .catch(error => {
-                    console.error('Error loading Notebook:', error);
-                });
-        } else {
-            // Replace this URL with the URL of the notebook file
-            const notebookUrl = window.location.origin + '/nb/' + this.props.notebookId;
+        let notebookUrl 
 
-            axios.get(notebookUrl)
-                .then(response => {
-                    this.setState({ notebook: response.data });
-                })
-                .catch(error => {
-                    console.error('Notebook loading error:', error);
-                });
-            }
+        notebookUrl = 'https://raw.githubusercontent.com/Pawel024/brain-builder/laurens/notebooks/' + this.props.notebookId + '.ipynb'  // TODO: change the repo
+
+        axios.get(notebookUrl)
+            .then(response => response.json())
+            .then(data => this.setState({ notebook: data }))
+            .catch(error => {
+                console.error('Error loading notebook:', error);
+            });
     }
 
     render() {
