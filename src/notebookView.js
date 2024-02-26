@@ -54,6 +54,19 @@ class NotebookView extends React.Component {
         this.ws.close();
     }
 
+    handleClick = (index) => {
+        console.log("Clicked cell", index);
+        if (this.ws.readyState === this.ws.OPEN && this.state.notebook) {
+            this.setState({ currentCell: index });
+            const data = {
+                code: this.state.notebook.cells[index].source.join(''),
+                cell: index,
+            };
+            try {this.ws.send(JSON.stringify(data));}
+            catch (error) {console.error('Error sending message:', error);}
+        }
+    }
+
     render() {
         return(
             <Theme accentColor="cyan" grayColor="slate" panelBackground="solid" radius="large" appearance='light'>
@@ -81,9 +94,9 @@ class NotebookView extends React.Component {
                     {this.state.notebook !== null && console.log(this.ws.readyState)}
                     {this.state.notebook !== null && this.state.notebook.cells.map((cell, index) => {
                     if (cell.cell_type === 'markdown') {
-                        return <MarkdownCell key={index} cell={cell} style={{ margin: '20px' }} />;
+                        return <MarkdownCell key={index} cell={cell} style={{ margin: '10px' }} />;
                     } else if (cell.cell_type === 'code') {
-                        return <CodeCell key={index} cell={cell} ws={this.ws} style={{ margin: '20px' }} />;
+                        return <CodeCell key={index} cell={cell} handleClick={() => this.handleClick(index)} style={{ margin: '10px' }} />;
                     }
                     // Handle other cell types...
                     })}
@@ -147,13 +160,11 @@ class CodeCell extends React.Component {
         const source = cell.source.join('');
 
         return (
-            <Flex direction="row" gap="2" >
-            <div className="code-cell">
-                <PlayButton ws={this.props.ws} nr={this.props.key} />
+            <Flex direction="row" gap="2" className="code-cell" >
+                <PlayButton onClick={this.props.handleClick} />
                 <SyntaxHighlighter language="python" style={solarizedlight}>
                     {source}
                 </SyntaxHighlighter>
-            </div>
             </Flex>
         );
     }
@@ -164,24 +175,9 @@ class PlayButton extends React.Component {
         super(props);
     }
 
-    handleClick = (index) => {
-        console.log("Clicked cell", index);
-        {/*
-        if (this.ws.readyState === this.ws.OPEN && this.state.notebook) {
-            this.setState({ currentCell: index });
-            const data = {
-                code: this.state.notebook.cells[index].source.join(''),
-                cell: index,
-            };
-            try {this.ws.send(JSON.stringify(data));}
-            catch (error) {console.error('Error sending message:', error);}
-        }
-        */}
-    }
-
     render() {
         return (
-            <button onClick={this.handleClick(this.props.ws, this.props.key)}><PlayIcon width="10" height="10" /></button>
+            <button onClick={this.props.onClick}><PlayIcon width="10" height="10" /></button>
         );
     }
 }
