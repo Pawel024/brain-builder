@@ -80,7 +80,7 @@ class CelRunner(AsyncWebsocketConsumer):
     def run(self, code):
         #TODO: add some security measures here
         if code[:5] == 'print' and len(code) < 100:
-            outp = io.StringIo()
+            outp = io.StringIO()
             with redirect_stdout(outp):
                 exec(code)
             return outp.getvalue()
