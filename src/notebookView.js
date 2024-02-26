@@ -54,12 +54,15 @@ class NotebookView extends React.Component {
     }
 
     handleClick = (index) => {
-        this.setState({ currentCell: index });
-        const data = {
-            code: this.state.notebook.cells[index].source.join(''),
-            cell: index,
-        };
-        this.ws.send(JSON.stringify(data));
+        if (this.ws.readyState === this.ws.OPEN) {
+            this.setState({ currentCell: index });
+            const data = {
+                code: this.state.notebook.cells[index].source.join(''),
+                cell: index,
+            };
+            try {this.ws.send(JSON.stringify(data));}
+            catch (error) {console.error('Error sending message:', error);}
+        }
     }
 
     render() {
