@@ -93,7 +93,7 @@ class NotebookView extends React.Component {
                 </Box>
                 <div className="notebook-view">
                     {this.state.notebook === null && <div>Loading...</div>}
-                    {this.state.notebook !== null && console.log(this.state.notebook)}
+                    {this.state.notebook !== null && console.log(this.ws.readyState)}
                     {this.state.notebook !== null && this.state.notebook.cells.map((cell, index) => {
                     if (cell.cell_type === 'markdown') {
                         return <MarkdownCell key={index} cell={cell} style={{ margin: '10px' }} />;
@@ -113,9 +113,14 @@ class MarkdownCell extends React.Component {
         super(props);
         this.state = {
             isEditing: false,
-            content: this.props.source.join(''),
-            newContent: this.props.source.join(''),
+            content: '',
+            newContent: '',
         };
+    }
+
+    componentDidMount() {
+        this.setState({ content: this.props.source.join('') });
+        this.setState({ newContent: this.props.source.join('') });
     }
 
     handleClick = () => {
