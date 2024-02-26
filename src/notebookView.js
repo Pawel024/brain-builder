@@ -23,8 +23,7 @@ class NotebookView extends React.Component {
         notebookUrl = 'https://raw.githubusercontent.com/Pawel024/brain-builder/laurens/notebooks/' + this.props.notebookId + '.ipynb'  // TODO: change the repo
 
         axios.get(notebookUrl)
-            .then(response => response.text())
-            .then(data => this.setState({ notebook: JSON.parse(data) }))
+            .then(response => this.setState({ notebook: JSON.parse(response.data) }))
             .catch(error => {
                 console.error('Error loading notebook:', error);
             });
