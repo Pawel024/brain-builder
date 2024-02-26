@@ -54,6 +54,8 @@ class NotebookView extends React.Component {
     }
 
     handleClick = (index) => {
+        console.log("Clicked cell", index);
+        {/*
         if (this.ws.readyState === this.ws.OPEN) {
             this.setState({ currentCell: index });
             const data = {
@@ -63,6 +65,7 @@ class NotebookView extends React.Component {
             try {this.ws.send(JSON.stringify(data));}
             catch (error) {console.error('Error sending message:', error);}
         }
+        */}
     }
 
     render() {
@@ -93,7 +96,7 @@ class NotebookView extends React.Component {
                     if (cell.cell_type === 'markdown') {
                         return <MarkdownCell key={index} cell={cell} style={{ margin: '10px' }} />;
                     } else if (cell.cell_type === 'code') {
-                        return <CodeCell key={index} cell={cell} onClick={this.handleClick(index)} style={{ margin: '10px' }} />;
+                        return <CodeCell key={index} cell={cell} handleClick={this.handleClick(index)} style={{ margin: '10px' }} />;
                     }
                     // Handle other cell types...
                     })}
@@ -154,7 +157,7 @@ class CodeCell extends React.Component {
         return (
             <Flex direction="row" gap="2" >
             <div className="code-cell">
-                <PlayButton onClick={this.props.onClick} />
+                <PlayButton onClick={this.props.handleClick} />
                 <SyntaxHighlighter language="python" style={solarizedlight}>
                     {source}
                 </SyntaxHighlighter>
