@@ -119,8 +119,8 @@ class MarkdownCell extends React.Component {
     }
 
     componentDidMount() {
-        this.setState({ content: this.props.source.join('') });
-        this.setState({ newContent: this.props.source.join('') });
+        this.setState({ content: this.props.cell.source.join('') });
+        this.setState({ newContent: this.props.cell.source.join('') });
     }
 
     handleClick = () => {
