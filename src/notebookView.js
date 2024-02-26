@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import { Theme, Box, Grid, Heading, IconButton, Flex } from '@radix-ui/themes';
 import { Link } from 'react-router-dom';
-import { HomeIcon } from '@radix-ui/react-icons';
+import { HomeIcon, PlayIcon } from '@radix-ui/react-icons';
 import tu_delft_pic from "./tud_black_new.png";
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
@@ -53,6 +53,15 @@ class NotebookView extends React.Component {
         this.ws.close();
     }
 
+    handleClick = (index) => {
+        this.setState({ currentCell: index });
+        const data = {
+            code: this.state.notebook.cells[index].source.join(''),
+            cell: index,
+        };
+        this.ws.send(JSON.stringify(data));
+    }
+
     render() {
         return(
             <Theme accentColor="cyan" grayColor="slate" panelBackground="solid" radius="large" appearance='light'>
@@ -79,9 +88,9 @@ class NotebookView extends React.Component {
                     {this.state.notebook === null && <div>Loading...</div>}
                     {this.state.notebook !== null && this.state.notebook.cells.map((cell, index) => {
                     if (cell.cell_type === 'markdown') {
-                        return <MarkdownCell key={index} cell={cell} />;
+                        return <MarkdownCell key={index} cell={cell} style={{ margin: '10px' }} />;
                     } else if (cell.cell_type === 'code') {
-                        return <CodeCell key={index} cell={cell} />;
+                        return <CodeCell key={index} cell={cell} onClick={this.handleClick(index)} style={{ margin: '10px' }} />;
                     }
                     // Handle other cell types...
                     })}
@@ -105,16 +114,32 @@ class MarkdownCell extends React.Component {
 }
 
 class CodeCell extends React.Component {
+
     render() {
         const { cell } = this.props;
         const source = cell.source.join('');
 
         return (
+            <Flex direction="row" gap="2" >
             <div className="code-cell">
+                <PlayButton onClick={this.props.onClick} />
                 <SyntaxHighlighter language="python" style={solarizedlight}>
                     {source}
                 </SyntaxHighlighter>
             </div>
+            </Flex>
+        );
+    }
+}
+
+class PlayButton extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <button onClick={this.props.onClick}><PlayIcon width="10" height="10" /></button>
         );
     }
 }
