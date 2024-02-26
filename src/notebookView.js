@@ -19,19 +19,19 @@ class NotebookView extends React.Component {
 
     componentDidMount() {
         if (this.props.notebookId === 'Test') {
-            fetch('/Test.ipynb')
-                // store the notebook 'Test.ipynb' in the notebook state as a JSON object
-                .then(response => response.text())
-                .then(text => console.log(text))
-                /*
-                .then(data => {
-                    console.log(data);
-                    let parsedData = JSON.parse(data);
-                    console.log(parsedData);
-                    this.setState({ notebook: parsedData })
+            fetch('/notebooks/Test.ipynb')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json()
                 })
-                */
-                .catch(error => console.log('Fetch error:', error));
+                .then(data => {
+                    this.setState({ notebook: data });
+                })
+                .catch(error => {
+                    console.error('Error loading Notebook:', error);
+                });
         } else {
             // Replace this URL with the URL of the notebook file
             const notebookUrl = window.location.origin + '/nb/' + this.props.notebookId;
