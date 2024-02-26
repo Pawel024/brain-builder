@@ -67,7 +67,7 @@ class CelRunner(AsyncWebsocketConsumer):
         print("cel runner connected")
 
     async def disconnect(self, close_code):
-        print("cel runner disconnected")
+        print("cel runner disconnected, ", close_code)
     
     async def receive(self, text_data):
         data = json.loads(text_data)

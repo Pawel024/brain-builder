@@ -101,13 +101,42 @@ class NotebookView extends React.Component {
 }
 
 class MarkdownCell extends React.Component {
-    render() {
-        const { cell } = this.props;
-        const source = cell.source.join('');
+    constructor(props) {
+        super(props);
+        this.state = {
+            isEditing: false,
+            content: this.props.source.join(''),
+            newContent: this.props.source.join(''),
+        };
+    }
 
+    handleClick = () => {
+        this.setState({ isEditing: true });
+    }
+
+    handleChange = (event) => {
+        this.setState({ newContent: event.target.value });
+    }
+
+    handleBlur = () => {
+        this.setState({ isEditing: false });
+    }
+
+    handleKeyDown = (event) => {
+        if (event.key === "Enter" && this.state.isEditing) {
+            event.preventDefault();
+            this.setState({ isEditing: false, content: this.state.newContent });
+        }
+    }
+
+    render() {
         return (
-            <div className="markdown-cell">
-                <ReactMarkdown>{source}</ReactMarkdown>
+            <div className="markdown-cell" onClick={this.handleClick} >
+            {this.state.isEditing ? (
+                <textarea value={this.state.content} onChange={this.handleChange} onBlur={this.handleBlur} onKeyDown={this.handleKeyDown} />
+            ) : (
+                <ReactMarkdown>{this.state.content}</ReactMarkdown>
+            )}
             </div>
         );
     }
