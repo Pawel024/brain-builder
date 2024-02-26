@@ -57,3 +57,27 @@ class Plotter(AsyncWebsocketConsumer):
             plot = b64encode(plot).decode()
             await self.send(json.dumps({'title': 'plot', 'plot': plot}))
             print("plot sent")
+
+
+class CelRunner(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.user_id = self.scope['url_route']['kwargs']['userId']
+        self.notebook_id = self.scope['url_route']['kwargs']['notebookId']
+        await self.accept()
+        print("cel runner connected")
+
+    async def disconnect(self, close_code):
+        print("cel runner disconnected")
+    
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        cell_nr = data['cell']
+        outp = self.run(data['code'])
+        await self.send(json.dumps({'cell': cell_nr, 'output': outp}))
+    
+    def run(self, code):
+        #TODO: add some security measures here
+        if code[:5] == 'print' and len(code) < 100:
+            return eval(code)
+        else:
+            return "You are currently not allowed to run this code"

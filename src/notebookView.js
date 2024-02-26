@@ -14,7 +14,9 @@ class NotebookView extends React.Component {
         super(props);
         this.state = {
             notebook: null,
+            currentCell: 0,
         };
+        this.ws = new WebSocket(`wss://${this.props.host}/nb/${this.props.userId}/${this.props.notebookId}/`);
     }
 
     componentDidMount() {
@@ -23,10 +25,32 @@ class NotebookView extends React.Component {
         notebookUrl = 'https://raw.githubusercontent.com/Pawel024/brain-builder/laurens/notebooks/' + this.props.notebookId + '.ipynb'  // TODO: change the repo
 
         axios.get(notebookUrl)
-            .then(response => this.setState({ notebook: JSON.parse(response.data) }))
+            .then(response => this.setState({ notebook: response.data }))
             .catch(error => {
                 console.error('Error loading notebook:', error);
             });
+
+        this.ws.onclose = () => {
+            console.log('WebSocket connection closed');
+        };
+
+        this.ws.onopen = () => {
+            console.log('WebSocket connection opened');
+        }
+
+        this.ws.onerror = (error) => {
+            console.log('WebSocket error: ', error);
+        }
+
+        this.ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log("Message", data.title, " received")
+            // TODO: handle the message
+        }
+    }
+
+    componentWillUnmount() {
+        this.ws.close();
     }
 
     render() {
