@@ -2,6 +2,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 from backend import data_functions as df
 from base64 import b64encode, b64decode
+import io
+from contextlib import redirect_stdout
 
 class Coach(AsyncWebsocketConsumer):
     connections = {}
@@ -78,6 +80,9 @@ class CelRunner(AsyncWebsocketConsumer):
     def run(self, code):
         #TODO: add some security measures here
         if code[:5] == 'print' and len(code) < 100:
-            return eval(code)
+            outp = io.StringIo()
+            with redirect_stdout(outp):
+                exec(code)
+            return outp.getvalue()
         else:
             return "You are currently not allowed to run this code"

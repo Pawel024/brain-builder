@@ -130,21 +130,21 @@ class MarkdownCell extends React.Component {
     }
 
     handleBlur = () => {
-        this.setState({ isEditing: false });
+        this.setState({ isEditing: false, newContent: this.state.content });
     }
 
     handleKeyDown = (event) => {
-        if (event.key === "Enter" && this.state.isEditing) {
+        if (this.state.isEditing && event.key === "Enter") {
             event.preventDefault();
             this.setState({ isEditing: false, content: this.state.newContent });
-        }
+        } 
     }
 
     render() {
         return (
             <div className="markdown-cell" onClick={this.handleClick} >
             {this.state.isEditing ? (
-                <textarea value={this.state.content} onChange={this.handleChange} onBlur={this.handleBlur} onKeyDown={this.handleKeyDown} />
+                <textarea value={this.state.newContent} onChange={this.handleChange} onBlur={this.handleBlur} onKeyDown={this.handleKeyDown} />
             ) : (
                 <ReactMarkdown>{this.state.content}</ReactMarkdown>
             )}
@@ -154,6 +154,38 @@ class MarkdownCell extends React.Component {
 }
 
 class CodeCell extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isEditing: false,
+            content: '',
+            newContent: '',
+        };
+    }
+
+    componentDidMount() {
+        this.setState({ content: this.props.cell.source.join('') });
+        this.setState({ newContent: this.props.cell.source.join('') });
+    }
+
+    handleClick = () => {
+        this.setState({ isEditing: true });
+    }
+
+    handleChange = (event) => {
+        this.setState({ newContent: event.target.value });
+    }
+
+    handleBlur = () => {
+        this.setState({ isEditing: false, newContent: this.state.content });
+    }
+
+    handleKeyDown = (event) => {
+        if (this.state.isEditing && event.key === "Enter") {
+            event.preventDefault();
+            this.setState({ isEditing: false, content: this.state.newContent });
+        } 
+    }
 
     render() {
         const { cell } = this.props;
@@ -162,9 +194,13 @@ class CodeCell extends React.Component {
         return (
             <Flex direction="row" gap="2" className="code-cell" >
                 <PlayButton onClick={this.props.handleClick} />
+                {this.state.isEditing ? (
+                <textarea value={this.state.newContent} onChange={this.handleChange} onBlur={this.handleBlur} onKeyDown={this.handleKeyDown} />
+                ) : (
                 <SyntaxHighlighter language="python" style={solarizedlight}>
-                    {source}
+                    {this.state.content}
                 </SyntaxHighlighter>
+                )}
             </Flex>
         );
     }
