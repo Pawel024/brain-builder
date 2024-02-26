@@ -8,6 +8,7 @@ import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { solarizedlight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { toHaveStyle } from '@testing-library/jest-dom/matchers';
 
 class NotebookView extends React.Component {
     constructor(props) {
@@ -56,7 +57,7 @@ class NotebookView extends React.Component {
     handleClick = (index) => {
         console.log("Clicked cell", index);
         {/*
-        if (this.ws.readyState === this.ws.OPEN) {
+        if (this.ws.readyState === this.ws.OPEN && this.state.notebook) {
             this.setState({ currentCell: index });
             const data = {
                 code: this.state.notebook.cells[index].source.join(''),
@@ -92,6 +93,7 @@ class NotebookView extends React.Component {
                 </Box>
                 <div className="notebook-view">
                     {this.state.notebook === null && <div>Loading...</div>}
+                    {this.state.notebook !== null && console.log(this.state.notebook)}
                     {this.state.notebook !== null && this.state.notebook.cells.map((cell, index) => {
                     if (cell.cell_type === 'markdown') {
                         return <MarkdownCell key={index} cell={cell} style={{ margin: '10px' }} />;
