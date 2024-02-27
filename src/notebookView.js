@@ -8,7 +8,6 @@ import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { solarizedlight } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { toHaveStyle } from '@testing-library/jest-dom/matchers';
 
 class NotebookView extends React.Component {
     constructor(props) {
@@ -104,9 +103,9 @@ class NotebookView extends React.Component {
                     {this.state.notebook !== null && console.log(this.ws.readyState)}
                     {this.state.notebook !== null && this.state.notebook.cells.map((cell, index) => {
                     if (cell.cell_type === 'markdown') {
-                        return <MarkdownCell key={index} cell={cell} content={this.state.cellContents[index]} onContentChange={() => this.handleContentChange} style={{ margin: '10px' }} />;
+                        return <MarkdownCell key={index} cell={cell} content={this.state.cellContents[index]} onContentChange={(newContent) => this.handleContentChange(index, newContent)} style={{ margin: '10px' }} />;
                     } else if (cell.cell_type === 'code') {
-                        return <CodeCell key={index} cell={cell} content={this.state.cellContents[index]} onContentChange={() => this.handleContentChange} handleClick={() => this.handleClick(index)} style={{ margin: '10px' }} />;
+                        return <CodeCell key={index} cell={cell} content={this.state.cellContents[index]} onContentChange={(newContent) => this.handleContentChange(index, newContent)} handleClick={() => this.handleClick(index)} style={{ margin: '10px' }} />;
                     }
                     // Handle other cell types...
                     })}
