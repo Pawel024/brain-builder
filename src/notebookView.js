@@ -197,7 +197,7 @@ class CodeCell extends React.Component {
                 {this.state.isEditing ? (
                 <textarea value={this.state.newContent} onChange={this.handleChange} onBlur={this.handleBlur} onKeyDown={this.handleKeyDown} />
                 ) : (
-                <SyntaxHighlighter language="python" style={solarizedlight}>
+                <SyntaxHighlighter language="python" style={solarizedlight} onClick={this.setState({ isEditing: true })} >
                     {this.state.content}
                 </SyntaxHighlighter>
                 )}
