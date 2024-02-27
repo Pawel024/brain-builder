@@ -518,9 +518,12 @@ function App() {
         console.log("Setting default states instead.")
       });
     */
+  
+    alert("Welcome to brAIn bUIlder! This is a beta version, so please know that bugs are possible. We would love to hear your feedback. Have fun!");
+  
   }, []);
   
-  useEffect(() => {  // TODO: figure out what this is doing and if it's necessary
+  useEffect(() => {  
     if (cytoLayers.every(subArray => subArray.length === 0)) {
       console.log("cytoLayers is empty, setting [4, 8, 8, 3]");
       // cytoLayers is empty, set it to a default value
