@@ -1,10 +1,13 @@
 import React from 'react';
 import './App.css';
-import { Theme, Box, Grid, Heading, IconButton, Flex } from '@radix-ui/themes';
+import { Theme, Box, Grid, Heading, IconButton, Flex, Button } from '@radix-ui/themes';
 import { Link } from 'react-router-dom';
 import { HomeIcon } from '@radix-ui/react-icons';
 import tu_delft_pic from "./tud_black_new.png";
 import axios from 'axios';
+import Slider from 'react-animated-slider';
+import 'react-animated-slider/build/horizontal.css';
+import slideContent from './slideContent';
 
 class Introduction extends React.Component {
     constructor(props) {
@@ -59,6 +62,7 @@ class Introduction extends React.Component {
             </Box>
         </Grid>
         </Box>
+        <Flex direction="column">
         {this.props.taskId !== 0 && (
           <Flex direction="row" gap="2" >
           <Box style={{ flex: 2, overflow: 'auto', padding: '30px 300px', fontFamily:'monospace' }}>
@@ -76,8 +80,22 @@ class Introduction extends React.Component {
               </div>
             )}
           </Box>
+          <Slider>
+          {slideContent.map((item, index) => (
+            <div
+              key={index}
+            >
+              <div className="center">
+                <h1>{item.title}</h1>
+                <p>{item.description}</p>
+                <Button onClick={item.button.action}>{item.button.text}</Button>
+              </div>
+            </div>
+          ))}
+          </Slider>
           </Flex>
           )}
+        </Flex>
     </Theme>
     )}
 }

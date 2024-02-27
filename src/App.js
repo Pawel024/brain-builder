@@ -1234,7 +1234,7 @@ function App() {
                       </Link>
                     ))}
 
-                    {challenges.map((challenge, index) => (
+                    {/*challenges.map((challenge, index) => (
                       <Link key={index} to={`customData${level}${challenge}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                         <ChallengeButton size="1" variant="outline">
                           <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
@@ -1243,7 +1243,7 @@ function App() {
                           </Flex>
                         </ChallengeButton>
                       </Link>
-                    ))}
+                    ))*/}
 
                     {quizzesByLevel[level] && quizzesByLevel[level].map((quiz, index) => (
                       <>
