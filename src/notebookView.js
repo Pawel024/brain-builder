@@ -16,6 +16,7 @@ class NotebookView extends React.Component {
         this.state = {
             notebook: null,
             currentCell: 0,
+            cellContents: [],
         };
         this.ws = new WebSocket(`wss://${this.props.host}/nb/${this.props.userId}/${this.props.notebookId}/`);
     }
@@ -26,7 +27,10 @@ class NotebookView extends React.Component {
         notebookUrl = 'https://raw.githubusercontent.com/Pawel024/brain-builder/laurens/notebooks/' + this.props.notebookId + '.ipynb'  // TODO: change the repo
 
         axios.get(notebookUrl)
-            .then(response => this.setState({ notebook: response.data }))
+            .then(response => {
+                this.setState({ notebook: response.data });
+                this.setState({ cellContents: response.data.cells.map(cell => cell.source.join('')) });
+            })
             .catch(error => {
                 console.error('Error loading notebook:', error);
             });
@@ -67,6 +71,12 @@ class NotebookView extends React.Component {
         }
     }
 
+    handleContentChange = (index, newContent) => {
+        const newCellContents = this.state.cellContents.slice();
+        newCellContents[index] = newContent;
+        this.setState({ cellContents: newCellContents });
+    }
+
     render() {
         return(
             <Theme accentColor="cyan" grayColor="slate" panelBackground="solid" radius="large" appearance='light'>
@@ -94,9 +104,9 @@ class NotebookView extends React.Component {
                     {this.state.notebook !== null && console.log(this.ws.readyState)}
                     {this.state.notebook !== null && this.state.notebook.cells.map((cell, index) => {
                     if (cell.cell_type === 'markdown') {
-                        return <MarkdownCell key={index} cell={cell} style={{ margin: '10px' }} />;
+                        return <MarkdownCell key={index} cell={cell} content={this.state.cellContents[index]} onContentChange={() => this.handleContentChange} style={{ margin: '10px' }} />;
                     } else if (cell.cell_type === 'code') {
-                        return <CodeCell key={index} cell={cell} handleClick={() => this.handleClick(index)} style={{ margin: '10px' }} />;
+                        return <CodeCell key={index} cell={cell} content={this.state.cellContents[index]} onContentChange={() => this.handleContentChange} handleClick={() => this.handleClick(index)} style={{ margin: '10px' }} />;
                     }
                     // Handle other cell types...
                     })}
@@ -111,13 +121,11 @@ class MarkdownCell extends React.Component {
         super(props);
         this.state = {
             isEditing: false,
-            content: '',
             newContent: '',
         };
     }
 
     componentDidMount() {
-        this.setState({ content: this.props.cell.source.join('') });
         this.setState({ newContent: this.props.cell.source.join('') });
     }
 
@@ -136,7 +144,8 @@ class MarkdownCell extends React.Component {
     handleKeyDown = (event) => {
         if (this.state.isEditing && event.key === "Enter") {
             event.preventDefault();
-            this.setState({ isEditing: false, content: this.state.newContent });
+            this.setState({ isEditing: false});
+            this.props.onContentChange(this.state.newContent);
         } 
     }
 
@@ -146,7 +155,7 @@ class MarkdownCell extends React.Component {
             {this.state.isEditing ? (
                 <textarea value={this.state.newContent} onChange={this.handleChange} onBlur={this.handleBlur} onKeyDown={this.handleKeyDown} />
             ) : (
-                <ReactMarkdown>{this.state.content}</ReactMarkdown>
+                <ReactMarkdown>{this.props.content}</ReactMarkdown>
             )}
             </div>
         );
@@ -158,18 +167,12 @@ class CodeCell extends React.Component {
         super(props);
         this.state = {
             isEditing: false,
-            content: '',
             newContent: '',
         };
     }
 
     componentDidMount() {
-        this.setState({ content: this.props.cell.source.join('') });
         this.setState({ newContent: this.props.cell.source.join('') });
-    }
-
-    handleClick = () => {
-        this.setState({ isEditing: true });
     }
 
     handleChange = (event) => {
@@ -183,24 +186,25 @@ class CodeCell extends React.Component {
     handleKeyDown = (event) => {
         if (this.state.isEditing && event.key === "Enter") {
             event.preventDefault();
-            this.setState({ isEditing: false, content: this.state.newContent });
+            this.setState({ isEditing: false });
+            this.props.onContentChange(this.state.newContent);
         } 
     }
 
     render() {
-        const { cell } = this.props;
-        const source = cell.source.join('');
 
         return (
             <Flex direction="row" gap="2" className="code-cell" >
                 <PlayButton onClick={this.props.handleClick} />
+                <div style={{ flex: 2, overflow: 'auto' }} onClick={() => this.setState({ isEditing: true })} >
                 {this.state.isEditing ? (
                 <textarea value={this.state.newContent} onChange={this.handleChange} onBlur={this.handleBlur} onKeyDown={this.handleKeyDown} />
                 ) : (
-                <SyntaxHighlighter language="python" style={solarizedlight} onClick={this.setState({ isEditing: true })} >
-                    {this.state.content}
+                <SyntaxHighlighter language="python" style={solarizedlight} >
+                    {this.props.content}
                 </SyntaxHighlighter>
                 )}
+                </div>
             </Flex>
         );
     }

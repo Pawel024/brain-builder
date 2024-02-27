@@ -78,7 +78,7 @@ class CelRunner(AsyncWebsocketConsumer):
         await self.send(json.dumps({'cell': cell_nr, 'output': outp}))
     
     def run(self, code):
-        #TODO: add some security measures here
+        #TODO: add some security measures here and expand the type of allowed code
         if code[:5] == 'print' and len(code) < 100:
             outp = io.StringIO()
             with redirect_stdout(outp):
