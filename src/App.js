@@ -519,6 +519,11 @@ function App() {
         console.log("Setting default states instead.")
       });
     */
+
+    
+  alert("Welcome to brAIn bUIlder! This is a beta version, so please know that bugs are possible. We would love to hear your feedback. Have fun!");
+  
+
   }, []);
   
   useEffect(() => {  // TODO: figure out what this is doing and if it's necessary
