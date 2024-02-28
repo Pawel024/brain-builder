@@ -142,7 +142,6 @@ class Building extends React.Component {
         if (response.data.description[0] === 't') {
           console.log("Attempting to convert to array")
           this.createDescriptionList(response.data.description);
-          this.createJoyrideSteps();
         } else {
           this.typeWriter(response.data.description);  // this works
         }
@@ -255,7 +254,7 @@ class Building extends React.Component {
         );
         return [subtitle, ...formattedParagraphs];
       });
-      this.setState({ description: descriptionList });
+      this.setState({ description: descriptionList }, this.createJoyrideSteps);
     } catch (error) {
       console.error('Error parsing JSON or formatting description:', error);
     }
