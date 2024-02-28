@@ -66,20 +66,20 @@ class Introduction extends React.Component {
           <Box style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', height: window.innerHeight-52, padding: '30px 0px' }}>
             {this.state.content.length > 0 ? (
               <>
-              <Flex direction="row" gap="2" style={{ height: '100vh'}}>
-              <Box style={{ flex:2 }}>
+              <Flex direction="row" gap="2" style={{ height: '100%'}}>
+              <Box style={{ flexBasis: '67%' }}>
               <Slider classNames={horizontalCss} previousButton={<ChevronLeftIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>} nextButton={<ChevronRightIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>}>
                 {this.state.content.map(([subtitle, text], index) => (
                   <div key={index} className="slide-container">
                     <div className="slide-content">
                       <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign:"center" }}>&gt;_{subtitle} </Heading>
                       <p>{text}</p>
-                  </div>
+                    </div>
                   </div>
                 ))}
               </Slider>
               </Box>
-              <Box style={{ flex:1, padding: '0px 60px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
+              <Box style={{ flexBasis: '33%', padding: '0px 60px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
                 <Flex direction="column" gap="2" style={{ justifyContent:"center", alignItems:"center" }}>
                   {this.state.content.map(([subtitle, text], index) => (
                     <Button variant="outline">{subtitle}</Button>
