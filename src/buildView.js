@@ -262,6 +262,7 @@ class Building extends React.Component {
   }
 
   createJoyrideSteps = () => {
+    console.log("Creating new steps: ", this.state.description)
     const stepList = this.state.description.map(([subtitle, ...paragraphs], index) => ({
       target: '.buildBody',
       content: `<h2>${subtitle}</h2> ${paragraphs.map(paragraph => `<p>${paragraph}</p>`).join(' ')}`,
@@ -269,7 +270,7 @@ class Building extends React.Component {
       disableBeacon: true,
       spotlightClicks: true,
     }));
-    console.log("Creating new steps: ", stepList[0])
+    console.log("These are the first 3 steps now: ", stepList.slice(0, 3))
     this.setState({ steps: stepList });
   }
   
