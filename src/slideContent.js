@@ -23,3 +23,5 @@ const slideContent = [
     },
     // more slides...
   ];
+
+export default slideContent;
