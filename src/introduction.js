@@ -63,11 +63,10 @@ class Introduction extends React.Component {
         </Grid>
         </Box>
         {this.props.taskId !== 0 && (
-          <Flex direction="row" gap="2" >
-          <Box style={{ overflow: 'auto', fontFamily:'monospace' }}>
+          <Box style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', padding: '30px 60px' }}>
             {this.state.content.length > 0 ? (
               <Flex direction="row" gap="2" >
-              <Box style={{ flex:2, padding:'30px 60px' }}>
+              <Box style={{ flex:2 }}>
               <Slider classNames={horizontalCss} previousButton={<ChevronLeftIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>} nextButton={<ChevronRightIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>}>
                 {this.state.content.map(([subtitle, text], index) => (
                   <div key={index} className="slide-container">
@@ -79,7 +78,7 @@ class Introduction extends React.Component {
                 ))}
               </Slider>
               </Box>
-              <Box style={{ flex:1, padding: '30px 60px' }}>
+              <Box style={{ flex:1 }}>
                 <Flex direction="column" gap="2" style={{ justifyContent:"center" }}>
                   {this.state.content.map(([subtitle, text], index) => (
                     <Button variant="outline">{subtitle}</Button>
@@ -94,7 +93,6 @@ class Introduction extends React.Component {
               </div>
             )}
           </Box>
-          </Flex>
         )}
     </Theme>
     )}
