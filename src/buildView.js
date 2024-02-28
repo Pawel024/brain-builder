@@ -146,13 +146,18 @@ class Building extends React.Component {
           this.typeWriter(response.data.description);  // this works
         }
       }
+      this.continueComponentDidMount();
     })
     .catch(error => {
       console.error('Task description error:', error);
       this.typeWriter("There was an error loading the task description. Please try reloading the paper or contact us");
+      this.continueComponentDidMount();
     });
+  }
 
+  continueComponentDidMount = () => {
     if (this.props.taskId === 0 || this.state.description.length > 0) {
+      console.log("Running tutorial")
       this.setState({ runTutorial: true }, () => {
         // Delay the click on the beacon until after the Joyride component has been rendered
         setTimeout(() => {
@@ -266,8 +271,6 @@ class Building extends React.Component {
       target: '.buildBody',
       content: `<h2>${subtitle}</h2> ${paragraphs.map(paragraph => `<p>${paragraph}</p>`).join(' ')}`,
       placement: 'center',
-      disableBeacon: true,
-      spotlightClicks: true,
     }));
     console.log("These are the first 3 steps now: ", stepList.slice(0, 3))
     this.setState({ steps: stepList });
