@@ -262,9 +262,9 @@ class Building extends React.Component {
   }
 
   createJoyrideSteps = () => {
-    const stepList = this.state.description.map(([subtitle], index) => ({
+    const stepList = this.state.description.map(([subtitle, ...paragraphs], index) => ({
       target: '.buildBody',
-      content: subtitle,
+      content: `<h2>${subtitle}</h2> ${paragraphs.map(paragraph => `<p>${paragraph}</p>`).join(' ')}`,
       placement: 'center',
       disableBeacon: true,
       spotlightClicks: true,
