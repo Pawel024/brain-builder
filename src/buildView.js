@@ -262,14 +262,15 @@ class Building extends React.Component {
   }
 
   createJoyrideSteps = () => {
-    const steps = this.state.description.map(([subtitle], index) => ({
+    const stepList = this.state.description.map(([subtitle], index) => ({
       target: '.buildBody',
       content: subtitle,
       placement: 'center',
       disableBeacon: true,
       spotlightClicks: true,
     }));
-    this.setState({ steps });
+    console.log("Creating new steps: ", stepList[0])
+    this.setState({ steps: stepList });
   }
   
 
@@ -626,7 +627,7 @@ class Building extends React.Component {
         run={this.state.runTutorial}
         continuous={true}
         disableOverlayClose={true}
-        disableCloseOnEsc={true}
+        disableCloseOnEsc={false}
         disableScrolling={true}
         callback={this.handleJoyrideCallback}
         locale={{ last: 'Finish' }}
