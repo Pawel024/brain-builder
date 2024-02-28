@@ -132,7 +132,28 @@ class Building extends React.Component {
   };
 
   componentDidMount() {
-    if (this.props.taskId === 0) {
+    axios.get(window.location.origin + '/api/tasks/?task_id=' + this.props.taskId)
+    .then(response => {
+      this.shortDescription = response.data.short_description;
+      if (response.data.description[0] === '[') {
+        this.setState({ description: JSON.parse(response.data.description) });
+        console.log("Attempting to set the array")
+      } else {
+        if (response.data.description[0] === 't') {
+          console.log("Attempting to convert to array")
+          this.createDescriptionList(response.data.description);
+          this.createJoyrideSteps();
+        } else {
+          this.typeWriter(response.data.description);  // this works
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Task description error:', error);
+      this.typeWriter("There was an error loading the task description. Please try reloading the paper or contact us");
+    });
+
+    if (this.props.taskId === 0 || this.state.description.length > 0) {
       this.setState({ runTutorial: true }, () => {
         // Delay the click on the beacon until after the Joyride component has been rendered
         setTimeout(() => {
@@ -149,26 +170,6 @@ class Building extends React.Component {
     this.props.loadLastCytoLayers(this.props.setCytoLayers, this.props.apiData, this.props.setApiData, 'cytoLayers' + this.props.taskId, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs);
     this.props.updateCytoLayers(this.props.setCytoLayers, this.props.nOfInputs, this.props.nOfOutputs, this.props.index);
     }
-
-    axios.get(window.location.origin + '/api/tasks/?task_id=' + this.props.taskId)
-    .then(response => {
-      this.shortDescription = response.data.short_description;
-      if (response.data.description[0] === '[') {
-        this.setState({ description: JSON.parse(response.data.description) });
-        console.log("Attempting to set the array")
-      } else {
-        if (response.data.description[0] === 't') {
-          console.log("Attempting to convert to array")
-          this.createDescriptionList(response.data.description);
-        } else {
-          this.typeWriter(response.data.description);  // this works
-        }
-      }
-    })
-    .catch(error => {
-      console.error('Task description error:', error);
-      this.typeWriter("There was an error loading the task description. Please try reloading the paper or contact us");
-    });
   }
 
   chartRef = React.createRef();
@@ -259,6 +260,17 @@ class Building extends React.Component {
       console.error('Error parsing JSON or formatting description:', error);
     }
   }
+
+  createJoyrideSteps = () => {
+    const steps = this.state.description.map(([subtitle], index) => ({
+      target: '.buildBody',
+      content: subtitle,
+      placement: 'center',
+      disableBeacon: true,
+      spotlightClicks: true,
+    }));
+    this.setState({ steps });
+  }
   
 
   render() {
@@ -289,7 +301,7 @@ class Building extends React.Component {
       <Tabs.Root defaultValue="building" style={{ fontFamily:'monospace' }}>
 
         <Tabs.List size="2">
-          <Tabs.Trigger value="task" >Background Info</Tabs.Trigger>
+          {/* <Tabs.Trigger value="task" >Background Info</Tabs.Trigger> */}
           <Tabs.Trigger value="building" >Build</Tabs.Trigger>
           <Tabs.Trigger value="stuff">Result</Tabs.Trigger>
           {/*<Tabs.Trigger value="settings">Settings</Tabs.Trigger>*/}
@@ -430,6 +442,7 @@ class Building extends React.Component {
             <div id="/api-data">
               {this.props.isTraining===2 ? (
                 <Flex direction='column' >
+                  {this.shortDescription}
                   {(this.props.taskId < 20 &&
                   <div style={{ color: this.props.accuracyColor, fontFamily:'monospace' }}><b>R^2: {parseFloat(this.props.errorList[1]).toFixed(2)}</b></div>
                   )}
