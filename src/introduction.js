@@ -64,18 +64,29 @@ class Introduction extends React.Component {
         </Box>
         {this.props.taskId !== 0 && (
           <Flex direction="row" gap="2" >
-          <Box style={{ flex: 2, overflow: 'auto', padding: '30px 100px', fontFamily:'monospace' }}>
+          <Box style={{ overflow: 'auto', fontFamily:'monospace' }}>
             {this.state.content.length > 0 ? (
+              <Flex direction="row" gap="2" >
+              <Box style={{ flex:2, padding:'30px 60px' }}>
               <Slider classNames={horizontalCss} previousButton={<ChevronLeftIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>} nextButton={<ChevronRightIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>}>
-              {this.state.content.map(([subtitle, text], index) => (
-                <div key={index} className="slide-container">
-                  <div className="slide-content">
-                    <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign:"center" }}>&gt;_{subtitle} </Heading>
-                    <p>{text}</p>
-                </div>
-                </div>
-              ))}
-        </Slider>
+                {this.state.content.map(([subtitle, text], index) => (
+                  <div key={index} className="slide-container">
+                    <div className="slide-content">
+                      <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign:"center" }}>&gt;_{subtitle} </Heading>
+                      <p>{text}</p>
+                  </div>
+                  </div>
+                ))}
+              </Slider>
+              </Box>
+              <Box style={{ flex:1, padding: '30px 60px' }}>
+                <Flex direction="column" gap="2" style={{ justifyContent:"center" }}>
+                  {this.state.content.map(([subtitle, text], index) => (
+                    <Button variant="outline">{subtitle}</Button>
+                  ))}
+                </Flex>
+              </Box>
+              </Flex>
             ) : (
               <div style={{ textAlign:'justify', marginBottom: '20px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Key Concepts </Heading>
@@ -84,7 +95,7 @@ class Introduction extends React.Component {
             )}
           </Box>
           </Flex>
-          )}
+        )}
     </Theme>
     )}
 }

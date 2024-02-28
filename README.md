@@ -4,8 +4,12 @@ This app was made in 2023 by two TU Delft students to support education in the c
 
 ## Authors
 
-- Laurens Ledeganck (L.A.K.Ledeganck@student.tudelft.nl)
-- Paweł Rok (P.J.Rok@student.tudelft.nl)
+- Laurens Ledeganck (laurens.ledeganck@brain-builder.app)
+- Paweł Rok (pawel.rok@brain-builder.app)
+
+## Contact us
+
+Do you have a question, suggestion for future development or a bug report? Email us at info@brain-builder.app and we'll be happy to talk about it!
 
 ## Resources Used
 
