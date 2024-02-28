@@ -67,11 +67,11 @@ class Introduction extends React.Component {
           <Box style={{ flex: 2, overflow: 'auto', padding: '30px 300px', fontFamily:'monospace' }}>
             {this.state.content.length > 0 ? (
               <Slider classNames={horizontalCss} previousButton={<ChevronLeftIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>} nextButton={<ChevronRightIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>}>
-              {this.state.content.map((item, index) => (
+              {this.state.content.map(([subtitle, text], index) => (
                 <div key={index} className="slide-container">
                   <div className="slide-content">
-                    <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign:"center" }}>&gt;_{item.title} </Heading>
-                    <p>{item.description}</p>
+                    <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign:"center" }}>&gt;_{subtitle} </Heading>
+                    <p>{text}</p>
                 </div>
                 </div>
               ))}
