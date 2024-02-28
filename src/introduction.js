@@ -63,9 +63,9 @@ class Introduction extends React.Component {
         </Grid>
         </Box>
         {this.props.taskId !== 0 && (
-          <Box style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', padding: '30px 60px' }}>
+          <Box style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', heigh: window.innerHeight-52, padding: '30px 0px' }}>
             {this.state.content.length > 0 ? (
-              <Flex direction="row" gap="2" >
+              <Flex direction="row" gap="2" style={{ height: '100%'}}>
               <Box style={{ flex:2 }}>
               <Slider classNames={horizontalCss} previousButton={<ChevronLeftIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>} nextButton={<ChevronRightIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>}>
                 {this.state.content.map(([subtitle, text], index) => (
@@ -78,7 +78,7 @@ class Introduction extends React.Component {
                 ))}
               </Slider>
               </Box>
-              <Box style={{ flex:1 }}>
+              <Box style={{ flex:1, padding: '0px 60px', justifyContent:"center", alignItems:"center" }}>
                 <Flex direction="column" gap="2" style={{ justifyContent:"center" }}>
                   {this.state.content.map(([subtitle, text], index) => (
                     <Button variant="outline">{subtitle}</Button>
@@ -87,7 +87,7 @@ class Introduction extends React.Component {
               </Box>
               </Flex>
             ) : (
-              <div style={{ textAlign:'justify', marginBottom: '20px' }}>
+              <div style={{ textAlign:'justify', marginBottom: '20px', padding: '0px 300px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Key Concepts </Heading>
                 {this.state.printedContent}
               </div>
