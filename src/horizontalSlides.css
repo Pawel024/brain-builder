@@ -61,7 +61,7 @@
 
 	&.animateIn,
 	&.animateOut {
-		transition: all 2s ease;
+		transition: all 1s ease;
 	}
 
 	&.animateIn {
