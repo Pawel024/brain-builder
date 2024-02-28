@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { Theme, Box, Grid, Heading, IconButton, Flex, Button } from '@radix-ui/themes';
+import { Theme, Box, Grid, Heading, IconButton, Flex, Button, Separator } from '@radix-ui/themes';
 import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 import { Link } from 'react-router-dom';
 import { HomeIcon } from '@radix-ui/react-icons';
@@ -65,6 +65,7 @@ class Introduction extends React.Component {
         {this.props.taskId !== 0 && (
           <Box style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', height: window.innerHeight-52, padding: '30px 0px' }}>
             {this.state.content.length > 0 ? (
+              <>
               <Flex direction="row" gap="2" style={{ height: '100vh'}}>
               <Box style={{ flex:2 }}>
               <Slider classNames={horizontalCss} previousButton={<ChevronLeftIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>} nextButton={<ChevronRightIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>}>
@@ -78,7 +79,7 @@ class Introduction extends React.Component {
                 ))}
               </Slider>
               </Box>
-              <Box style={{ flex:1, padding: '0px 60px', justifyContent:"center", alignItems:"center" }}>
+              <Box style={{ flex:1, padding: '0px 60px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
                 <Flex direction="column" gap="2" style={{ justifyContent:"center", alignItems:"center" }}>
                   {this.state.content.map(([subtitle, text], index) => (
                     <Button variant="outline">{subtitle}</Button>
@@ -86,6 +87,8 @@ class Introduction extends React.Component {
                 </Flex>
               </Box>
               </Flex>
+              <Separator orientation='vertical' style = {{ height: window.innerHeight-110, position: 'absolute', left: window.innerWidth * 0.67, bottom: (window.innerHeight-52) * 0.5, transform: `translateY(${(window.innerHeight - 110) / 2}px)` }}/>
+              </>
             ) : (
               <div style={{ textAlign:'justify', marginBottom: '20px', padding: '0px 300px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Key Concepts </Heading>
