@@ -64,7 +64,7 @@ class Introduction extends React.Component {
         </Box>
         {this.props.taskId !== 0 && (
           <Flex direction="row" gap="2" >
-          <Box style={{ flex: 2, overflow: 'auto', padding: '30px 300px', fontFamily:'monospace' }}>
+          <Box style={{ flex: 2, overflow: 'auto', padding: '30px 100px', fontFamily:'monospace' }}>
             {this.state.content.length > 0 ? (
               <Slider classNames={horizontalCss} previousButton={<ChevronLeftIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>} nextButton={<ChevronRightIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>}>
               {this.state.content.map(([subtitle, text], index) => (
