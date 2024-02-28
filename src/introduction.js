@@ -15,8 +15,13 @@ class Introduction extends React.Component {
         this.state = {
           content: [],
           printedContent: '',
+          currentSlide: 0,
         }
     }
+
+    goToSlide = (index) => {
+      this.setState({ currentSlide: index });
+    };
 
     typeWriter = (txt, speed=15, i=0) => {
         if (i < txt.length) {
@@ -68,7 +73,7 @@ class Introduction extends React.Component {
               <>
               <Flex direction="row" gap="2" style={{ height: '100%'}}>
               <Box style={{ flexBasis: '67%', display: 'flex', justifyContent:"center", alignItems:"center" }}>
-              <Slider classNames={horizontalCss} previousButton={<ChevronLeftIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>} nextButton={<ChevronRightIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>}>
+              <Slider classNames={horizontalCss} current={this.state.currentSlide} previousButton={<ChevronLeftIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>} nextButton={<ChevronRightIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>}>
                 {this.state.content.map(([subtitle, text], index) => (
                   <div key={index} className="slide-container">
                     <div className="slide-content">
@@ -82,7 +87,7 @@ class Introduction extends React.Component {
               <Box style={{ flexBasis: '33%', padding: '0px 60px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
                 <Flex direction="column" gap="2" style={{ justifyContent:"center", alignItems:"center", width:"100%" }}>
                   {this.state.content.map(([subtitle, text], index) => (
-                    <Button variant="outline" style={{ width:"100%" }}>{subtitle}</Button>
+                    <Button variant="outline" style={{ width:"100%" }} onClick={() => this.goToSlide(index)}>{subtitle}</Button>
                   ))}
                 </Flex>
               </Box>
