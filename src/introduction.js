@@ -6,7 +6,7 @@ import { HomeIcon } from '@radix-ui/react-icons';
 import tu_delft_pic from "./tud_black_new.png";
 import axios from 'axios';
 import Slider from 'react-animated-slider';
-import 'react-animated-slider/build/horizontal.css';
+import horizontalCss from './horizontalSlides.css';
 import slideContent from './slideContent';
 
 class Introduction extends React.Component {
@@ -66,7 +66,7 @@ class Introduction extends React.Component {
           <Flex direction="row" gap="2" >
           <Box style={{ flex: 2, overflow: 'auto', padding: '30px 300px', fontFamily:'monospace' }}>
             {this.state.content.length > 0 ? (
-              <Slider>
+              <Slider classNames={horizontalCss}>
                 {this.state.content.map(([subtitle, text], index) => (
                   <div key={index}>
                     {/*<Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_{subtitle} </Heading>
