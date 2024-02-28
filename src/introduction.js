@@ -62,17 +62,22 @@ class Introduction extends React.Component {
             </Box>
         </Grid>
         </Box>
-        <Flex direction="column">
         {this.props.taskId !== 0 && (
           <Flex direction="row" gap="2" >
           <Box style={{ flex: 2, overflow: 'auto', padding: '30px 300px', fontFamily:'monospace' }}>
             {this.state.content.length > 0 ? (
-              this.state.content.map(([subtitle, text], index) => (
-              <div key={index}>
-                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_{subtitle} </Heading>
-                <p>{text}</p>
-              </div>
-              ))
+              <Slider>
+                {this.state.content.map(([subtitle, text], index) => (
+                  <div key={index}>
+                    {/*<Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_{subtitle} </Heading>
+                    <p>{text}</p>*/}
+                    <div className="center">
+                      <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_{subtitle} </Heading>
+                      <p>{text}</p>
+                  </div>
+                  </div>
+                ))}
+              </Slider>
             ) : (
               <div style={{ textAlign:'justify', marginBottom: '20px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Key Concepts </Heading>
@@ -80,22 +85,8 @@ class Introduction extends React.Component {
               </div>
             )}
           </Box>
-          <Slider>
-          {slideContent.map((item, index) => (
-            <div
-              key={index}
-            >
-              <div className="center">
-                <h1>{item.title}</h1>
-                <p>{item.description}</p>
-                <Button onClick={item.button.action}>{item.button.text}</Button>
-              </div>
-            </div>
-          ))}
-          </Slider>
           </Flex>
           )}
-        </Flex>
     </Theme>
     )}
 }
