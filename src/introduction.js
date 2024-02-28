@@ -1,13 +1,13 @@
 import React from 'react';
 import './App.css';
 import { Theme, Box, Grid, Heading, IconButton, Flex, Button } from '@radix-ui/themes';
+import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 import { Link } from 'react-router-dom';
 import { HomeIcon } from '@radix-ui/react-icons';
 import tu_delft_pic from "./tud_black_new.png";
 import axios from 'axios';
 import Slider from 'react-animated-slider';
 import horizontalCss from './horizontalSlides.css';
-import slideContent from './slideContent';
 
 class Introduction extends React.Component {
     constructor(props) {
@@ -66,18 +66,16 @@ class Introduction extends React.Component {
           <Flex direction="row" gap="2" >
           <Box style={{ flex: 2, overflow: 'auto', padding: '30px 300px', fontFamily:'monospace' }}>
             {this.state.content.length > 0 ? (
-              <Slider classNames={horizontalCss}>
-                {this.state.content.map(([subtitle, text], index) => (
-                  <div key={index}>
-                    {/*<Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_{subtitle} </Heading>
-                    <p>{text}</p>*/}
-                    <div className="center">
-                      <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_{subtitle} </Heading>
-                      <p>{text}</p>
-                  </div>
-                  </div>
-                ))}
-              </Slider>
+              <Slider classNames={horizontalCss} previousButton={<ChevronLeftIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>} nextButton={<ChevronRightIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>}>
+              {this.state.content.map((item, index) => (
+                <div key={index} className="slide-container">
+                  <div className="slide-content">
+                    <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign:"center" }}>&gt;_{item.title} </Heading>
+                    <p>{item.description}</p>
+                </div>
+                </div>
+              ))}
+        </Slider>
             ) : (
               <div style={{ textAlign:'justify', marginBottom: '20px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Key Concepts </Heading>
