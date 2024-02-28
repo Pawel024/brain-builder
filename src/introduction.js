@@ -67,7 +67,7 @@ class Introduction extends React.Component {
             {this.state.content.length > 0 ? (
               <>
               <Flex direction="row" gap="2" style={{ height: '100%'}}>
-              <Box style={{ flexBasis: '67%' }}>
+              <Box style={{ flex: 2, boxSizing: 'border-box' }}>
               <Slider classNames={horizontalCss} previousButton={<ChevronLeftIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>} nextButton={<ChevronRightIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>}>
                 {this.state.content.map(([subtitle, text], index) => (
                   <div key={index} className="slide-container">
@@ -79,8 +79,8 @@ class Introduction extends React.Component {
                 ))}
               </Slider>
               </Box>
-              <Box style={{ flexBasis: '33%', padding: '0px 60px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
-                <Flex direction="column" gap="2" style={{ justifyContent:"center", alignItems:"center" }}>
+              <Box style={{ flex: 1, boxSizing: 'border-box', padding: '0px 60px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
+                <Flex direction="column" gap="2" style={{ justifyContent:"center", alignItems:"center", width:"100%" }}>
                   {this.state.content.map(([subtitle, text], index) => (
                     <Button variant="outline">{subtitle}</Button>
                   ))}
