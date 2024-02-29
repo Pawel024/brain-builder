@@ -26,11 +26,11 @@
 		}
 
 		&.previousButton {
-			left: 50px;
+			left: 40px;
 		}
 
 		&.nextButton {
-			right: 50px;
+			right: 40px;
 		}
 	}
 }
@@ -92,5 +92,5 @@
 
 .slide-content {
 	text-align: justify;
-	padding: 170px;
+	padding: 180px;
 }
