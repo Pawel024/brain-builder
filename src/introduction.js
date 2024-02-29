@@ -74,7 +74,7 @@ class Introduction extends React.Component {
               <>
               <Flex direction="row" gap="2" style={{ height: '100%'}}>
               <Box style={{ flexBasis: '67%', display: 'flex', justifyContent:"center", alignItems:"center" }}>
-              <Slider classNames={horizontalCss} infinite={false} slideIndex={this.state.currentSlide} previousButton={<ChevronLeftIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>} nextButton={<ChevronRightIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>}>
+              <Slider key={this.state.currentSlide} classNames={horizontalCss} infinite={false} slideIndex={this.state.currentSlide} previousButton={<ChevronLeftIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>} nextButton={<ChevronRightIcon style={{ color: 'var(--slate-9)', width:64, height:64 }}/>}>
                 {this.state.content.map(([subtitle, text], index) => (
                   <div key={index} className="slide-container">
                     <div className="slide-content">
