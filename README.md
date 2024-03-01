@@ -9,7 +9,7 @@ This app was made in 2023 by two TU Delft students to support education in the c
 
 ## Contact us
 
-Do you have a question, suggestion for development or a bug report? Email us at [info@brain-builder.app](mailto:info@brain-builder.app) and we'll be happy to talk about it!
+Do you have a question, development suggestion or a bug report? Email us at [info@brain-builder.app](mailto:info@brain-builder.app) and we'll be happy to talk about it!
 
 ## Resources Used
 
