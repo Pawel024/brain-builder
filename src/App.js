@@ -767,7 +767,7 @@ function App() {
       user_id: userId,
       task_id: taskId,
       progress_pk: null,
-      learning_rate: learningRate,
+      learning_rate: parseFloat(learningRate),
       epochs: iterations,
       normalization: normalization,
       network_input: JSON.stringify(cytoLayers),
