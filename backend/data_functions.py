@@ -259,15 +259,15 @@ class DataFromExcel(Dataset):
                             row = k // n_cols
                             col = k % n_cols
                             if n_plots == 1:
-                                ax.scatter(self.data.iloc[:, i], self.data.iloc[:, j])
+                                ax.scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=(4/255, 151/255, 185/255))
                                 ax.set_xlabel(self.data.columns[i].replace('_', ' '))
                                 ax.set_ylabel(self.data.columns[j].replace('_', ' '))
                             elif n_rows == 1:
-                                ax[col].scatter(self.data.iloc[:, i], self.data.iloc[:, j])
+                                ax[col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=(4/255, 151/255, 185/255))
                                 ax[col].set_xlabel(self.data.columns[i].replace('_', ' '))
                                 ax[col].set_ylabel(self.data.columns[j].replace('_', ' '))
                             else: 
-                                ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j])
+                                ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=(4/255, 151/255, 185/255))
                                 ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
                                 ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
                             k += 1
@@ -729,15 +729,15 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
                             row = k // n_cols
                             col = k % n_cols
                             if n_plots == 1:
-                                ax.scatter(d[:, i], d[:, j])
+                                ax.scatter(d[:, i], d[:, j], c=(4/255, 151/255, 185/255))
                                 ax.set_xlabel(c[i].replace('_', ' '))
                                 ax.set_ylabel(c[j].replace('_', ' '))
                             elif n_rows == 1:
-                                ax[col].scatter(d[:, i], d[:, j])
+                                ax[col].scatter(d[:, i], d[:, j], c=(4/255, 151/255, 185/255))
                                 ax[col].set_xlabel(c[i].replace('_', ' '))
                                 ax[col].set_ylabel(c[j].replace('_', ' '))
                             else:
-                                ax[row, col].scatter(d[:, i], d[:, j])
+                                ax[row, col].scatter(d[:, i], d[:, j], c=(4/255, 151/255, 185/255))
                                 ax[row, col].set_xlabel(c[i].replace('_', ' '))
                                 ax[row, col].set_ylabel(c[j].replace('_', ' '))
                             k += 1
