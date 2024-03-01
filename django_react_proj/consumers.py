@@ -5,12 +5,14 @@ from base64 import b64encode, b64decode
 
 class Coach(AsyncWebsocketConsumer):
     connections = {}
+    cancelVars = {}
 
     async def connect(self):
         print(f'Connection scope: {self.scope}')
         self.user_id = self.scope['url_route']['kwargs']['userId']
         self.task_id = self.scope['url_route']['kwargs']['taskId']
         Coach.connections[(self.user_id, self.task_id)] = self
+        Coach.cancelVars[(self.user_id, self.task_id)] = False
         print("coach connected")
         await self.accept()
 
@@ -20,15 +22,15 @@ class Coach(AsyncWebsocketConsumer):
         
     # Receive message from WebSocket
     async def receive(self, text_data):
-        print("coach received data, but is currently unequipped to handle it")
-        # uncomment if we decide to send frontend data via the WebSocket as well
-        """
-        instructions = json.loads(data)
+        instructions = json.loads(text_data)
         task_type = instructions['title']
         print("instructions received, preparing for task ", task_type)
-        from process_data import process
-        process(instructions, root_link, pk, csrf_token, callback=self.send_data)
-        """
+        if task_type == 'cancel':
+            Coach.cancelVars[(self.user_id, self.task_id)] = True
+
+        #from process_data import process
+        #process(instructions, root_link, pk, csrf_token, callback=self.send_data)
+        
 
     # Send an update to the frontend
     async def send_data(self, data):

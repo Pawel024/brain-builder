@@ -92,6 +92,9 @@ async def process(req):
         u['title'] = 'update'
         
         for epoch in range(epochs):
+            if Coach.cancelVars.get((str(user_id), str(task_id))):
+                print("Training cancelled")
+                break
             print("Epoch: ", epoch)
             errors, accuracy, we, bi = building.train_nn_epoch(network, training_set, test_set, epoch, epochs, learning_rate, tag, errors)
             if we is not None:

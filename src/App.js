@@ -709,6 +709,10 @@ function App() {
     document.getElementById(taskId + "-input" + column).value = nodeInput;
   }, [maxNodes]);
 
+
+  const cancelRequestRef = useRef(null);
+
+
   // ------- POST REQUEST -------
   const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs, normalization) => {
     e.preventDefault();
@@ -922,6 +926,26 @@ function App() {
         }
       }
     };
+
+    function cancelRequest(taskId) {
+      var userId = getCookie('user_id');
+      ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
+      if (ws && ws.readyState !== WebSocket.CLOSED) {
+        let message = {'title': 'cancel'};
+        ws.send(JSON.stringify(message));
+  
+        ws.close();
+      }
+      clearTimeout(timeoutId);
+      setIsTraining(prevIsTraining => {
+        const newIsTraining = [...prevIsTraining];
+        newIsTraining[index] = 0;
+        return newIsTraining;
+      });
+      console.log("Training cancelled")
+    };
+    cancelRequestRef.current = cancelRequest;
+
   };
 
 
@@ -1399,6 +1423,7 @@ function App() {
                   setErrorList={setErrorList}
                   setWeights={setWeights}
                   setBiases={setBiases}
+                  cancelRequest={cancelRequestRef.current}
                 />
                 </>
               }
