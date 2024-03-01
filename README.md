@@ -7,6 +7,10 @@ This app was made in 2023 by two TU Delft students to support education in the c
 - Laurens Ledeganck ([laurens.ledeganck@brain-builder.app](mailto:laurens.ledeganck@brain-builder.app))
 - Paweł Rok ([pawel.rok@brain-builder.app](mailto:pawel.rok@brain-builder.app))
 
+## Contact us
+
+Do you have a question, suggestion for development or a bug report? Email us at [info@brain-builder.app](mailto:info@brain-builder.app) and we'll be happy to talk about it!
+
 ## Resources Used
 
 This project was made using:
@@ -20,7 +24,3 @@ This project was made using:
 Licensed under the MIT License, Copyright © 2023 Paweł Rok and Laurens Ledeganck.
 
 See [LICENSE](https://github.com/Pawel024/brain-builder/blob/django_app/LICENSE) for more information.
-
-## Contact us
-
-Do you have a question, suggestion for future development or a bug report? Email us at [info@brain-builder.app](mailto:info@brain-builder.app) and we'll be happy to talk about it!
