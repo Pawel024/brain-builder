@@ -79,15 +79,19 @@ class Introduction extends React.Component {
                 <ChevronLeftIcon
                   style={{ color: 'var(--slate-9)', width:64, height:64 }}
                   onClick={() => {
-                    const prevSlide = (this.state.currentSlide - 1 + this.state.content.length) % this.state.content.length;
-                    this.setState({ currentSlide: prevSlide });
+                    const prevSlide = this.state.currentSlide - 1;
+                    if (prevSlide >= 0) {
+                      this.setState({ currentSlide: prevSlide });
+                    }
                 }}/>}
                 nextButton={
                   <ChevronRightIcon
                     style={{ color: 'var(--slate-9)', width:64, height:64 }}
                     onClick={() => {
-                      const nextSlide = (this.state.currentSlide + 1) % this.state.content.length;
-                      this.setState({ currentSlide: nextSlide });
+                      const nextSlide = this.state.currentSlide + 1;
+                      if (nextSlide < this.state.content.length) {
+                        this.setState({ currentSlide: nextSlide });
+                      }
                   }}/>}
               >
                 {this.state.content.map(([subtitle, text], index) => (
