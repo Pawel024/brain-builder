@@ -325,7 +325,7 @@ class Building extends React.Component {
         <Box px="4" pt="3" pb="0">
         <Tabs.Content value="task">
           {this.props.taskId !== 0 && (
-            <Box style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', height: window.innerHeight-52, padding: '30px 0px' }}>
+            <Box style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', height: window.innerHeight-72, padding: '20px 0px' }}>
             {this.state.description.length > 0 ? (
               <>
               <Flex direction="row" gap="2" style={{ height: '100%'}}>
@@ -375,7 +375,7 @@ class Building extends React.Component {
                 </Flex>
               </Box>
               </Flex>
-              <Separator orientation='vertical' style = {{ height: window.innerHeight-110, position: 'absolute', left: window.innerWidth * 0.67, bottom: (window.innerHeight-52) * 0.5, transform: `translateY(${(window.innerHeight - 110) / 2}px)` }}/>
+              <Separator orientation='vertical' style = {{ height: window.innerHeight-130, position: 'absolute', left: window.innerWidth * 0.67, bottom: (window.innerHeight-52) * 0.5, transform: `translateY(${(window.innerHeight - 110) / 2}px)` }}/>
               </>
             ) : (
               <div style={{ flexbasis:'50%', textAlign:'justify', marginBottom: '20px', padding: '0px 300px' }}>
@@ -539,7 +539,8 @@ class Building extends React.Component {
               ))}
             </div>
           </Box>
-
+          {console.log("this.state.isTraining: ", this.state.isTraining)}
+          {console.log("type of isTraining: ", typeof(this.state.isTraining))}
           <IconButton
             onClick={
               this.props.taskId !== 0 ? (this.state.isTraining === 1 ? () => {} : 
