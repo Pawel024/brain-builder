@@ -329,7 +329,8 @@ class Building extends React.Component {
             {this.state.description.length > 0 ? (
               <>
               <Flex direction="row" gap="2" style={{ height: '100%'}}>
-              <Box style={{ flexBasis: '67%', display: 'flex', justifyContent:"center", alignItems:"center" }}>
+              <Flex direction="column" gap="2" style={{ flexbasis: '67%', height: '100%'}}>
+              <Box style={{ flexBasis: '50%', display: 'flex', justifyContent:"center", alignItems:"center" }}>
               <Slider key={this.state.currentSlide} classNames={horizontalCss} infinite={false} slideIndex={this.state.currentSlide}
               previousButton={
                 <ChevronLeftIcon
@@ -361,10 +362,11 @@ class Building extends React.Component {
                   </div>
                 ))}
               </Slider>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
                   <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}}/>
                 </div>
               </Box>
+              </Flex>
               <Box style={{ flexBasis: '33%', padding: '0px 90px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
                 <Flex direction="column" gap="2" style={{ justifyContent:"center", alignItems:"center", width:"100%" }}>
                   {this.state.description.map(([subtitle, text], index) => (
@@ -376,7 +378,7 @@ class Building extends React.Component {
               <Separator orientation='vertical' style = {{ height: window.innerHeight-110, position: 'absolute', left: window.innerWidth * 0.67, bottom: (window.innerHeight-52) * 0.5, transform: `translateY(${(window.innerHeight - 110) / 2}px)` }}/>
               </>
             ) : (
-              <div style={{ textAlign:'justify', marginBottom: '20px', padding: '0px 300px' }}>
+              <div style={{ flexbasis:'50%', textAlign:'justify', marginBottom: '20px', padding: '0px 300px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Your Task </Heading>
                 {this.state.printedDescription}
               </div>
