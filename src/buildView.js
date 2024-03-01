@@ -1,10 +1,12 @@
 import React from 'react'
 import './App.css';
-import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator, Checkbox, Text } from '@radix-ui/themes';
+import { Theme, Flex, Box, Tabs, Heading, Grid, IconButton, Separator, Checkbox, Text, Button } from '@radix-ui/themes';
 import * as Form from '@radix-ui/react-form';
+import horizontalCss from './horizontalSlides.css';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
 import color_scale_pic from "./color_scale_2.png";
+import Slider from 'react-animated-slider';
 import { Link } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { PlayIcon, ChevronLeftIcon, ChevronRightIcon, HomeIcon } from '@radix-ui/react-icons';
@@ -100,6 +102,7 @@ class Building extends React.Component {
       description: [],
       printedDescription: '',
       runTutorial: false,
+      currentSlide: 0,
       steps: [
         {
           target: '.buildBody',
@@ -278,6 +281,11 @@ class Building extends React.Component {
     this.setState({ steps: stepList });
     */
   }
+
+  goToSlide = (index) => {
+    this.setState({ currentSlide: index });
+    console.log("Going to slide " + index)
+  };
   
 
   render() {
@@ -308,7 +316,7 @@ class Building extends React.Component {
       <Tabs.Root defaultValue="building" style={{ fontFamily:'monospace' }}>
 
         <Tabs.List size="2">
-          {/* <Tabs.Trigger value="task" >Background Info</Tabs.Trigger> */}
+          <Tabs.Trigger value="task" >Background Info</Tabs.Trigger>
           <Tabs.Trigger value="building" >Build</Tabs.Trigger>
           <Tabs.Trigger value="stuff">Result</Tabs.Trigger>
           {/*<Tabs.Trigger value="settings">Settings</Tabs.Trigger>*/}
@@ -317,6 +325,64 @@ class Building extends React.Component {
         <Box px="4" pt="3" pb="0">
         <Tabs.Content value="task">
           {this.props.taskId !== 0 && (
+            <Box style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', height: window.innerHeight-52, padding: '30px 0px' }}>
+            {this.state.description.length > 0 ? (
+              <>
+              <Flex direction="row" gap="2" style={{ height: '100%'}}>
+              <Box style={{ flexBasis: '67%', display: 'flex', justifyContent:"center", alignItems:"center" }}>
+              <Slider key={this.state.currentSlide} classNames={horizontalCss} infinite={false} slideIndex={this.state.currentSlide}
+              previousButton={
+                <ChevronLeftIcon
+                  style={{ color: 'var(--slate-9)', width:64, height:64 }}
+                  onClick={() => {
+                    const prevSlide = this.state.currentSlide - 1;
+                    if (prevSlide >= 0) {
+                      this.setState({ currentSlide: prevSlide });
+                    }
+                }}/>}
+                nextButton={
+                  <ChevronRightIcon
+                    style={{ color: 'var(--slate-9)', width:64, height:64 }}
+                    onClick={() => {
+                      const nextSlide = this.state.currentSlide + 1;
+                      if (nextSlide < this.state.description.length) {
+                        this.setState({ currentSlide: nextSlide });
+                      }
+                  }}/>}
+              >
+                {this.state.description.map(([subtitle, ...paragraphs], index) => (
+                  <div key={index} className="slide-container">
+                    <div className="slide-content">
+                      <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign:"center" }}>&gt;_{subtitle} </Heading>
+                      {paragraphs.map((paragraph, pIndex) => (
+                        <p key={pIndex} dangerouslySetInnerHTML={{ __html: paragraph }}></p>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </Slider>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+                  <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}}/>
+                </div>
+              </Box>
+              <Box style={{ flexBasis: '33%', padding: '0px 90px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
+                <Flex direction="column" gap="2" style={{ justifyContent:"center", alignItems:"center", width:"100%" }}>
+                  {this.state.description.map(([subtitle, text], index) => (
+                    <Button variant="outline" style={{ width:"100%"}} pressed={this.state.currentSlide === index} onClick={() => this.goToSlide(index)}>{subtitle}</Button>
+                  ))}
+                </Flex>
+              </Box>
+              </Flex>
+              <Separator orientation='vertical' style = {{ height: window.innerHeight-110, position: 'absolute', left: window.innerWidth * 0.67, bottom: (window.innerHeight-52) * 0.5, transform: `translateY(${(window.innerHeight - 110) / 2}px)` }}/>
+              </>
+            ) : (
+              <div style={{ textAlign:'justify', marginBottom: '20px', padding: '0px 300px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Your Task </Heading>
+                {this.state.printedDescription}
+              </div>
+            )}
+          </Box>
+        /*
           <Flex direction="row" gap="2" >
           <Box style={{ flex: 2, overflow: 'auto', padding: '20px 300px', fontFamily:'monospace' }}>
             {this.state.description.length > 0 ? (
@@ -336,19 +402,19 @@ class Building extends React.Component {
             )}
           </Box>
           <Separator orientation='vertical' style = {{ height: window.innerHeight-110 }}/>
-            {/* next to this, plot the dataset */}
             <Box style={{ flex: 1, padding: '20px 20px' }}>
-                {/*
+              	//
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginTop: 20, marginBottom:7 }}>&gt;_The Dataset</Heading>	
                 <div style={{ textAlign:'justify' }}>
                   This dataset contains {this.props.nOfObjects}, each with {this.props.nOfInputs} features. There are {this.props.nOfOutputs} targets. The features are: {this.props.featureNames.join(', ')}.
                 </div>
-                */}
+                //
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
-                  <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}/*URL.revokeObjectURL(this.props.initPlot)*/}/>
+                  <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}}/>
                 </div>
             </Box>
           </Flex>
+        */
           )}
         </Tabs.Content>
         <Tabs.Content value="building">          
