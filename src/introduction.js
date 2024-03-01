@@ -85,7 +85,7 @@ class Introduction extends React.Component {
                 ))}
               </Slider>
               </Box>
-              <Box style={{ flexBasis: '33%', padding: '0px 100px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
+              <Box style={{ flexBasis: '33%', padding: '0px 90px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
                 <Flex direction="column" gap="2" style={{ justifyContent:"center", alignItems:"center", width:"100%" }}>
                   {this.state.content.map(([subtitle, text], index) => (
                     <Button variant="outline" style={{ width:"100%", backgroundColor: this.state.currentSlide === index ? 'var(--accent-a3)' : 'white'}} onClick={() => this.goToSlide(index)}>{subtitle}</Button>
