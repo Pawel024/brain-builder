@@ -205,7 +205,6 @@ function App() {
       action: 0,
       user_id: userId,
       task_id: taskId,
-      progress_pk: null,
       learning_rate: 0,
       epochs: 0,
       normalization: normalization, 
@@ -785,7 +784,6 @@ function App() {
       action: 1,
       user_id: userId,
       task_id: taskId,
-      progress_pk: null,
       learning_rate: parseFloat(learningRate),
       epochs: iterations,
       normalization: normalization,
@@ -1598,7 +1596,7 @@ function App() {
               </Box>
             </Grid>
             </Box>
-            <FeedbackApp host={window.location.origin} />
+            <FeedbackApp host={window.location.origin} cookie={getCookie('csrftoken')} />
           </div>
           } />
             

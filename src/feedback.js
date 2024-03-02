@@ -10,7 +10,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import a11yDark from './a11y-dark';
 
 
-const FeedbackForm = ({ questions, host }) => {
+const FeedbackForm = ({ questions, host, cookie }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -54,7 +54,7 @@ const FeedbackForm = ({ questions, host }) => {
 
   useEffect(() => {
     if (isFinished) {
-    axios.post(host + '/api/feedback', { feedback })
+    axios.post(host + '/api/feedback', { feedback: feedback }, {headers: { 'X-CSRFToken': cookie }})
       .then(response => {
         console.log(response);
       })
@@ -121,7 +121,7 @@ const FeedbackForm = ({ questions, host }) => {
   );
 };
   
-function FeedbackApp({ host }) {
+function FeedbackApp({ host, cookie }) {
 
   // ------- WINDOW RESIZING -------
 
@@ -222,7 +222,7 @@ function FeedbackApp({ host }) {
     }));
   }, [questions]);
 
-  return <FeedbackForm questions={questions} host={host} />;
+  return <FeedbackForm questions={questions} host={host} cookie={cookie} />;
 }
 
 export default FeedbackApp;
