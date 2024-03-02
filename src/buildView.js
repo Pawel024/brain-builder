@@ -326,13 +326,13 @@ class Building extends React.Component {
         <Tabs.Content value="task">
           {this.props.taskId !== 0 && (
             <Flex direction="row" gap="2" style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', height: window.innerHeight-72 }}>
-              <Box style={{ flexBasis: '50%', display: 'flex', justifyContent:"center", alignItems:"center" }}>
+              <Box style={{ flexBasis: '50%', display: 'flex', justifyContent:"center", alignItems:"center", padding: "0px 30px" }}>
                 <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}}/>
               </Box>
               <Box style={{ flexBasis: '50%' }}>
               {this.state.description.length > 0 ? (              
                 <Box style={{ padding: '20px 90px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
-                  <Box style={{ marginBottom: 50 }}>
+                  <Box style={{ marginBottom: 0 }}>
                     <Slider key={this.state.currentSlide} classNames={horizontalCss} infinite={false} slideIndex={this.state.currentSlide}
                       previousButton={
                         <ChevronLeftIcon
@@ -378,7 +378,7 @@ class Building extends React.Component {
                 </Box>
               )}
               </Box>
-              <Separator orientation='vertical' style = {{ height: window.innerHeight-130, position: 'absolute', left: window.innerWidth * 0.67, bottom: (window.innerHeight-52) * 0.5, transform: `translateY(${(window.innerHeight - 110) / 2}px)` }}/>
+              <Separator orientation='vertical' style = {{ height: window.innerHeight-130, position: 'absolute', left: window.innerWidth * 0.5, bottom: (window.innerHeight-52) * 0.5, transform: `translateY(${(window.innerHeight - 110) / 2}px)` }}/>
           </Flex>)}
         {/*
           <Flex direction="row" gap="2" >
