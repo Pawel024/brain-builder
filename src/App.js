@@ -800,11 +800,13 @@ function App() {
       console.log('WebSocket connection closed');
     };
 
+    let timeoutId = null;
+
     ws.onerror = function(event) {
       console.error('Error:', event);
+      cancelRequest();
+      alert("A websocket error occurred. Please try again. If the problem persists, please contact us.");
     };
-
-    let timeoutId = null;
 
     ws.onopen = () => {
       console.log('WebSocket connection opened');
@@ -825,6 +827,8 @@ function App() {
               timeout: pendingTime
             }).catch((error) => {
                 console.log(error);
+                cancelRequest();
+                alert("An axios error occurred. Please try again. If the problem persists, please contact us.");
           });
         } else {
             // If the record does not exist, throw an error
@@ -841,7 +845,12 @@ function App() {
               timeout: pendingTime
             }).catch((error) => {
                 console.log(error);
+                cancelRequest();
+                alert("An axios error occurred. Please try again. If the problem persists, please contact us.");
             })
+          } else {
+            cancelRequest();
+            alert("An axios error occurred. Please try again. If the problem persists, please contact us.");
           }
       })
 
@@ -927,14 +936,12 @@ function App() {
       }
     };
 
-    function cancelRequest(taskId, index) {
-      const userId = getCookie('user_id');
-      const ws_to_cancel = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
-      if (ws_to_cancel && ws.readyState !== WebSocket.CLOSED) {
+    function cancelRequest() {
+      if (ws && ws.readyState !== WebSocket.CLOSED) {
         let message = {'title': 'cancel'};
-        ws_to_cancel.send(JSON.stringify(message));
+        ws.send(JSON.stringify(message));
   
-        ws_to_cancel.close();
+        ws.close();
       }
       clearTimeout(timeoutId);
       setIsTraining(prevIsTraining => {
