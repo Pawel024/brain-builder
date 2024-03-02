@@ -142,11 +142,11 @@ class Building extends React.Component {
         this.setState({ description: JSON.parse(response.data.description) });
         console.log("Attempting to set the array")
       } else {
-        if (response.data.description[0] === 't') {
+        if (response.data.description[0] === '*') {
+          this.typeWriter(response.data.description);  // this works
+        } else {
           console.log("Attempting to convert to array")
           this.createDescriptionList(response.data.description);
-        } else {
-          this.typeWriter(response.data.description);  // this works
         }
       }
       this.continueComponentDidMount();
