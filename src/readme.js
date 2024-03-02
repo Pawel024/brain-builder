@@ -3,15 +3,15 @@ import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import './App.css';
 
-function Readme() {
+function Readme(file) {
   const [readme, setReadme] = useState('');
 
   useEffect(() => {
-    axios.get('https://raw.githubusercontent.com/pawel024/brain-builder/django_app/README.md')
+    axios.get('https://raw.githubusercontent.com/pawel024/brain-builder/django_app/' + file)
       .then(response => {
         setReadme(response.data);
       });
-  }, []);
+  }, [file]);
 
   return (
     <div className='readme'>

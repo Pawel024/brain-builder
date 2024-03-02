@@ -6,7 +6,7 @@ import * as Slider from '@radix-ui/react-slider';
 import '@radix-ui/themes/styles.css';
 import tu_delft_pic from "./tud_black_new.png";
 import { Link, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { PlusIcon, MinusIcon, RocketIcon, HomeIcon, DrawingPinIcon, Pencil2Icon } from '@radix-ui/react-icons';
+import { PlusIcon, MinusIcon, RocketIcon, HomeIcon, DrawingPinIcon, Pencil2Icon, Link2Icon } from '@radix-ui/react-icons';
 import { styled } from '@stitches/react';
 import axios from 'axios';
 import BuildView from './buildView';
@@ -18,6 +18,7 @@ import QuizApp from './quiz';
 import CustomBlock from './customBlocks';
 import Tutorial from './tutorial';
 import FeedbackApp from './feedback';
+import LinksPage from './links';
 
 
 const colorScale = chroma.scale(['#49329b', '#5e5cc2', '#8386d8', '#afb0e1', '#dddddd', '#e3a692', '#d37254', '#b64124', '#8f0500']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
@@ -153,11 +154,14 @@ function NotFound() {
   const isMontyPythonLover = true; // Replace with your condition
 
   return (
-    <div>
-      <h1>404</h1>
-      <p>Page not found : ( </p>
+    // disable both horizontal and vertical scrolling, cut off the overflow
+    <Box style={{ overflow: 'hidden', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+      <Box style={{ textAlign: 'center', color: 'white' }}>
+        <Heading style={{ fontSize:90 }}>404</Heading>
+        <p style={{ fontSize:90 }}>Page not found : ( </p>
+      </Box>
       {isMontyPythonLover && <img src={require('./monty-python.jpeg')} alt="Monty Python" />}
-    </div>
+    </Box>
   );
 }
 
@@ -1315,8 +1319,10 @@ function App() {
                   </Box>
                 </Box>
               ))} 
-                <Box>
-                  <Link to={`feedback`} style={{ color: 'inherit', textDecoration: 'none' }}>
+              <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:10 }}>&gt;_Wrapping Up</Heading>
+                <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(136px, 136px))', gap: '15px', alignItems: 'start', justifyContent: 'start'}}>
+                  <Link to='feedback' style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                       <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
                         <label>Give Feedback</label>
@@ -1324,13 +1330,22 @@ function App() {
                       </Flex>
                     </ChallengeButton>
                   </Link>
+                <Link to='links' style={{ color: 'inherit', textDecoration: 'none' }}>
+                  <ChallengeButton size="1" variant="outline">
+                    <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                      <label>Useful Links</label>
+                      <div><Link2Icon width="27" height="27" /></div>
+                    </Flex>
+                  </ChallengeButton>
+                </Link>  
                 </Box>
+              </Box>
             </Flex>
             <Flex direction='column' gap='3' style={{ flex: 1 }}>
               <Box style={{ flex: 1, border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 30px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Readme</Heading>
                 <Box>
-                    <Readme />
+                    <Readme file="README.md"/>
                 </Box>
               </Box>
             </Flex>
@@ -1599,9 +1614,10 @@ function App() {
             <FeedbackApp host={window.location.origin} cookie={getCookie('csrftoken')} />
           </div>
           } />
-            
+          <Route path={`/links`} element={
+            <LinksPage/>
+          } />
           <Route path="*" element={<NotFound />} />
-          
         </Routes>
       </Router>
       </Theme>

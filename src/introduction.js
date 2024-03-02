@@ -79,6 +79,7 @@ class Introduction extends React.Component {
               </Box>
           </Grid>
         </Box>
+        {console.log(this.state.showContent)}
         {this.props.taskId !== 0 && (
           <Box style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', height: window.innerHeight-52, padding: '30px 300px' }}>
             {this.state.content.length > 0 ? (
