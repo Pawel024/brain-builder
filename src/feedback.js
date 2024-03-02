@@ -111,7 +111,7 @@ const FeedbackForm = ({ questions, host }) => {
   );
 };
   
-function FeedbackApp() {
+function FeedbackApp({ host }) {
 
   // ------- WINDOW RESIZING -------
 
@@ -136,7 +136,7 @@ function FeedbackApp() {
   }, []);
 
 
-  // ------- ACTUAL QUIZ -------
+  // ------- ACTUAL FORM -------
 
   const [questions, setQuestions] = useState([
     {
@@ -212,7 +212,7 @@ function FeedbackApp() {
     }));
   }, [questions]);
 
-  return <FeedbackForm questions={questions} host={this.props.host} />;
+  return <FeedbackForm questions={questions} host={host} />;
 }
 
 export default FeedbackApp;
