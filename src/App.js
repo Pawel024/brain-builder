@@ -1300,6 +1300,16 @@ function App() {
                   </Box>
                 </Box>
               ))} 
+                <Box>
+                  <Link to={`feedback`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <ChallengeButton size="1" variant="outline">
+                      <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
+                        <label>Feedback</label>
+                        <div><Pencil2Icon width="27" height="27" /></div>
+                      </Flex>
+                    </ChallengeButton>
+                  </Link>
+                </Box>
             </Flex>
             <Flex direction='column' gap='3' style={{ flex: 1 }}>
               <Box style={{ flex: 1, border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 30px' }}>
