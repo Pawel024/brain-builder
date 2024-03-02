@@ -927,14 +927,14 @@ function App() {
       }
     };
 
-    function cancelRequest(taskId) {
-      var userId = getCookie('user_id');
-      ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
-      if (ws && ws.readyState !== WebSocket.CLOSED) {
+    function cancelRequest(taskId, index) {
+      const userId = getCookie('user_id');
+      const ws_to_cancel = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
+      if (ws_to_cancel && ws.readyState !== WebSocket.CLOSED) {
         let message = {'title': 'cancel'};
-        ws.send(JSON.stringify(message));
+        ws_to_cancel.send(JSON.stringify(message));
   
-        ws.close();
+        ws_to_cancel.close();
       }
       clearTimeout(timeoutId);
       setIsTraining(prevIsTraining => {
