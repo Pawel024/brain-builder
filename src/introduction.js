@@ -50,6 +50,53 @@ class Introduction extends React.Component {
     render () { return(
     <Theme accentColor="cyan" grayColor="slate" panelBackground="solid" radius="large" appearance='light'>
         <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
+          <Grid columns='3' mt='1'>
+          <Box ml='3' style={{display:"flex"}}>  
+              <Link to="/">
+                  <IconButton aria-label="navigate to home" width='auto' height='21' style={{ marginLeft: 'auto', color: 'inherit', textDecoration: 'none' }}>
+                  <HomeIcon color="white" width='auto' height='18' style={{ marginTop: 2 }} />
+                  </IconButton>
+              </Link>
+              </Box>
+              <Link to={window.location.origin} style={{ textDecoration: 'none' }}>
+              <Heading as='h1' align='center' size='6' style={{ color: 'var(--gray-1)', marginTop: 2, marginBottom: 0, textDecoration: 'none', fontFamily:'monospace, Courier New, Courier' }}>brAIn builder</Heading>
+              </Link>
+              <Box align='end' mr='3' >
+              <Link to="https://www.tudelft.nl/en/" target="_blank" style={{ textDecoration: 'none'}}>
+                  <img src={tu_delft_pic} alt='Tu Delft Logo' width='auto' height='30'/>
+              </Link>
+              </Box>
+          </Grid>
+        </Box>
+        {this.props.taskId !== 0 && (
+          <Box style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', height: window.innerHeight-52, padding: '30px 300px' }}>
+            {this.state.content.length > 0 ? (
+              <Flex direction="column" gap="3" style={{ width: '100%', height: '100%'}}>
+                {this.state.content.map(([subtitle, text], index) => (
+                  <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px', textAlign: 'justify' }}>
+                    <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign:"center" }}>&gt;_{subtitle} </Heading>
+                    <p>{text}</p>
+                  </Box>
+                ))}
+              </Flex>
+            ) : (
+              <div style={{ textAlign:'justify' }}>
+                <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Key Concepts </Heading>
+                {this.state.printedContent}
+              </div>
+            )}
+          </Box>
+        )}
+    </Theme>
+    )}
+}
+
+export default Introduction;
+
+
+/*
+<Theme accentColor="cyan" grayColor="slate" panelBackground="solid" radius="large" appearance='light'>
+        <Box py="2" style={{ backgroundColor: "var(--cyan-10)"}}>
         <Grid columns='3' mt='1'>
         <Box ml='3' style={{display:"flex"}}>  
             <Link to="/">
@@ -123,7 +170,4 @@ class Introduction extends React.Component {
           </Box>
         )}
     </Theme>
-    )}
-}
-
-export default Introduction;
+*/
