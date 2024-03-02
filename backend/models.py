@@ -105,3 +105,6 @@ class Quiz(models.Model):
 
     def __str__(self):
         return str(self.quiz_id)
+
+class Feedback(models.Model):
+    feedback = models.JSONField()

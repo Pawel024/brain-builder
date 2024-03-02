@@ -617,7 +617,7 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
             target = np.array([target], dtype=int).reshape(-1, 1)
         else:
             target = self.targets[idx]
-            target = np.array([target], dtype=int).reshape(-1, self.n_targets)
+            target = np.array([target], dtype=float).reshape(-1, self.n_targets)
         dat = self.data[idx, :]
         dat = np.array([dat], dtype=float).reshape(-1, self.n_features)
         sample = {'data': dat, 'target': target}

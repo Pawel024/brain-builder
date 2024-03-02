@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Row, TaskDescription, Progress, Quiz, Intro
+from .models import Row, TaskDescription, Progress, Quiz, Intro, Feedback
 
 class RowSerializer(serializers.ModelSerializer):
     class Meta:
@@ -32,3 +32,8 @@ class QuizSerializer(serializers.ModelSerializer):
             'question_4', 'code_4', 'option_4_a', 'option_4_b', 'option_4_c', 'option_4_d', 'answer_4',
             'question_5', 'code_5', 'option_5_a', 'option_5_b', 'option_5_c', 'option_5_d', 'answer_5',
         ]
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = ['feedback']
