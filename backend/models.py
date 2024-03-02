@@ -108,3 +108,7 @@ class Quiz(models.Model):
 
 class Feedback(models.Model):
     feedback = models.JSONField()
+    timestamp = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.timestamp)
