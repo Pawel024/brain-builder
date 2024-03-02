@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import { Theme, Box, Grid, Heading, IconButton, Flex, Button, Separator } from '@radix-ui/themes';
-import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
+import { ChevronDownIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 import { Link } from 'react-router-dom';
 import { HomeIcon } from '@radix-ui/react-icons';
 import tu_delft_pic from "./tud_black_new.png";
@@ -14,6 +14,7 @@ class Introduction extends React.Component {
         super(props);
         this.state = {
           content: [],
+          showContent: [],
           printedContent: '',
           currentSlide: 0,
         }
@@ -22,6 +23,16 @@ class Introduction extends React.Component {
     goToSlide = (index) => {
       this.setState({ currentSlide: index });
       console.log("Going to slide " + index)
+    };
+
+    handleshowContent = (index, expand) => {
+      if (expand) {
+        //set showContent[index] to true hence expand the content
+        this.setState({ showContent: this.state.showContent.map((value, i) => i === index ? true : value) });
+      } else {
+        //set showContent[index] to false hence collapse the content
+        this.setState({ showContent: this.state.showContent.map((value, i) => i === index ? false : value) });
+      }
     };
 
     typeWriter = (txt, speed=15, i=0) => {
@@ -35,7 +46,7 @@ class Introduction extends React.Component {
         axios.get(window.location.origin + '/api/intros/?intro_id=' + this.props.introId)
         .then(response => {
         if (response.data.content[0] === '[') {
-            this.setState({ content: JSON.parse(response.data.content) });
+            this.setState({ content: JSON.parse(response.data.content), showContent: Array(JSON.parse(response.data.content).length).fill(false) });
             console.log("Attempting to set the array")
         } else {
             this.typeWriter(response.data.content);  // this works
@@ -74,8 +85,13 @@ class Introduction extends React.Component {
               <Flex direction="column" gap="3" style={{ width: '100%', height: '100%'}}>
                 {this.state.content.map(([subtitle, text], index) => (
                   <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px', textAlign: 'justify' }}>
-                    <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign:"center" }}>&gt;_{subtitle} </Heading>
-                    <p>{text}</p>
+                    <Box style={{ display: 'flex' }}>
+                      <Heading as='h2' size='5' style={{ flexBasis: '80%', color: 'var(--slate-12)', marginBottom:7, textAlign: 'start' }}>&gt;_{subtitle} </Heading>
+                      <IconButton style={{ flexBasis: '20%' }} onClick={ this.state.showContent[index] ? () => this.handleshowContent(index, true) : () => this.handleshowContent(index, false)}>
+                        { this.state.showContent[index] ? (<ChevronRightIcon/>) : (<ChevronDownIcon/>) }
+                      </IconButton>
+                    </Box>
+                    { this.state.showContent[index] && (<p>{text}</p>)}
                   </Box>
                 ))}
               </Flex>
