@@ -768,6 +768,9 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
                 Z = Z.reshape(mesh[0].shape)
 
                 ax.contourf(mesh[0], mesh[1], Z, alpha=0.5)
+
+                ax.set_xlabel("Feature 1")
+                ax.set_ylabel("Feature 2")
         
         elif self.data_type == 2:
             if self.n_features == 1 and self.n_targets == 1:
@@ -785,10 +788,11 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
 
                 ax.plot(inp, Z, color=(185/255,38/255,4/255))
 
+                ax.set_xlabel("Feature")
+                ax.set_ylabel("Target")
 
-        ax.scatter(self.data[:, self.feature_names[0]], self.data[:, self.target_names[0]])
-        ax.set_xlabel(self.feature_names[0].replace('_', ' '))
-        ax.set_ylabel(self.target_names[0].replace('_', ' '))
+
+        ax.scatter(self.data[:, 0], self.data[:, 1])
         img = BytesIO()
         fig.tight_layout()
         fig.savefig(img, format='png')
