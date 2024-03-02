@@ -543,7 +543,7 @@ class Building extends React.Component {
           {console.log("type of isTraining: ", typeof(this.props.isTraining))}
           <IconButton
             onClick={
-              this.props.taskId !== 0 ? (this.props.isTraining === 1 ? () => {} : 
+              this.props.taskId !== 0 ? (this.props.isTraining === 1 ? () => {this.props.cancelRequest(this.props.taskId)} : 
               (event) => this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs, this.props.normalization) 
               ) : () => {}
             }
@@ -551,7 +551,7 @@ class Building extends React.Component {
             style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.92 * (window.innerHeight-140)), left: Math.round(0.835 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.12 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}
             disabled = { (this.props.iterationsSliderVisibility && !this.props.iterations) || (this.props.lrSliderVisibility && !this.props.learningRate) }>
               <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
-                <PlayIcon width="18" height="18" />{this.props.isTraining === 1 ? "Cancel" : "Start training!"}
+                {this.props.isTraining === 1 ? "Cancel" : (<><PlayIcon width="18" height="18" />Start training!</>)}
               </Flex>
           </IconButton>
           </Box>
