@@ -12,7 +12,7 @@ import a11yDark from './a11y-dark';
 
 const FeedbackForm = ({ questions, host }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [isQuizFinished, setIsQuizFinished] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
   const [progress, setProgress] = useState(0);
   const [textInputValue, setTextInputValue] = useState("");
   const [selectedOption, setSelectedOption] = useState(null);
@@ -48,13 +48,12 @@ const FeedbackForm = ({ questions, host }) => {
     if (nextQuestion < questions.length) {
       setCurrentQuestion(nextQuestion);
     } else {
-      setIsQuizFinished(true);
+      setIsFinished(true);
     }
   };
 
-  useEffect((event) => {
-    if (isQuizFinished) {
-    event.preventDefault();
+  useEffect(() => {
+    if (isFinished) {
     axios.post(host + '/api/feedback', { feedback })
       .then(response => {
         console.log(response);
@@ -63,12 +62,11 @@ const FeedbackForm = ({ questions, host }) => {
         console.error(error);
       });
     }
-  }, [isQuizFinished]);
+  }, [isFinished]);
 
   return (
     <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: window.innerHeight-52, fontFamily: 'monospace', backgroundImage: 'linear-gradient(330deg, rgba(7,62,185, 0.15) 0%, rgba(7,185,130, 0.15) 100%)'}}>
-      isQuizFinished ? (
-        <Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", width:window.innerWidth/3, padding: '30px 50px', background:"solid", backgroundColor:"white" }}>
+      {isFinished ? (<Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", width:window.innerWidth/3, padding: '30px 50px', background:"solid", backgroundColor:"white" }}>
           <Flex gap="1" direction="column" style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Heading size='2' style={{ color: 'var(--slate-12)', marginBottom:25 }}>
               Thank you for your feedback!
@@ -76,8 +74,7 @@ const FeedbackForm = ({ questions, host }) => {
             <CheckCircledIcon color="green" width="30" height="30" />
           </Flex>
         </Box>
-      ) : (
-      <Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", width:window.innerWidth/3, padding: '30px 50px', background:"solid", backgroundColor:"white" }}>
+      ) : (<Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", width:window.innerWidth/3, padding: '30px 50px', background:"solid", backgroundColor:"white" }}>
         <Flex gap="1" direction="column" style={{ justifyContent: 'center', alignItems: 'center' }}>
           <Progress.Root className="ProgressRoot" value={progress} style={{ marginBottom:5 }}>
             <Progress.Indicator
@@ -119,7 +116,7 @@ const FeedbackForm = ({ questions, host }) => {
           </Flex>
         </form>
       </Box>
-      )
+      )}
     </Box>
   );
 };

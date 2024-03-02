@@ -754,7 +754,7 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
         ax = fig.subplots(1, 1)
 
         if self.data_type == 1:
-            step = 0.05
+            step = 0.1
             if self.n_features < 3 and self.n_targets < 5:
                 if self.normalization:
                     mesh = np.meshgrid(*self.n_features * [np.arange(-0.1, 1.1, step)])
@@ -810,6 +810,9 @@ class DataFromFunction(Dataset):  # this one is for one to one regression on sim
         self.data = np.random.rand(self.n_objects) * (upper - lower) + lower
 
         self.targets = self.function(self.data) + np.random.normal(0, noise, self.n_objects)
+        # delete any NaNs
+        self.data = self.data[~np.isnan(self.targets)]
+        self.targets = self.targets[~np.isnan(self.targets)]
 
         self.feature_names = ['x']
         self.target_names = ['y']
@@ -826,7 +829,7 @@ class DataFromFunction(Dataset):  # this one is for one to one regression on sim
                                         (self.target_maxima - self.target_minima))
 
         self.images = []
-        self.plot_data()  # uncomment if you want plots of the data; they will be saved in plt_dir
+        self.plot_data()  
 
     def __len__(self):
         return self.n_objects
@@ -844,7 +847,7 @@ class DataFromFunction(Dataset):  # this one is for one to one regression on sim
 
         return sample
 
-    # adding some extra functions
+    # some extra functions
 
     def normalize(self, x):
         assert len(x) == 1 or type(x) is float
@@ -923,5 +926,5 @@ class DataFromFunction(Dataset):  # this one is for one to one regression on sim
         fig.tight_layout()
         fig.savefig(img, format='png')
         img.seek(0)
-        self.images.append(img.getvalue())
+        self.images[-1] = img.getvalue()
         fig.clear()

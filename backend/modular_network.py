@@ -103,6 +103,10 @@ class BuildNetwork(torch.nn.Module):
                 output = self(X.float().view(-1, self.input[0][0]))
                 if typ == 2:  # regression
                     for idx, out in enumerate(output):
+                        if type(out) != torch.Tensor:
+                            out = torch.tensor([out])
+                        if torch.isnan(out).any():
+                            print("NaN in output: ", out, " at index ", idx)
                         mse += torch.square(out - y[idx].float()).mean()
                         ys = torch.cat((ys, y[idx]), dim=0)
                         total += 1
