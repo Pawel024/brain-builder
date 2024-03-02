@@ -425,7 +425,7 @@ class Building extends React.Component {
               
               <img src={color_scale_pic} alt='Color scale from purple for negative to red for positive' width='20' height='auto' style={{ position: 'absolute', top: 15, left: 15 }}/>
 
-              {((this.props.taskId < 20 && this.props.img && this.props.img !== '' && this.props.isTraining===1) &&
+              {((this.props.imageVisibility && this.props.img && this.props.img !== '' && this.props.isTraining===1) &&
                 <Flex direction="column" gap="1" style={{ position: 'absolute', bottom: window.innerHeight*0.2, left: window.innerWidth*0.45 }}>
                 <img src={this.props.img} alt={`No plots yet`} onLoad={() => {}/*URL.revokeObjectURL(this.props.img)*/} style={{ height: '200px', width: 'auto' }}/>
                 {this.props.taskId === 11 && (

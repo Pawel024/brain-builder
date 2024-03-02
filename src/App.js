@@ -353,6 +353,7 @@ function App() {
   const [normalizationVisibility, setNormalizationVisibility] = useState([false]);
   const [iterationsSliderVisibility, setIterationsSliderVisibility] = useState([false]);
   const [lrSliderVisibility, setLRSliderVisibility] = useState([false]);
+  const [imageVisibility, setImageVisibility] = useState([false]);
   const [cytoLayers, setCytoLayers] = useState([]);
   const [isTraining, setIsTraining] = useState([]);
   const [apiData, setApiData] = useState([]);
@@ -417,6 +418,7 @@ function App() {
         setNormalizationVisibility(currentTaskData.map(entry => entry.normalization_visibility));
         setIterationsSliderVisibility(currentTaskData.map(entry => entry.iterations_slider_visibility));
         setLRSliderVisibility(currentTaskData.map(entry => entry.lr_slider_visibility));
+        setImageVisibility(currentTaskData.map(entry => entry.image_visibility));
         setCytoLayers(currentTaskIds.map(() => []));
         setIsTraining(currentTaskIds.map(() => false));
         setApiData(currentTaskIds.map(() => null));
@@ -1430,6 +1432,7 @@ function App() {
                   normalizationVisibility={normalizationVisibility[index]}
                   iterationsSliderVisibility={iterationsSliderVisibility[index]}
                   lrSliderVisibility={lrSliderVisibility[index]}
+                  imageVisibility={imageVisibility[index]}
                   setProgress={setProgress}
                   setErrorList={setErrorList}
                   setWeights={setWeights}
@@ -1492,10 +1495,12 @@ function App() {
                   normalizationVisibility={normalizationVisibility[index]}
                   iterationsSliderVisibility={iterationsSliderVisibility[index]}
                   lrSliderVisibility={lrSliderVisibility[index]}
+                  imageVisibility={imageVisibility[index]}
                   setProgress={setProgress}
                   setErrorList={setErrorList}
                   setWeights={setWeights}
                   setBiases={setBiases}
+                  cancelRequest={cancelRequestRef.current}
                 />
                 </>
               }

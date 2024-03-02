@@ -28,9 +28,10 @@ class TaskDescription(models.Model):
     max_epochs = models.IntegerField()
     max_layers = models.IntegerField()
     max_nodes = models.IntegerField()
-    normalization_visibility = models.BooleanField()
     iterations_slider_visibility = models.BooleanField()
     lr_slider_visibility = models.BooleanField()
+    normalization_visibility = models.BooleanField()
+    decision_boundary_visibility = models.BooleanField()
 
     def __str__(self):
         return str(self.task_id) + " - " + str(self.name)
