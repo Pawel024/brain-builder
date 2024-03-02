@@ -941,7 +941,7 @@ function App() {
     };
 
     function cancelRequest() {
-      if (ws && ws.readyState !== WebSocket.CLOSED) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
         let message = {'title': 'cancel'};
         ws.send(JSON.stringify(message));
   

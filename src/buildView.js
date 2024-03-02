@@ -329,46 +329,44 @@ class Building extends React.Component {
             {this.state.description.length > 0 ? (
               <>
               <Flex direction="row" gap="2" style={{ height: '100%'}}>
-              <Flex direction="column" gap="2" style={{ flexbasis: '67%', height: '100%'}}>
               <Box style={{ flexBasis: '50%', display: 'flex', justifyContent:"center", alignItems:"center" }}>
-              <Slider key={this.state.currentSlide} classNames={horizontalCss} infinite={false} slideIndex={this.state.currentSlide}
-              previousButton={
-                <ChevronLeftIcon
-                  style={{ color: 'var(--slate-9)', width:64, height:64 }}
-                  onClick={() => {
-                    const prevSlide = this.state.currentSlide - 1;
-                    if (prevSlide >= 0) {
-                      this.setState({ currentSlide: prevSlide });
-                    }
-                }}/>}
-                nextButton={
-                  <ChevronRightIcon
-                    style={{ color: 'var(--slate-9)', width:64, height:64 }}
-                    onClick={() => {
-                      const nextSlide = this.state.currentSlide + 1;
-                      if (nextSlide < this.state.description.length) {
-                        this.setState({ currentSlide: nextSlide });
-                      }
-                  }}/>}
-              >
-                {this.state.description.map(([subtitle, ...paragraphs], index) => (
-                  <div key={index} className="slide-container">
-                    <div className="slide-content">
-                      <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign:"center" }}>&gt;_{subtitle} </Heading>
-                      {paragraphs.map((paragraph, pIndex) => (
-                        <p key={pIndex} dangerouslySetInnerHTML={{ __html: paragraph }}></p>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </Slider>
-                <Box style={{ flexbasis: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
-                  <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}}/>
-                </Box>
+                <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}}/>
               </Box>
-              </Flex>
-              <Box style={{ flexBasis: '33%', padding: '0px 90px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
+              <Box style={{ flexBasis: '50%', padding: '0px 90px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
                 <Flex direction="column" gap="2" style={{ justifyContent:"center", alignItems:"center", width:"100%" }}>
+                  <Box style={{ marginBottom: 50 }}>
+                    <Slider key={this.state.currentSlide} classNames={horizontalCss} infinite={false} slideIndex={this.state.currentSlide}
+                      previousButton={
+                        <ChevronLeftIcon
+                          style={{ color: 'var(--slate-9)', width:64, height:64 }}
+                          onClick={() => {
+                            const prevSlide = this.state.currentSlide - 1;
+                            if (prevSlide >= 0) {
+                              this.setState({ currentSlide: prevSlide });
+                            }
+                        }}/>}
+                      nextButton={
+                        <ChevronRightIcon
+                          style={{ color: 'var(--slate-9)', width:64, height:64 }}
+                          onClick={() => {
+                            const nextSlide = this.state.currentSlide + 1;
+                            if (nextSlide < this.state.description.length) {
+                              this.setState({ currentSlide: nextSlide });
+                            }
+                        }}/>}
+                    >
+                      {this.state.description.map(([subtitle, ...paragraphs], index) => (
+                        <div key={index} className="slide-container">
+                          <div className="slide-content">
+                            <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign:"center" }}>&gt;_{subtitle} </Heading>
+                            {paragraphs.map((paragraph, pIndex) => (
+                              <p key={pIndex} dangerouslySetInnerHTML={{ __html: paragraph }}></p>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </Slider>
+                  </Box>
                   {this.state.description.map(([subtitle, text], index) => (
                     <Button variant="outline" style={{ width:"100%"}} pressed={this.state.currentSlide === index} onClick={() => this.goToSlide(index)}>{subtitle}</Button>
                   ))}
