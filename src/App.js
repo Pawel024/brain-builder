@@ -419,7 +419,7 @@ function App() {
         setNormalizationVisibility(currentTaskData.map(entry => entry.normalization_visibility));
         setIterationsSliderVisibility(currentTaskData.map(entry => entry.iterations_slider_visibility));
         setLRSliderVisibility(currentTaskData.map(entry => entry.lr_slider_visibility));
-        setImageVisibility(currentTaskData.map(entry => entry.image_visibility));
+        setImageVisibility(currentTaskData.map(entry => entry.decision_boundary_visibility));
         setCytoLayers(currentTaskIds.map(() => []));
         setIsTraining(currentTaskIds.map(() => false));
         setApiData(currentTaskIds.map(() => null));
