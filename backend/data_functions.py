@@ -759,7 +759,7 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
                 if self.normalization:
                     mesh = np.meshgrid(*self.n_features * [np.arange(-0.1, 1.1, step)])
                 else:
-                    mesh = np.meshgrid(*[np.arange(mini-mini*step, maxi+maxi*step, step) for mini, maxi in zip(self.minima, self.maxima)])
+                    mesh = np.meshgrid(*[np.arange(mini-abs(mini)*step, maxi+abs(maxi)*step, step) for mini, maxi in zip(self.minima, self.maxima)])
                 
                 # Plot the decision boundary. For that, we will assign a color to each
                 # point in the mesh.
@@ -769,6 +769,7 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
                 Z = Z.reshape(mesh[0].shape)
 
                 ax.contourf(mesh[0], mesh[1], Z, alpha=0.5)
+                ax.scatter(self.data[:, 0], self.data[:, 1], c=self.targets)
 
                 ax.set_xlabel("Feature 1")
                 ax.set_ylabel("Feature 2")
@@ -788,12 +789,12 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
                 Z = Z[:, 0]
 
                 ax.plot(inp, Z, color=(185/255,38/255,4/255))
+                ax.scatter(self.data[:, 0], self.targets[:, 0])
 
                 ax.set_xlabel("Feature")
                 ax.set_ylabel("Target")
 
 
-        ax.scatter(self.data[:, 0], self.data[:, 1])
         img = BytesIO()
         fig.tight_layout()
         fig.savefig(img, format='png')
