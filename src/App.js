@@ -827,8 +827,10 @@ function App() {
               timeout: pendingTime
             }).catch((error) => {
                 console.log(error);
-                cancelRequest();
-                alert("An axios error occurred. Please try again. If the problem persists, please contact us.");
+                if (!axios.isCancel(error) && error.code !== 'ECONNABORTED') {
+                  cancelRequest();
+                  alert("An axios error occurred. Please try again. If the problem persists, please contact us.");
+                }
           });
         } else {
             // If the record does not exist, throw an error
@@ -845,8 +847,10 @@ function App() {
               timeout: pendingTime
             }).catch((error) => {
                 console.log(error);
-                cancelRequest();
-                alert("An axios error occurred. Please try again. If the problem persists, please contact us.");
+                if (!axios.isCancel(error) && error.code !== 'ECONNABORTED') {
+                  cancelRequest();
+                  alert("An axios error occurred. Please try again. If the problem persists, please contact us.");
+                }
             })
           } else {
             cancelRequest();
