@@ -86,12 +86,12 @@ class CustomBlock extends Component {
     render() {
         const texts = {
             11: [
-                ["Background",
-                "The nodes of a neural network are based on the perceptron: a simple model which takes a number of inputs, *multiplies* each with a weight and then *adds* a bias. When we visualize this, we get a linear function  - like the one on the right. You might notice this makes a neuron a very simple mathematical operation, and that is correct! In fact, a whole neural network is just a big function composed of a lot of simple perceptrons."],
+                ["Perceptrons",
+                "The buidling block of a neural network is the 'perceptron', also called 'neuron' or 'node': a simple model which takes a number of inputs, *multiplies* each with a weight and then *adds* a bias. When we visualize this, we get a simple linear function like the one on the right. Note that this is a simplified version of the perceptron: many variations exist."],
                 ["Your Task",
-                "Your task here is quite simple: try to set the parameters of a neuron in such a way that the function best matches the data. This is actually just a linear regression, since the output of a single neuron will always be linear."],
+                "Your task here is quite simple: try to set the parameters of the perceptron in such a way that the function best matches the data. This is actually just a linear regression, since the output of a single perceptron will always be linear."],
                 ["The Data",
-                "The data is generated along a line, with some random noise added."],
+                "The data consists of points generated along a line, with some random noise added."],
             ]
         }
 

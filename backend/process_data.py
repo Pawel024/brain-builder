@@ -68,7 +68,7 @@ async def process(req):
     elif req['action'] == 1:  # create and train a network
         d, u = {}, {}
         errors = []
-        epochs, learning_rate, normalization = int(req['epochs']), float(req['learning_rate']), bool(req['normalization'])
+        epochs, learning_rate, normalization, af = int(req['epochs']), float(req['learning_rate']), bool(req['normalization']), bool(req['activations_on'])
         input_list = ((learning_rate, epochs, normalization), json.loads(req['network_input']))  # TODO: remove the learning rate and epochs from this path
         tag = int(req['task_id'])
 
@@ -81,7 +81,7 @@ async def process(req):
             data = None
             print("No data in cache, about to load it")
 
-        network, data, training_set, test_set = building.build_nn(input_list, tag, data)
+        network, data, training_set, test_set = building.build_nn(input_list, tag, dat=data, af=af)
         print("Network initiated, starting training")
         d['title'] = 'progress'
         d['progress'] = 0  # just update the progress

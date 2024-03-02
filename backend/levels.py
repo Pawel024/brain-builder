@@ -35,7 +35,7 @@ def find_type(tag):
     return games.loc[tag, 'type']
 
 
-def convert_input(lst, tag):
+def convert_input(lst, tag, af=True):
     # basic settings
     other, nodes = lst
     structure = [[nodes[0]]]
@@ -51,6 +51,11 @@ def convert_input(lst, tag):
         structure[-1][2] = 'Softmax'
     elif games.loc[tag, 'type'] == 2:
         structure[-1][2] = ''
+
+    # modifications depending on activation setting
+    if not af:
+        for x in structure:
+            x[2] = ''
 
     return structure, learning_rate, epochs, normalization
 

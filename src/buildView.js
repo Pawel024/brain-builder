@@ -507,8 +507,16 @@ class Building extends React.Component {
             </Flex>
           </Text>):(<div></div>)}
 
+          {this.props.afVisibility ? (
+          <Text as="label" size="2">
+            <Flex style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)-20), left: Math.round(0.7 * (window.innerWidth * 0.97)), width: Math.round(0.27 * (window.innerWidth * 0.97)), justifyContent:"flex-start", alignItems:"flex-start"}} gap="2">          
+              <Checkbox disabled = { this.props.isTraining===1 } onChange={ (event) => {this.props.setAf(this.props.index, event.target.checked)}} checked={this.props.af} />
+              Enable activation functions
+            </Flex>
+          </Text>):(<div></div>)}
+
           {/* make the position of the box shift down if normalization is true */}
-          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)) + (this.props.normalizationVisibility ? 30 : 0), left: Math.round(0.7 * (window.innerWidth * 0.97)), alignItems: 'center', justifyContent: 'start', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
+          <Box style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)) + ((this.props.normalizationVisibility || this.props.afVisibility) ? 30 : 0), left: Math.round(0.7 * (window.innerWidth * 0.97)), alignItems: 'center', justifyContent: 'start', height: '100vh', fontSize: '14px', color: 'var(--slate-11)' }}>
             <div id="/api-data">
               {this.props.isTraining===2 ? (
                 <Flex direction='column' >
@@ -539,7 +547,7 @@ class Building extends React.Component {
           <IconButton
             onClick={
               this.props.taskId !== 0 ? (this.props.isTraining === 1 ? () => {this.props.cancelRequest(this.props.taskId, this.props.index)} : 
-              (event) => this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs, this.props.normalization) 
+              (event) => this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs, this.props.normalization, this.props.af) 
               ) : () => {}
             }
             variant="solid"

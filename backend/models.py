@@ -4,7 +4,7 @@ class Row(models.Model):
     action = models.IntegerField()
     user_id = models.CharField(max_length=100)
     task_id = models.IntegerField()
-    progress_pk = models.IntegerField(null=True)
+    activations_on = models.BooleanField(default=True)
     learning_rate = models.FloatField(max_length=10)
     epochs = models.IntegerField()
     normalization = models.BooleanField()
@@ -31,6 +31,7 @@ class TaskDescription(models.Model):
     iterations_slider_visibility = models.BooleanField()
     lr_slider_visibility = models.BooleanField()
     normalization_visibility = models.BooleanField()
+    af_visibility = models.BooleanField(default=False)
     decision_boundary_visibility = models.BooleanField()
 
     def __str__(self):

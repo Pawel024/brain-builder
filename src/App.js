@@ -200,7 +200,6 @@ function App() {
     var csrftoken = getCookie('csrftoken');
 
     normalization = false;  // TODO: make this an actual variable
-    if (taskId === 11) {normalization = false}
 
     const dataData = {
       action: 0,
@@ -209,7 +208,8 @@ function App() {
       progress_pk: null,
       learning_rate: 0,
       epochs: 0,
-      normalization: normalization, // TODO: replace this with the actual normalization value
+      normalization: normalization, 
+      activations_on: true,
       network_input: JSON.stringify([]),
       games_data: gamesData,
     };
@@ -352,6 +352,8 @@ function App() {
   const [maxNodes, setMaxNodes] = useState([]);
   const [normalization, setNormalization] = useState([true]);
   const [normalizationVisibility, setNormalizationVisibility] = useState([false]);
+  const [afs, setAfs] = useState(Array(taskIds.length).fill(true));
+  const [afVisibility, setAfVisibility] = useState([false]);
   const [iterationsSliderVisibility, setIterationsSliderVisibility] = useState([false]);
   const [lrSliderVisibility, setLRSliderVisibility] = useState([false]);
   const [imageVisibility, setImageVisibility] = useState([false]);
@@ -375,6 +377,14 @@ function App() {
   // this is for the intros
   const [introIds, setIntroIds] = useState([]);
   const [introData, setIntroData] = useState([]);
+
+  function setAf(index, value) {
+    setAfs(prevAfs => {
+      const newAfs = [...prevAfs];
+      newAfs[index] = value;
+      return newAfs;
+    });
+  };
 
   // ------- CYTOSCAPE EDITING -------
   const [loadedTasks, setLoadedTasks] = useState(false);
@@ -417,6 +427,7 @@ function App() {
         setWeights(currentWeights);
         setTaskNames(currentTaskNames);
         setNormalizationVisibility(currentTaskData.map(entry => entry.normalization_visibility));
+        setAfVisibility(currentTaskData.map(entry => entry.af_visibility));
         setIterationsSliderVisibility(currentTaskData.map(entry => entry.iterations_slider_visibility));
         setLRSliderVisibility(currentTaskData.map(entry => entry.lr_slider_visibility));
         setImageVisibility(currentTaskData.map(entry => entry.decision_boundary_visibility));
@@ -717,7 +728,7 @@ function App() {
 
 
   // ------- POST REQUEST -------
-  const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs, normalization) => {
+  const putRequest = (e, cytoLayers, apiData, setApiData, setAccuracy, setIsTraining, learningRate, iterations, taskId, index, nOfInputs, nOfOutputs, normalization, af) => {
     e.preventDefault();
     if (!learningRate) {learningRate = 0.01};  // set learning rate to default if it's undefined
     if (!iterations) {iterations = 50};  // set learning rate to default if it's undefined
@@ -725,6 +736,11 @@ function App() {
     if (taskId === 11){
       learningRate = 0.0005;
       normalization = false;
+      af = false;
+    }
+    if (taskId === 12){
+      normalization = false;
+      af = false;
     }
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
@@ -773,6 +789,7 @@ function App() {
       learning_rate: parseFloat(learningRate),
       epochs: iterations,
       normalization: normalization,
+      activations_on: af,
       network_input: JSON.stringify(cytoLayers),
       games_data: gamesData,  
     };
@@ -1304,7 +1321,7 @@ function App() {
                   <Link to={`feedback`} style={{ color: 'inherit', textDecoration: 'none' }}>
                     <ChallengeButton size="1" variant="outline">
                       <Flex gap="2" style={{ flexDirection: "column", alignItems: "center"}}>
-                        <label>Feedback</label>
+                        <label>Give Feedback</label>
                         <div><Pencil2Icon width="27" height="27" /></div>
                       </Flex>
                     </ChallengeButton>
@@ -1370,6 +1387,8 @@ function App() {
               loadData={null}
               normalization={null}
               normalizationVisibility={true}
+              af={null}
+              afVisibility={true}
               iterationsSliderVisibility={true}
               lrSliderVisibility={true}
               initPlot={null}
@@ -1439,8 +1458,11 @@ function App() {
                   img={imgs[index]}
                   initPlot={initPlots[index]}
                   loadData={loadData}
-                  normalization={true}
+                  normalization={false}
                   normalizationVisibility={normalizationVisibility[index]}
+                  af={afs[index]}
+                  setAf={setAf}
+                  afVisibility={afVisibility[index]}
                   iterationsSliderVisibility={iterationsSliderVisibility[index]}
                   lrSliderVisibility={lrSliderVisibility[index]}
                   imageVisibility={imageVisibility[index]}
@@ -1502,8 +1524,11 @@ function App() {
                   img={imgs[index]}
                   initPlot={initPlots[index]}
                   loadData={loadData}
-                  normalization={true}
+                  normalization={false}
                   normalizationVisibility={normalizationVisibility[index]}
+                  af={afs[index]}
+                  setAf={setAf}
+                  afVisibility={afVisibility[index]}
                   iterationsSliderVisibility={iterationsSliderVisibility[index]}
                   lrSliderVisibility={lrSliderVisibility[index]}
                   imageVisibility={imageVisibility[index]}
