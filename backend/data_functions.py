@@ -754,6 +754,7 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
         ax = fig.subplots(1, 1)
 
         if self.data_type == 1:
+            step = 0.1
             if self.n_features < 3 and self.n_targets < 5:
                 if self.normalization:
                     mesh = np.meshgrid(*self.n_features * [np.arange(-0.1, 1.1, step)])

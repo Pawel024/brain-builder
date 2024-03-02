@@ -97,13 +97,13 @@ class BuildNetwork(torch.nn.Module):
     def test(self, data, typ=1, acc=False):
         accuracy = None
         with torch.no_grad():
-            ys, mse, correct, total = torch.tensor([]), torch.tensor([self.input[-1][0]*[0.]]), 0, 0
+            ys, mse, correct, total = torch.tensor([]), 0, 0, 0
             for datapoint in data:
                 X, y = datapoint['data'], datapoint['target']
                 output = self(X.float().view(-1, self.input[0][0]))
                 if typ == 2:  # regression
                     for idx, out in enumerate(output):
-                        mse += torch.square(out - y[idx].float())
+                        mse += torch.square(out - y[idx].float()).mean()
                         ys = torch.cat((ys, y[idx]), dim=0)
                         total += 1
                 else:  # classification
