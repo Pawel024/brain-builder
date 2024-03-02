@@ -362,7 +362,7 @@ class Building extends React.Component {
                   </div>
                 ))}
               </Slider>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+                <div style={{ flexbasis: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
                   <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}}/>
                 </div>
               </Box>

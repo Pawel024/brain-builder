@@ -786,7 +786,7 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
                 ax.plot(inp, Z, color=(185/255,38/255,4/255))
 
 
-        ax.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.target_names[0]])
+        ax.scatter(self.data[:, self.feature_names[0]], self.data[:, self.target_names[0]])
         ax.set_xlabel(self.feature_names[0].replace('_', ' '))
         ax.set_ylabel(self.target_names[0].replace('_', ' '))
         img = BytesIO()
