@@ -1,6 +1,29 @@
 # Welcome to brAIn builder!
 
-This app was made in 2023 by two TU Delft students to support education in the course AE2224-II: Artificial Intelligence for Aerospace Engineering. Enjoy learning from it!
+This app was created in 2023 by two TU Delft students to support the course AE2224-II "Artificial Intelligence for Aerospace Engineering". 
+PLease know it is still in development and can contain bugs. 
+
+We look forward to your feedback!
+
+Laurens and Paweł
+
+## Want to learn more? 
+
+Here are some videos and websites we found very helpful when learning about neural networks:
+
+- Amazing video series (we're serious, please watch this): "The Basics of Neural Networks, and the Math Behind How They Learn", by 3blue1brown: https://www.3blue1brown.com/topics/neural-networks
+- Pretty visualisations: "Why Neural Networks Can Learn Almost Anything", by Emergent Garden: https://www.youtube.com/watch?v=0QczhVg5HaI
+- Even prettier visualizations: "Watching Neural Networks Learn", by Emergent GardenL  https://www.youtube.com/watch?v=TkwXa7Cvfr8
+- A more advanced version of this tool, made by Daniel Smilkov and Shan Carter (these people work at Google, so they know what they're doing): https://playground.tensorflow.org
+- A great website if you're looking for answers to your data science related questions: https://towardsdatascience.com/
+
+Wanna start coding?
+- A nice tutorial if you want to code your own nn without fancy libraries (this is how this app started!): https://realpython.com/python-ai-neural-network/
+- A nice tutorial if you do want to learn the fancy libraries: https://www.freecodecamp.org/news/how-to-build-a-neural-network-with-pytorch/
+- Official pytorch tutorial (the library we used to train the neural networks): https://pytorch.org/tutorials/beginner/basics/intro.html
+- Documentation of a widely-used machine learning library (we used it to create some of the datasets, but they also have a neural network module): https://scikit-learn.org/stable/index.html
+
+Enjoy learning!
 
 ## Authors
 
@@ -9,7 +32,7 @@ This app was made in 2023 by two TU Delft students to support education in the c
 
 ## Contact us
 
-Do you have a question, suggestion for future development or a bug report? Send us an email at [info@brain-builder.app](mailto:info@brain-builder.app) and we'll be happy to talk about it!
+Do you have a question, suggestion or want to report a bug? Send us an email at [info@brain-builder.app](mailto:info@brain-builder.app) and we'll be happy to take a look!
 
 ## Resources Used
 
