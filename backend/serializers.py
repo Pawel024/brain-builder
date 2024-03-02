@@ -4,7 +4,7 @@ from .models import Row, TaskDescription, Progress, Quiz, Intro, Feedback
 class RowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Row
-        fields = ('pk', 'action', 'task_id', 'user_id', 'progress_pk', 'learning_rate', 'epochs', 'normalization', 'network_input', 'games_data','timestamp')
+        fields = ('pk', 'action', 'task_id', 'user_id', 'activations_on', 'learning_rate', 'epochs', 'normalization', 'network_input', 'games_data','timestamp')
 
 class TaskDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
