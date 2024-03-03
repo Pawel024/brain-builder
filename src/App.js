@@ -909,18 +909,19 @@ function App() {
             });
           }
           
-          // update the weights if they changed 
-          if (weights[index].length === 0 || data.network_weights[0][0] !== weights[index][0][0]) {
-            setWeights(prevWeights => {
-              const newWeights = [...prevWeights];
-              newWeights[index] = data.network_weights;
-              return newWeights;
-            });
-          }
         }
-      } else if (data.title === 'update') {  // every 10%; includes network_biases and plots
-        // update the biases if it changed
-        if (data.network_biases.length !== biases[index].length) {
+      } else if (data.title === 'update') {  // every 2%; includes network_biases and plots
+        // update the weights if they changed 
+        if (weights[index].length === 0 || data.network_weights[0][0] !== weights[index][0][0]) {
+          setWeights(prevWeights => {
+            const newWeights = [...prevWeights];
+            newWeights[index] = data.network_weights;
+            return newWeights;
+          });
+        }
+
+        // update the biases if they changed
+        if (biases[index].length !== 0 || data.network_biases[0] !== biases[index][0]) {
           setBiases(prevBiases => {
             const newBiases = [...prevBiases];
             newBiases[index] = data.network_biases;
