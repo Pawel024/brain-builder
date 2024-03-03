@@ -123,13 +123,15 @@ class Introduction extends React.Component {
           <Box style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', height: window.innerHeight-52, padding: '30px 300px' }}>
             {this.state.content.length > 0 ? (
               <Flex direction="column" gap="3" style={{ width: '100%', height: '100%'}}>
-                {this.state.content.map(([subtitle, text], index) => (
+                {this.state.content.map(([subtitle, ...paragraphs], index) => (
                   <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px', textAlign: 'justify', backgroundColor: this.state.showContent[index] ? 'transparent' : 'var(--cyan-3)', cursor: 'pointer' }}
                     onClick={this.state.showContent[index] ? () => this.handleShowContent(index, false) : () => this.handleShowContent(index, true)}
                   >
                     <Flex direction="column" style={{textAlign: 'justify'}}>
                       <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign: 'start' }}>&gt;_{subtitle} </Heading>
-                      { this.state.showContent[index] && (<p>{text}</p>)}
+                      { this.state.showContent[index] && paragraphs.map((paragraph, i) => (
+                        <p key={i} dangerouslySetInnerHTML={{ __html: paragraph }} style={{ marginBottom: 0, textAlign: 'justify' }}></p>
+                      ))}
                     </Flex>
                   </Box>
                 ))}
