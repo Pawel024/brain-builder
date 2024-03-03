@@ -99,7 +99,7 @@ class Building extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      description: [],
+      description: [['title', 'some text'], ['another title', 'some more text']],
       printedDescription: '',
       runTutorial: false,
       currentSlide: 0,
@@ -130,6 +130,7 @@ class Building extends React.Component {
 
   handleTabChange = (value) => {
     this.setState({ activeTab: value });
+    console.log("Tab changed to " + value) // for debugging
   };
 
   typeWriter = (txt, speed=15, i=0) => {
@@ -241,6 +242,11 @@ class Building extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    // cancel the request
+    this.props.cancelRequest(this.props.taskId, this.props.index);
+  }
+
   handleJoyrideCallback = (data) => {
     const { action, status } = data;
 
@@ -318,12 +324,12 @@ class Building extends React.Component {
         </Grid>
       </Box>
 
-      <Tabs.Root defaultValue="building" style={{ fontFamily:'monospace' }} onValueChange={this.handleTabChange}>
+      <Tabs.Root defaultValue="building" style={{ fontFamily:'monospace' }}>
 
         <Tabs.List size="2">
-          <Tabs.Trigger value="task" >Background Info </Tabs.Trigger>
-          <Tabs.Trigger value="building" >Build</Tabs.Trigger>
-          <Tabs.Trigger value="stuff">Result</Tabs.Trigger>
+          <Tabs.Trigger value="task" onValueChange={this.handleTabChange} >Background Info </Tabs.Trigger>
+          <Tabs.Trigger value="building" onValueChange={this.handleTabChange} >Build</Tabs.Trigger>
+          <Tabs.Trigger value="stuff" onValueChange={this.handleTabChange} >Result</Tabs.Trigger>
           {/*<Tabs.Trigger value="settings">Settings</Tabs.Trigger>*/}
         </Tabs.List>
 
@@ -331,13 +337,19 @@ class Building extends React.Component {
         <Tabs.Content value="task">
           {this.props.taskId !== 0 && (
             <Flex direction="row" gap="2" style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', height: window.innerHeight-72 }}>
-              <Box style={{ flexBasis: '50%', display: 'flex', justifyContent:"center", alignItems:"center", padding: "0px 30px" }}>
-                <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}}/>
-              </Box>
-              <Box style={{ flexBasis: '50%' }}>
-              {this.state.description.length > 0 ? (              
-                <Box style={{ padding: '20px 90px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
-                  <Box style={{ marginBottom: 0 }}>
+              <Box style={{ flexBasis: '60%' }}>
+              {this.state.description.length > 0 ? (  
+                console.log("Description: ", this.state.description),
+                console.log("Current slide: ", this.state.currentSlide),            
+                <Flex direction='column' gap='2' style={{ padding: '20px 90px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
+                  {/*
+                  <Flex direction="column" gap="2" style={{ flexbasis:'30%', justifyContent:"center", alignItems:"center", width:"100%" }}>
+                    {this.state.description.map(([subtitle, text], index) => (
+                      <Button variant="outline" style={{ width:"100%"}} pressed={this.state.currentSlide === index} onClick={() => this.goToSlide(index)}>{subtitle}</Button>
+                    ))}
+                  </Flex>
+                  */}
+                  <Flex style={{ flexbasis:'100%', marginBottom: 0, width:'100%' }}>
                     <Slider key={this.state.currentSlide} classNames={horizontalCss} infinite={false} slideIndex={this.state.currentSlide}
                       previousButton={
                         <ChevronLeftIcon
@@ -369,13 +381,8 @@ class Building extends React.Component {
                         </div>
                       ))}
                     </Slider>
-                  </Box>
-                  <Flex direction="column" gap="2" style={{ justifyContent:"center", alignItems:"center", width:"100%" }}>
-                    {this.state.description.map(([subtitle, text], index) => (
-                      <Button variant="outline" style={{ width:"100%"}} pressed={this.state.currentSlide === index} onClick={() => this.goToSlide(index)}>{subtitle}</Button>
-                    ))}
                   </Flex>
-                </Box>
+                </Flex>
               ) : (
                 <Box style={{ textAlign:'justify', padding: '20px 300px' }}>
                   <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Your Task </Heading>
@@ -383,7 +390,10 @@ class Building extends React.Component {
                 </Box>
               )}
               </Box>
-              <Separator orientation='vertical' style = {{ height: window.innerHeight-130, position: 'absolute', left: window.innerWidth * 0.5, bottom: (window.innerHeight-52) * 0.5, transform: `translateY(${(window.innerHeight - 110) / 2}px)` }}/>
+              <Separator orientation='vertical' style = {{ height: window.innerHeight-130, position: 'absolute', left: window.innerWidth * 0.6, bottom: (window.innerHeight-52) * 0.5, transform: `translateY(${(window.innerHeight - 110) / 2}px)` }}/>
+              <Box style={{ flexBasis: '40%', display: 'flex', justifyContent:"center", alignItems:"center", padding: "0px 30px" }}>
+                <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}}/>
+              </Box>
           </Flex>)}
         {/*
           <Flex direction="row" gap="2" >
