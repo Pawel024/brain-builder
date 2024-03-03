@@ -46,13 +46,15 @@ class Introduction extends React.Component {
         axios.get(window.location.origin + '/api/intros/?intro_id=' + this.props.introId)
         .then(response => {
         if (response.data.content[0] === '[') {
-            this.setState({ content: JSON.parse(response.data.content), showContent: Array(JSON.parse(response.data.content).length).fill(false) });
-            console.log("Attempting to set the array")
-            const urlParams = new URLSearchParams(window.location.search);
-            const openBox = urlParams.get('section');
-            if (openBox !== null) {
-              this.handleShowContent(parseInt(openBox), true);
-            }
+            this.setState({ content: JSON.parse(response.data.content),
+              showContent: Array(JSON.parse(response.data.content).length).fill(false)
+            }, () => {
+              const urlParams = new URLSearchParams(window.location.search);
+              const openBox = urlParams.get('section');
+              if (openBox !== null) {
+                this.handleShowContent(parseInt(openBox), true);
+              }
+            });
         } else if (response.data.content[0] === '*') {
           this.typeWriter(response.data.content);  // this works
         } else {
@@ -122,7 +124,7 @@ class Introduction extends React.Component {
             {this.state.content.length > 0 ? (
               <Flex direction="column" gap="3" style={{ width: '100%', height: '100%'}}>
                 {this.state.content.map(([subtitle, text], index) => (
-                  <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px', textAlign: 'justify', backgroundColor: this.state.showContent[index] ? 'transparent' : 'var(--slate-3)', cursor: 'pointer' }}
+                  <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px', textAlign: 'justify', backgroundColor: this.state.showContent[index] ? 'transparent' : 'var(--cyan-3)', cursor: 'pointer' }}
                     onClick={this.state.showContent[index] ? () => this.handleShowContent(index, false) : () => this.handleShowContent(index, true)}
                   >
                     <Flex direction="column" style={{textAlign: 'justify'}}>
