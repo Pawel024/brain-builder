@@ -745,6 +745,8 @@ function App() {
       normalization = false;
       af = false;
     }
+    console.log("AF setting: ", af);  // for debugging
+
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
 
