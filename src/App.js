@@ -19,6 +19,7 @@ import CustomBlock from './customBlocks';
 import Tutorial from './tutorial';
 import FeedbackApp from './feedback';
 import LinksPage from './links';
+import NotFound from './notFound';
 
 
 const colorScale = chroma.scale(['#49329b', '#5e5cc2', '#8386d8', '#afb0e1', '#dddddd', '#e3a692', '#d37254', '#b64124', '#8f0500']).domain([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.52, 0.75, 1]);
@@ -144,25 +145,6 @@ export function generateCytoStyle(list = []) {
     }
   ];
   return cStyle;
-}
-
-
-
-// ------- 404 PAGE -------
-
-function NotFound() {
-  const isMontyPythonLover = true; // Replace with your condition
-
-  return (
-    // disable both horizontal and vertical scrolling, cut off the overflow
-    <Box style={{ overflow: 'hidden', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-      <Box style={{ textAlign: 'center', color: 'white' }}>
-        <Heading style={{ fontSize:90 }}>404</Heading>
-        <p style={{ fontSize:90 }}>Page not found : ( </p>
-      </Box>
-      {isMontyPythonLover && <img src={require('./monty-python.jpeg')} alt="Monty Python" />}
-    </Box>
-  );
 }
 
 

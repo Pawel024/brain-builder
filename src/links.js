@@ -28,7 +28,7 @@ function LinksPage () {
               </Box>
           </Grid>
         </Box>
-        <Box style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', height: window.innerHeight-52, padding: '30px 300px' }}>
+        <Box style={{ overflow: 'auto', width: '100%', height: window.innerHeight-52, padding: '30px 300px' }}>
             <Box style={{ flex: 1, border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 30px' }}>
                 <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7 }}>&gt;_Useful Links</Heading>
                 <Readme file="Links.md"/>
