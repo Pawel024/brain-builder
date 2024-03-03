@@ -48,6 +48,11 @@ class Introduction extends React.Component {
         if (response.data.content[0] === '[') {
             this.setState({ content: JSON.parse(response.data.content), showContent: Array(JSON.parse(response.data.content).length).fill(false) });
             console.log("Attempting to set the array")
+            const urlParams = new URLSearchParams(window.location.search);
+            const openBox = urlParams.get('section');
+            if (openBox !== null) {
+              this.handleShowContent(parseInt(openBox), true);
+            }
         } else {
             this.typeWriter(response.data.content);  // this works
         }

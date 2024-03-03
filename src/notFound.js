@@ -16,23 +16,12 @@ function NotFound() {
             backgroundImage: `url(${isMontyPythonLover ? require('./monty-python.jpeg') : ''})`, // Set the image as the background
             backgroundSize: 'cover', // Cover the entire area
             backgroundPosition: 'top left', // Align the image to the top left
+            justifyContent: 'center', 
+            alignItems: 'center'
         }}>
-            <Box style={{ 
-                position: 'fixed', 
-                top: 0, 
-                left: 0, 
-                width: '100vw', 
-                height: '100vh', 
-                display: 'flex', 
-                flexDirection: 'column', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                zIndex: 999 
-            }}>
-                <Box style={{ textAlign: 'center', color: 'white' }}>
-                    <Heading style={{ fontSize:90 }}>404</Heading>
-                    <p style={{ fontSize:48 }}>Page not found : ( </p>
-                </Box>
+            <Box style={{ textAlign: 'center', color: 'white', backgroundColor: 'transparent' }}>
+                <Heading style={{ fontSize:90 }}>404</Heading>
+                <p style={{ fontSize:48 }}>Page not found : ( </p>
             </Box>
         </Box>
     );
