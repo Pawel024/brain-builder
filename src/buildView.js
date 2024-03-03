@@ -99,7 +99,7 @@ class Building extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      description: [['title', 'some text'], ['another title', 'some more text']],
+      description: [['title', 'some text'], ['another title', 'some more text, actually this is gonna be such a super duper long paragraph of text cause I wanna see how it behaves when the box overflows, are we there yet? Is this enough? ']],
       printedDescription: '',
       runTutorial: false,
       currentSlide: 0,
@@ -165,7 +165,7 @@ class Building extends React.Component {
   }
 
   continueComponentDidMount = () => {
-    if (this.props.taskId === 0 || this.state.description.length > 0) {
+    if (this.props.taskId === 0) {
       console.log("Running tutorial")
       this.setState({ runTutorial: true }, () => {
         // Delay the click on the beacon until after the Joyride component has been rendered
@@ -243,8 +243,9 @@ class Building extends React.Component {
   }
 
   componentWillUnmount() {
-    // cancel the request
-    this.props.cancelRequest(this.props.taskId, this.props.index);
+    if (this.props.isTraining === 1) {
+      this.props.cancelRequest();
+    }
   }
 
   handleJoyrideCallback = (data) => {
@@ -341,7 +342,7 @@ class Building extends React.Component {
               {this.state.description.length > 0 ? (  
                 console.log("Description: ", this.state.description),
                 console.log("Current slide: ", this.state.currentSlide),            
-                <Flex direction='column' gap='2' style={{ padding: '20px 90px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
+                <Flex direction='column' gap='2' style={{ padding: '20px 10px', display: 'flex', justifyContent:"center", alignItems:"center" }}>
                   {/*
                   <Flex direction="column" gap="2" style={{ flexbasis:'30%', justifyContent:"center", alignItems:"center", width:"100%" }}>
                     {this.state.description.map(([subtitle, text], index) => (
@@ -548,7 +549,7 @@ class Building extends React.Component {
                 <Flex direction= 'column'>
                   <div style={{ fontFamily:'monospace' }}><b>Training... </b></div>
                   <div style={{ fontFamily:'monospace' }}><b>Progress: {Math.round((parseFloat(this.props.progress))*100)}%</b></div>
-                  <canvas ref={this.chartRef} id="myChart" style={{ width: Math.round(0.27 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:10 }}></canvas>
+                  <canvas ref={this.chartRef} id="myChart" style={{ display: this.state.activeTab === 'building' ? 'block' : 'none', width: Math.round(0.27 * (window.innerWidth * 0.97)), height: Math.round(0.35 * (window.innerHeight-140)), marginTop:10 }}></canvas>
                 </Flex>
               ) : (
                 <div style={{ textAlign:'justify', width: Math.round(0.27 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
@@ -718,10 +719,6 @@ class Building extends React.Component {
         </Tabs.Content>*/}
         </Box>
         </Tabs.Root>
-      
-      <div style={{ display: this.state.activeTab === 'building' ? 'block' : 'none' }}>
-        <canvas ref={this.chartRef} />
-      </div>
 
       <Joyride
         steps={this.state.steps}
