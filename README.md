@@ -1,8 +1,8 @@
 # Welcome to brAIn builder!
 
-This app was created in 2023 by two TU Delft students to support the course AE2224-II "Artificial Intelligence for Aerospace Engineering". It is meant to give you a conceptual idea of what neural networks are and what they can do, without getting into the math and programming. Please know it is still in development and can contain bugs.
+This app was created in 2023 by two TU Delft students to support the course AE2224-II "Artificial Intelligence for Aerospace Engineering". It is meant to give you a conceptual idea of what neural networks are and what they can do, without getting into the math and programming. Please know it is still in development so some bugs are possible. We look forward to your feedback!
 
-We look forward to your feedback!
+Laurens and Paweł
 
 ## Authors
 
