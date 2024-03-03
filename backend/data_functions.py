@@ -89,6 +89,7 @@ class DataFromExcel(Dataset):
         if data_type == 1:
             self.feature_names = self.data.columns[~self.data.columns.str.contains('Target')]
             self.n_features = len(self.feature_names)
+            print("Feature names, n_features: ", self.feature_names, self.n_features)
 
             self.target_names = self.data.loc[:, 'Target'].unique()
             self.n_targets = len(self.target_names)
@@ -281,62 +282,36 @@ class DataFromExcel(Dataset):
     # This function is based on a CSE2510 Notebook and plots the decision boundary of a classifier
     def plot_decision_boundary(self, model):
         step = 0.01
+        fig = mf.Figure()
+        ax = fig.subplots(1, 1)
 
         if self.data_type == 1:
-            if self.n_features < 3:  # can probably go up to 4 or 5
+            step = 0.1
+            if self.n_features < 3 and self.n_targets < 5:
                 if self.normalization:
-                    mesh = np.meshgrid(*self.n_features*[np.arange(-0.1, 1.1, step)])
+                    mesh = np.meshgrid(*self.n_features * [np.arange(-0.1, 1.1, step)])
                 else:
-                    mesh = np.meshgrid(*[np.arange(mini, maxi, step) for mini, maxi in zip(self.minima, self.maxima)])
-
+                    mesh = np.meshgrid(*[np.arange(mini-abs(mini)*step, maxi+abs(maxi)*step, step) for mini, maxi in zip(self.minima, self.maxima)])
+                
                 # Plot the decision boundary. For that, we will assign a color to each
                 # point in the mesh.
+                    
                 mesh = np.array(mesh)
                 Z = np.array(model.predict(mesh.reshape(self.n_features, -1).T))
                 Z = Z.reshape(mesh[0].shape)
 
-                n_plots = self.n_features * (self.n_features - 1) // 2
-                n_cols = 2
-                n_rows = int(np.ceil(n_plots / n_cols))
-                fig = mf.Figure()
-                ax = fig.subplots(n_rows, n_cols)
-                k = 0
+                ax.contourf(mesh[0], mesh[1], Z, alpha=0.5)
+                ax.scatter(self.data[:, 0], self.data[:, 1], c=self.targets)
 
-                for i in range(self.n_features):
-                    if type(self.data.iloc[0, i]) is not str and self.data.columns[i] != 'Target':
-                        for j in range(i + 1, self.n_features + 1):
-                            if type(self.data.iloc[0, j]) is not str and self.data.columns[i] != 'Target':
-                                # Put the result into a color plot
-                                row = k // n_cols
-                                col = k % n_cols
-                                if n_plots == 1:
-                                    ax.contourf(mesh[i][0],
-                                                mesh[j][0],
-                                                Z, alpha=0.5)
-                                    ax.scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
-                                    ax.set_xlabel(self.data.columns[i].replace('_', ' '))
-                                    ax.set_ylabel(self.data.columns[j].replace('_', ' '))
-                                elif n_rows == 1:
-                                    ax[col].contourf(mesh[i][0],
-                                                    mesh[j][0],
-                                                    Z, alpha=0.5)
-                                    ax[col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
-                                    ax[col].set_xlabel(self.data.columns[i].replace('_', ' '))
-                                    ax[col].set_ylabel(self.data.columns[j].replace('_', ' '))
-                                else:
-                                    ax[row, col].contourf(mesh[np.where(np.array(self.feature_names) == self.data.columns[i])[0]][0],
-                                                mesh[np.where(np.array(self.feature_names) == self.data.columns[j])[0]][0],
-                                                Z, alpha=0.5)
-                                    ax[row, col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
-                                    ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
-                                    ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
-                                k += 1
-                                if self.normalization:
-                                    ax.set_xlim(-0.1, 1.1)
-                                    ax.set_ylim(-0.1, 1.1)
-                                else:
-                                    ax.set_xlim(self.minima[i], self.maxima[i])
-                                    ax.set_ylim(self.minima[j], self.maxima[j])
+                ax.set_xlabel(self.feature_names[0].replace('_', ' '))
+                ax.set_ylabel(self.feature_names[1].replace('_', ' '))
+
+                if self.normalization:
+                    ax.set_xlim(-0.1, 1.1)
+                    ax.set_ylim(-0.1, 1.1)
+                else:
+                    ax.set_xlim(self.minima[0], self.maxima[0])
+                    ax.set_ylim(self.minima[1], self.maxima[1])
                 img = BytesIO()
                 fig.tight_layout()
                 fig.savefig(img, format='png')
