@@ -103,6 +103,7 @@ class Building extends React.Component {
       printedDescription: '',
       runTutorial: false,
       currentSlide: 0,
+      activeTab: 'building',
       steps: [
         {
           target: '.buildBody',
@@ -126,6 +127,10 @@ class Building extends React.Component {
     };
   }
   shortDescription = 'Please reload the page to load the task description';
+
+  handleTabChange = (value) => {
+    this.setState({ activeTab: value });
+  };
 
   typeWriter = (txt, speed=15, i=0) => {
     if (i < txt.length) {
@@ -313,10 +318,10 @@ class Building extends React.Component {
         </Grid>
       </Box>
 
-      <Tabs.Root defaultValue="building" style={{ fontFamily:'monospace' }}>
+      <Tabs.Root defaultValue="building" style={{ fontFamily:'monospace' }} onValueChange={this.handleTabChange}>
 
         <Tabs.List size="2">
-          <Tabs.Trigger value="task" >Background Info</Tabs.Trigger>
+          <Tabs.Trigger value="task" >Background Info </Tabs.Trigger>
           <Tabs.Trigger value="building" >Build</Tabs.Trigger>
           <Tabs.Trigger value="stuff">Result</Tabs.Trigger>
           {/*<Tabs.Trigger value="settings">Settings</Tabs.Trigger>*/}
@@ -703,6 +708,10 @@ class Building extends React.Component {
         </Tabs.Content>*/}
         </Box>
         </Tabs.Root>
+      
+      <div style={{ display: this.state.activeTab === 'building' ? 'block' : 'none' }}>
+        <canvas ref={this.chartRef} />
+      </div>
 
       <Joyride
         steps={this.state.steps}
