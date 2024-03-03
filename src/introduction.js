@@ -82,7 +82,8 @@ class Introduction extends React.Component {
       const descriptionList = splitText.map(subText => {
         const [subtitle, ...paragraphs] = subText.split('\n');
         const formattedParagraphs = paragraphs.map(paragraph => 
-          paragraph.replace(/\*([^*]+)\*/g, '<b>$1</b>')
+          paragraph.replace(/\*([^*]+)\*/g, '<b>$1</b>') // bold
+          .replace(/_([^_]+)_/g, '<i>$1</i>') // italic
         );
         return [subtitle, ...formattedParagraphs];
       });
