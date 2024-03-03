@@ -586,7 +586,7 @@ class Building extends React.Component {
         <Tabs.Content value="stuff">
         {this.props.taskId !== 0 && (
           <Flex direction="row" gap = "3" style={{ display: 'flex' }}>
-            <Box style={{ flexBasis: '50%', justifyContent: 'center', alignItems: 'center' }}>
+            <Box style={{ flexBasis: '50%', justifyContent: 'center', alignItems: 'center', padding: '30px 0px' }}>
               <Flex direction="column" gap="2" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
               
               {/* This will render the form with the feature names received from the backend, if it exists */}
@@ -700,7 +700,7 @@ class Building extends React.Component {
             <Separator orientation='vertical' style = {{ height: window.innerHeight-152, position: 'fixed', left: window.innerWidth * 0.5, bottom: (window.innerHeight-92) * 0.5, transform: `translateY(${(window.innerHeight - 152) / 2}px)` }}/>
             <Box style={{ flexBasis: '50%', justifyContent: 'center', alignItems: 'center' }}>
               {/* This will render the images, if they exist */}
-              <Flex direction="column" gap="2" style={{ justifyContent: 'center', alignItems: 'center', padding: '0px 30px' }}>
+              <Flex direction="column" gap="2" style={{ justifyContent: 'center', alignItems: 'center', padding: '30px 30px' }}>
                 {this.props.img ? (
                   <img src={this.props.img} alt={`No plots yet`} onLoad={() => {}/*URL.revokeObjectURL(this.props.img)*/}/>
                 ) : (
