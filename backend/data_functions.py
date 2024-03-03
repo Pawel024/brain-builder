@@ -82,11 +82,12 @@ class DataFromExcel(Dataset):
         self.n_targets, self.n_features, self.n_objects = 0, 0, 0
         self.target_names, self.feature_names, self.minima, self.maxima = [], [], [], []
 
+        # replace slashes and spaces in the column names
+        self.data.columns = self.data.columns.str.replace(' ', '_')
+        self.data.columns = self.data.columns.str.replace('/', '_')
+
         if data_type == 1:
             self.feature_names = self.data.columns[~self.data.columns.str.contains('Target')]
-            self.feature_names = [x.replace(' ', '_') for x in self.feature_names]
-            self.feature_names = [x.replace('/', '_') for x in self.feature_names]
-
             self.n_features = len(self.feature_names)
 
             self.target_names = self.data.loc[:, 'Target'].unique()
@@ -117,8 +118,6 @@ class DataFromExcel(Dataset):
             self.n_targets = len(self.target_names)
 
             self.feature_names = self.data.columns[~self.data.columns.str.contains('Target')]
-            self.feature_names = [x.replace(' ', '_') for x in self.feature_names]
-            self.feature_names = [x.replace('/', '_') for x in self.feature_names]
             self.feature_names = np.array(self.feature_names)
             self.n_features = len(self.feature_names)
             self.n_objects = len(self.data)
