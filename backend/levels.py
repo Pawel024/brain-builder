@@ -54,7 +54,7 @@ def convert_input(lst, tag, af=True):
 
     # modifications depending on activation setting
     if not af:
-        for x in structure:
+        for x in structure[1:]:
             x[2] = ''
 
     return structure, learning_rate, epochs, normalization
