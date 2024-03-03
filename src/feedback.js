@@ -173,8 +173,8 @@ function FeedbackApp({ host, cookie }) {
     {
       question: 'Did you experience any technical issues?',
       options: [
-        { optionText: 'Yes, many', isCorrect: false },
-        { optionText: 'Yes, some, but they were very annoying', isCorrect: false },
+        { optionText: 'Yes, many, it was very frustrating', isCorrect: false },
+        { optionText: 'Yes, some, but they were annoying', isCorrect: false },
         { optionText: 'Yes, some, but it did not bother me', isCorrect: true },
         { optionText: 'No, everything ran smoothly', isCorrect: false },
       ],
@@ -188,10 +188,11 @@ function FeedbackApp({ host, cookie }) {
     {
       question: 'Do you think this tool would be a useful addition to the AI course?',
       options: [
-        { optionText: 'Yes, the course needs this', isCorrect: false },
+        { optionText: "Yes, the course could really use this", isCorrect: false },
         { optionText: 'Yes, but with some modifications', isCorrect: false },
         { optionText: 'It could be helpful, but is not necessary', isCorrect: true },
         { optionText: 'The existing course material is enough for me', isCorrect: false },
+        { optionText: 'I am not taking the course', isCorrect: false}
       ],
       question_type: "rating",
     },
@@ -201,11 +202,12 @@ function FeedbackApp({ host, cookie }) {
       question_type: "text",
     },
     {
-      question: 'Do you want to see more dedicated tools like this one in other courses?',
+      question: 'Do you want to see more dedicated tools like this one in other TU Delft courses?',
       options: [
         { optionText: 'Yes, that would be very helpful', isCorrect: true },
         { optionText: 'Maybe', isCorrect: false },
         { optionText: 'No, I do not think I would use them', isCorrect: false },
+        { optionText: 'I am not studying at TU Delft', isCorrect: false}
       ],
       question_type: "rating",
     },

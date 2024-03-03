@@ -55,11 +55,14 @@ class BuildNetwork(torch.nn.Module):
         elif activation == 'Log_Softmax':
             return torch.nn.functional.log_softmax(x, dim=-1)
         else:
+            # cap the weights at 1000 to prevent overflow
+            parameters = list(self.parameters())
+            for p in parameters:
+                p.data = torch.clamp(p.data, -1000, 1000)
             return x
 
     def forward(self, x):  # feed data through the network; pay attention to the right name!
-        if torch.isnan(torch.tensor(x)).any() or torch.isinf(torch.tensor(x)).any():
-            print("NaN in input data")
+        print(x)
         for i in range(len(self.layers)):
             x = self.select_activation(self.layers[i](x), self.input[i+1][2])
         if torch.isnan(torch.tensor(x)).any() or torch.isinf(torch.tensor(x)).any():
