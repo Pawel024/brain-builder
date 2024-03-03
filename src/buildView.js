@@ -579,126 +579,129 @@ class Building extends React.Component {
       
         <Tabs.Content value="stuff">
         {this.props.taskId !== 0 && (
-          <Flex direction="row" gap = "3">
-            <Flex direction="column" gap="2">
-            
-            {/* This will render the form with the feature names received from the backend, if it exists */}
-            <Form.Root className="FormRoot" onSubmit={this.props.taskId !== 0 ? (event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData, this.props.taskId, this.props.index) : () => {}} style={{ fontFamily:'monospace' }}>
-              {this.props.featureNames.length > 0 && this.props.featureNames.map((featureName, index) => (
-                <Form.Field className="FormField" name={featureName} key={index}>
+          <Flex direction="row" gap = "3" style={{ display: 'flex' }}>
+            <Box style={{ flexBasis: '50%', justifyContent: 'center', alignItems: 'center' }}>
+              <Flex direction="column" gap="2" style={{ flex: 1 }}>
+              
+              {/* This will render the form with the feature names received from the backend, if it exists */}
+              <Form.Root className="FormRoot" onSubmit={this.props.taskId !== 0 ? (event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData, this.props.taskId, this.props.index) : () => {}} style={{ fontFamily:'monospace' }}>
+                {this.props.featureNames.length > 0 && this.props.featureNames.map((featureName, index) => (
+                  <Form.Field className="FormField" name={featureName} key={index}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                      <Form.Label className="FormLabel">{featureName}</Form.Label>
+                      <Form.Message className="FormMessage" match="valueMissing">
+                        Please enter the {featureName}
+                      </Form.Message>
+                      <Form.Message className="FormMessage" match="typeMismatch">
+                        Please provide a valid number.
+                      </Form.Message>
+                    </div>
+                    <Form.Control asChild>
+                      <input className="FormInput" type="text" pattern="^-?[0-9]*[.,]?[0-9]+" required />
+                    </Form.Control>
+                  </Form.Field>
+                ))}
+                {this.props.featureNames.length > 0 &&
+                <Form.Submit asChild>
+                  <button className="FormButton" style={{ marginTop: 10 }}>
+                    Predict!
+                  </button>
+                </Form.Submit>}
+              </Form.Root>
+              
+              {/*  // This is the old form
+              <Form.Root className="FormRoot" onSubmit={(event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData, this.props.taskId, this.props.index)} style={{ fontFamily:'monospace' }}>
+                <Form.Field className="FormField" name="s-m_axis">
                   <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                    <Form.Label className="FormLabel">{featureName}</Form.Label>
+                    <Form.Label className="FormLabel">Semi-Major Axis [km]</Form.Label>
                     <Form.Message className="FormMessage" match="valueMissing">
-                      Please enter the {featureName}
+                      Please enter the semi-major axis
                     </Form.Message>
                     <Form.Message className="FormMessage" match="typeMismatch">
-                      Please provide a valid number.
+                      Please provide a valid semi-major axis
                     </Form.Message>
                   </div>
                   <Form.Control asChild>
-                    <input className="FormInput" type="text" pattern="^-?[0-9]*[.,]?[0-9]+" required />
+                    <input className="FormInput" type="number" required />
                   </Form.Control>
                 </Form.Field>
-              ))}
-              {this.props.featureNames.length > 0 &&
-              <Form.Submit asChild>
-                <button className="FormButton" style={{ marginTop: 10 }}>
-                  Predict!
-                </button>
-              </Form.Submit>}
-            </Form.Root>
-            
-            {/*  // This is the old form
-            <Form.Root className="FormRoot" onSubmit={(event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData, this.props.taskId, this.props.index)} style={{ fontFamily:'monospace' }}>
-              <Form.Field className="FormField" name="s-m_axis">
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                  <Form.Label className="FormLabel">Semi-Major Axis [km]</Form.Label>
-                  <Form.Message className="FormMessage" match="valueMissing">
-                    Please enter the semi-major axis
-                  </Form.Message>
-                  <Form.Message className="FormMessage" match="typeMismatch">
-                    Please provide a valid semi-major axis
-                  </Form.Message>
-                </div>
-                <Form.Control asChild>
-                  <input className="FormInput" type="number" required />
-                </Form.Control>
-              </Form.Field>
 
-              <Form.Field className="FormField" name="inclination">
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                  <Form.Label className="FormLabel">Inclination [degrees]</Form.Label>
-                  <Form.Message className="FormMessage" match="valueMissing">
-                    Please enter the inclination
-                  </Form.Message>
-                  <Form.Message className="FormMessage" match="typeMismatch">
-                    Please provide a valid inclination
-                  </Form.Message>
-                </div>
-                <Form.Control asChild>
-                  <input className="FormInput" type="number" required />
-                </Form.Control>
-              </Form.Field>
+                <Form.Field className="FormField" name="inclination">
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                    <Form.Label className="FormLabel">Inclination [degrees]</Form.Label>
+                    <Form.Message className="FormMessage" match="valueMissing">
+                      Please enter the inclination
+                    </Form.Message>
+                    <Form.Message className="FormMessage" match="typeMismatch">
+                      Please provide a valid inclination
+                    </Form.Message>
+                  </div>
+                  <Form.Control asChild>
+                    <input className="FormInput" type="number" required />
+                  </Form.Control>
+                </Form.Field>
 
-              <Form.Field className="FormField" name="expected_life">
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                  <Form.Label className="FormLabel">Expected Life [years]</Form.Label>
-                  <Form.Message className="FormMessage" match="valueMissing">
-                    Please enter the expected life
-                  </Form.Message>
-                  <Form.Message className="FormMessage" match="typeMismatch">
-                    Please provide a valid expected life
-                  </Form.Message>
-                </div>
-                <Form.Control asChild>
-                  <input className="FormInput" type="number" required />
-                </Form.Control>
-              </Form.Field>
+                <Form.Field className="FormField" name="expected_life">
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                    <Form.Label className="FormLabel">Expected Life [years]</Form.Label>
+                    <Form.Message className="FormMessage" match="valueMissing">
+                      Please enter the expected life
+                    </Form.Message>
+                    <Form.Message className="FormMessage" match="typeMismatch">
+                      Please provide a valid expected life
+                    </Form.Message>
+                  </div>
+                  <Form.Control asChild>
+                    <input className="FormInput" type="number" required />
+                  </Form.Control>
+                </Form.Field>
 
-              <Form.Field className="FormField" name="launch_mass">
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                  <Form.Label className="FormLabel">Launch Mass [kg]</Form.Label>
-                  <Form.Message className="FormMessage" match="valueMissing">
-                    Please enter the launch mass
-                  </Form.Message>
-                  <Form.Message className="FormMessage" match="typeMismatch">
-                    Please provide a valid launch mass
-                  </Form.Message>
-                </div>
-                <Form.Control asChild>
-                  <input className="FormInput" type="number" required />
-                </Form.Control>
-              </Form.Field>
+                <Form.Field className="FormField" name="launch_mass">
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                    <Form.Label className="FormLabel">Launch Mass [kg]</Form.Label>
+                    <Form.Message className="FormMessage" match="valueMissing">
+                      Please enter the launch mass
+                    </Form.Message>
+                    <Form.Message className="FormMessage" match="typeMismatch">
+                      Please provide a valid launch mass
+                    </Form.Message>
+                  </div>
+                  <Form.Control asChild>
+                    <input className="FormInput" type="number" required />
+                  </Form.Control>
+                </Form.Field>
 
-              <Form.Submit asChild>
-                <button className="FormButton" style={{ marginTop: 10 }}>
-                  Predict!
-                </button>
-              </Form.Submit>
-            </Form.Root>
-            */}
-            
-            <div id="query-response" style={{ fontFamily:'monospace' }}>
-                {this.props.isResponding===2 ? (
-                  <div>Output: {this.props.apiData["network_input"]}</div>
-                ) : (this.props.isResponding===1 ? (
-                  <div>Getting your reply...</div>
+                <Form.Submit asChild>
+                  <button className="FormButton" style={{ marginTop: 10 }}>
+                    Predict!
+                  </button>
+                </Form.Submit>
+              </Form.Root>
+              */}
+              
+              <div id="query-response" style={{ fontFamily:'monospace' }}>
+                  {this.props.isResponding===2 ? (
+                    <div>Output: {this.props.apiData["network_input"]}</div>
+                  ) : (this.props.isResponding===1 ? (
+                    <div>Getting your reply...</div>
+                  ) : (
+                    <div></div>
+                  )
+                  )}
+                </div>
+              </Flex>
+            </Box>
+            <Box style={{ flexBasis: '50%', justifyContent: 'center', alignItems: 'center' }}>
+              {/* This will render the images, if they exist */}
+              <Flex direction="column" gap="2">
+                {this.props.img ? (
+                  <img src={this.props.img} alt={`No plots yet`} onLoad={() => {}/*URL.revokeObjectURL(this.props.img)*/}/>
                 ) : (
-                  <div></div>
-                )
+                  <div>No image available. Try reloading the page? If this problem persists, please contact us.</div>
                 )}
-              </div>
-            </Flex>
-            
-            {/* This will render the images, if they exist */}
-            <Flex direction="column" gap="2">
-              {this.props.img ? (
-                <img src={this.props.img} alt={`No plots yet`} onLoad={() => {}/*URL.revokeObjectURL(this.props.img)*/}/>
-              ) : (
-                <div>No image available. Try reloading the page? If this problem persists, please contact us.</div>
-              )}
-            {/* TODO: Turn this into a pretty animation */}
-            </Flex>
+              {/* TODO: Turn this into a pretty animation */}
+              </Flex>
+            </Box>
           </Flex>
         )}
         </Tabs.Content>
