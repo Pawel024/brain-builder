@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Heading } from '@radix-ui/themes';
-import montyPythonImage from './monty-python.jpeg';
 
 
 /**
@@ -14,7 +13,7 @@ function NotFound() {
     return (
         <Box style={{ 
             overflow: 'hidden', 
-            backgroundImage: `url(${isMontyPythonLover ? montyPythonImage : ''})`, // Set the image as the background
+            backgroundImage: `url(${isMontyPythonLover ? require('./monty-python.jpeg') : ''})`, // Set the image as the background
             backgroundSize: 'cover', // Cover the entire area
             backgroundPosition: 'top left', // Align the image to the top left
         }}>
@@ -22,7 +21,7 @@ function NotFound() {
                 position: 'fixed', 
                 top: 0, 
                 left: 0, 
-                width: '100%', 
+                width: '100vw', 
                 height: '100vh', 
                 display: 'flex', 
                 flexDirection: 'column', 
