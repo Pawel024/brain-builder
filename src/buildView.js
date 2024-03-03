@@ -343,8 +343,8 @@ class Building extends React.Component {
         <Box px="4" pt="3" pb="0">
         <Tabs.Content value="task">
           {this.props.taskId !== 0 && (
-            <Flex direction="row" gap="2" style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', height: window.innerHeight-72 }}>
-              <Box style={{ flexBasis: '60%' }}>
+            <Flex direction="row" gap="2" style={{ overflow: 'auto', fontFamily:'monospace', width: '100%', height: window.innerHeight-116 }}>
+              <Box style={{ flexBasis: '50%' }}>
               {this.state.description.length > 0 ? (  
                 console.log("Description: ", this.state.description),
                 console.log("Current slide: ", this.state.currentSlide),            
@@ -397,8 +397,8 @@ class Building extends React.Component {
                 </Box>
               )}
               </Box>
-              <Separator orientation='vertical' style = {{ height: window.innerHeight-130, position: 'absolute', left: window.innerWidth * 0.6, bottom: (window.innerHeight-52) * 0.5, transform: `translateY(${(window.innerHeight - 110) / 2}px)` }}/>
-              <Box style={{ flexBasis: '40%', display: 'flex', justifyContent:"center", alignItems:"center", padding: "0px 30px" }}>
+              <Separator orientation='vertical' style = {{ height: window.innerHeight-152, position: 'absolute', left: window.innerWidth * 0.5, bottom: (window.innerHeight-92) * 0.5, transform: `translateY(${(window.innerHeight - 152) / 2}px)` }}/>
+              <Box style={{ flexBasis: '50%', display: 'flex', justifyContent:"center", alignItems:"center", padding: "0px 30px" }}>
                 <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}}/>
               </Box>
           </Flex>)}
@@ -587,7 +587,7 @@ class Building extends React.Component {
         {this.props.taskId !== 0 && (
           <Flex direction="row" gap = "3" style={{ display: 'flex' }}>
             <Box style={{ flexBasis: '50%', justifyContent: 'center', alignItems: 'center' }}>
-              <Flex direction="column" gap="2" style={{ flex: 1 }}>
+              <Flex direction="column" gap="2" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
               
               {/* This will render the form with the feature names received from the backend, if it exists */}
               <Form.Root className="FormRoot" onSubmit={this.props.taskId !== 0 ? (event) => this.props.handleSubmit(event, this.props.setIsResponding, this.props.setApiData, this.props.taskId, this.props.index) : () => {}} style={{ fontFamily:'monospace' }}>

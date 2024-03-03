@@ -195,7 +195,7 @@ button {
 }
 
 .FormRoot {
-  width: 450px;
+  width: 30vw;
 }
 
 .FormField {
@@ -264,7 +264,7 @@ button {
   line-height: 1;
   font-weight: 500;
   height: 35px;
-  width: 420px;
+  width: 30vw - 30px;
 
   background-color: white;
   color: var(--cyan-11);

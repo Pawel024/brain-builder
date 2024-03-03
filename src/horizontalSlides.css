@@ -1,7 +1,7 @@
 .slider {
 	position: relative;
 	width: 100%;
-	height: 400px;
+	height: 100vw - 116px;
 	overflow: hidden;
 
 	& a {
@@ -26,11 +26,11 @@
 		}
 
 		&.previousButton {
-			left: 40px;
+			left: 20px;
 		}
 
 		&.nextButton {
-			right: 40px;
+			right: 20px;
 		}
 	}
 }
@@ -92,5 +92,5 @@
 
 .slide-content {
 	text-align: justify;
-	padding: 180px;
+	padding: 120px;
 }
