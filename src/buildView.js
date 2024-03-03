@@ -397,7 +397,7 @@ class Building extends React.Component {
                 </Box>
               )}
               </Box>
-              <Separator orientation='vertical' style = {{ height: window.innerHeight-152, position: 'absolute', left: window.innerWidth * 0.5, bottom: (window.innerHeight-92) * 0.5, transform: `translateY(${(window.innerHeight - 152) / 2}px)` }}/>
+              <Separator orientation='vertical' style = {{ height: window.innerHeight-152, position: 'fixed', left: window.innerWidth * 0.5, bottom: (window.innerHeight-92) * 0.5, transform: `translateY(${(window.innerHeight - 152) / 2}px)` }}/>
               <Box style={{ flexBasis: '50%', display: 'flex', justifyContent:"center", alignItems:"center", padding: "0px 30px" }}>
                 <img src={this.props.initPlot} alt='No data available' width='auto' height='auto' style={{ maxWidth: '100%', maxHeight: '100%' }} onLoad={() => {}}/>
               </Box>
@@ -609,7 +609,7 @@ class Building extends React.Component {
                 ))}
                 {this.props.featureNames.length > 0 &&
                 <Form.Submit asChild>
-                  <button className="FormButton" style={{ marginTop: 10 }}>
+                  <button className="FormButton" style={{ marginTop: 10, width: window.innerWidth * 0.3 - 30 }}>
                     Predict!
                   </button>
                 </Form.Submit>}
