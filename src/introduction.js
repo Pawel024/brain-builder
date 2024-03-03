@@ -85,14 +85,13 @@ class Introduction extends React.Component {
             {this.state.content.length > 0 ? (
               <Flex direction="column" gap="3" style={{ width: '100%', height: '100%'}}>
                 {this.state.content.map(([subtitle, text], index) => (
-                  <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px', textAlign: 'justify' }}>
-                    <Box style={{ display: 'flex' }}>
-                      <Heading as='h2' size='5' style={{ flexBasis: '80%', color: 'var(--slate-12)', marginBottom:7, textAlign: 'start' }}>&gt;_{subtitle} </Heading>
-                      <IconButton style={{ flexBasis: '20%' }} onClick={ this.state.showContent[index] ? () => this.handleshowContent(index, true) : () => this.handleshowContent(index, false)}>
-                        { this.state.showContent[index] ? (<ChevronRightIcon/>) : (<ChevronDownIcon/>) }
-                      </IconButton>
-                    </Box>
-                    { this.state.showContent[index] && (<p>{text}</p>)}
+                  <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px', textAlign: 'justify', backgroundColor: this.state.showContent[index] ? 'transparent' : 'var(--slate-2)', cursor: 'pointer' }}
+                    onClick={this.state.showContent[index] ? () => this.handleshowContent(index, true) : () => this.handleshowContent(index, false)}
+                  >
+                    <Flex direction="column" style={{textAlign: 'justify'}}>
+                      <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign: 'start' }}>&gt;_{subtitle} </Heading>
+                      { this.state.showContent[index] && (<p>{text}</p>)}
+                    </Flex>
                   </Box>
                 ))}
               </Flex>
