@@ -53,8 +53,11 @@ class Introduction extends React.Component {
             if (openBox !== null) {
               this.handleShowContent(parseInt(openBox), true);
             }
+        } else if (response.data.content[0] === '*') {
+          this.typeWriter(response.data.content);  // this works
         } else {
-            this.typeWriter(response.data.content);  // this works
+          console.log("Attempting to convert to array")
+          this.createDescriptionList(response.data.content);
         }
         })
         .catch(error => {
@@ -62,6 +65,35 @@ class Introduction extends React.Component {
         this.typeWriter("There was an error loading the introduction.");
         });
     }
+
+  createDescriptionList = (jsonText) => {
+    try {
+      const sanitizedJson = jsonText.replace(/<\/?[^>]+(>|$)/g, "")
+        .replace(/&/g, "&amp;")
+        .replace(/%/g, "&#37;")
+        .replace(/#/g, "&#35;")
+        .replace(/!/g, "&#33;")
+        .replace(/\?/g, "&#63;")
+        .replace(/'/g, "&#39;")
+        .replace(/"/g, "&quot;");
+      const splitText = sanitizedJson.split('\n ');
+      const descriptionList = splitText.map(subText => {
+        const [subtitle, ...paragraphs] = subText.split('\n');
+        const formattedParagraphs = paragraphs.map(paragraph => 
+          paragraph.replace(/\*([^*]+)\*/g, '<b>$1</b>')
+        );
+        return [subtitle, ...formattedParagraphs];
+      });
+      this.setState({ content: descriptionList, showContent: Array(descriptionList.length).fill(false) });
+      const urlParams = new URLSearchParams(window.location.search);
+      const openBox = urlParams.get('section');
+      if (openBox !== null) {
+        this.handleShowContent(parseInt(openBox), true);
+      }
+    } catch (error) {
+      console.error('Error parsing JSON or formatting description:', error);
+    }
+  }
 
     render () { return(
     <Theme accentColor="cyan" grayColor="slate" panelBackground="solid" radius="large" appearance='light'>
