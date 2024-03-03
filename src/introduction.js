@@ -25,7 +25,7 @@ class Introduction extends React.Component {
       console.log("Going to slide " + index)
     };
 
-    handleshowContent = (index, expand) => {
+    handleShowContent = (index, expand) => {
       if (expand) {
         //set showContent[index] to true hence expand the content
         this.setState({ showContent: this.state.showContent.map((value, i) => i === index ? true : value) });
@@ -85,8 +85,8 @@ class Introduction extends React.Component {
             {this.state.content.length > 0 ? (
               <Flex direction="column" gap="3" style={{ width: '100%', height: '100%'}}>
                 {this.state.content.map(([subtitle, text], index) => (
-                  <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px', textAlign: 'justify', backgroundColor: this.state.showContent[index] ? 'transparent' : 'var(--slate-2)', cursor: 'pointer' }}
-                    onClick={this.state.showContent[index] ? () => this.handleshowContent(index, true) : () => this.handleshowContent(index, false)}
+                  <Box style={{ border: "2px solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)", padding: '10px 24px', textAlign: 'justify', backgroundColor: this.state.showContent[index] ? 'transparent' : 'var(--slate-3)', cursor: 'pointer' }}
+                    onClick={this.state.showContent[index] ? () => this.handleShowContent(index, false) : () => this.handleShowContent(index, true)}
                   >
                     <Flex direction="column" style={{textAlign: 'justify'}}>
                       <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign: 'start' }}>&gt;_{subtitle} </Heading>
