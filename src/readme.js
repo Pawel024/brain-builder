@@ -7,7 +7,7 @@ function Readme(file) {
   const [readme, setReadme] = useState('');
 
   useEffect(() => {
-    axios.get(`https://raw.githubusercontent.com/pawel024/brain-builder/django_app/${file.toString()}`)
+    axios.get(`https://raw.githubusercontent.com/pawel024/brain-builder/django_app/${file}`)
       .then(response => {
         setReadme(response.data);
       });
