@@ -355,7 +355,7 @@ function App() {
   const [maxNodes, setMaxNodes] = useState([]);
   const [normalization, setNormalization] = useState([true]);
   const [normalizationVisibility, setNormalizationVisibility] = useState([false]);
-  const [afs, setAfs] = useState(Array(taskIds.length).fill(true));
+  const [afs, setAfs] = useState([]);
   const [afVisibility, setAfVisibility] = useState([false]);
   const [iterationsSliderVisibility, setIterationsSliderVisibility] = useState([false]);
   const [lrSliderVisibility, setLRSliderVisibility] = useState([false]);
@@ -430,6 +430,7 @@ function App() {
         setWeights(currentWeights);
         setTaskNames(currentTaskNames);
         setNormalizationVisibility(currentTaskData.map(entry => entry.normalization_visibility));
+        setAfs(currentTaskData.map(() => true));
         setAfVisibility(currentTaskData.map(entry => entry.af_visibility));
         setIterationsSliderVisibility(currentTaskData.map(entry => entry.iterations_slider_visibility));
         setLRSliderVisibility(currentTaskData.map(entry => entry.lr_slider_visibility));
