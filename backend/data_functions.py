@@ -222,11 +222,11 @@ class DataFromExcel(Dataset):
                             row = k // n_cols
                             col = k % n_cols
                             if n_plots == 1:
-                                ax.scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
+                                scatter = ax.scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
                                 ax.set_xlabel(self.data.columns[i].replace('_', ' '))
                                 ax.set_ylabel(self.data.columns[j].replace('_', ' '))
                             elif n_rows == 1:
-                                ax[col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
+                                scatter = ax[col].scatter(self.data.iloc[:, i], self.data.iloc[:, j], c=self.data.loc[:, 'Target'])
                                 ax[col].set_xlabel(self.data.columns[i].replace('_', ' '))
                                 ax[col].set_ylabel(self.data.columns[j].replace('_', ' '))
                             else: 
@@ -239,7 +239,7 @@ class DataFromExcel(Dataset):
             norm = Normalize(vmin=min(self.data.loc[:, 'Target']), vmax=max(self.data.loc[:, 'Target']))
             sm = ScalarMappable(cmap=cmap, norm=norm)
             legend_elements = [Line2D([0], [0], marker='o', color='w', markerfacecolor=sm.to_rgba(i), markersize=10) for i in range(len(self.target_names))]
-            fig.legend(handles=legend_elements, labels=list(self.target_names), loc='lower right')
+            fig.legend(handles=legend_elements, labels=list(self.target_names), loc='lower left', bbox_to_anchor=(1, 0), title='Classes')
 
         elif self.data_type == 2:
             n_plots = (self.n_features + self.n_targets) * (self.n_features + self.n_targets - 1) // 2
