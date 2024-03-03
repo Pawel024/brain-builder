@@ -16,8 +16,8 @@ function NotFound() {
             backgroundImage: `url(${isMontyPythonLover ? require('./monty-python.jpeg') : ''})`, // Set the image as the background
             backgroundSize: 'cover', // Cover the entire area
             backgroundPosition: 'top left', // Align the image to the top left
-            width: '100%',
-            height: '100%',
+            width: '100vw',
+            height: '100vh',
             justifyContent: 'center', 
             alignItems: 'center'
         }}>
