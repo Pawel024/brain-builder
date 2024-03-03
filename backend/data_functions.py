@@ -301,7 +301,7 @@ class DataFromExcel(Dataset):
                 Z = Z.reshape(mesh[0].shape)
 
                 ax.contourf(mesh[0], mesh[1], Z, alpha=0.5)
-                ax.scatter(self.data[:, 0], self.data[:, 1], c=self.data.loc[:, 'Target'])
+                ax.scatter(self.data.loc[:, self.feature_names[0]], self.data.loc[:, self.feature_names[1]], c=self.data.loc[:, 'Target'])
 
                 ax.set_xlabel(self.feature_names[0].replace('_', ' '))
                 ax.set_ylabel(self.feature_names[1].replace('_', ' '))
