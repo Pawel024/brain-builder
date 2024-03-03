@@ -697,9 +697,10 @@ class Building extends React.Component {
                 </div>
               </Flex>
             </Box>
+            <Separator orientation='vertical' style = {{ height: window.innerHeight-152, position: 'fixed', left: window.innerWidth * 0.5, bottom: (window.innerHeight-92) * 0.5, transform: `translateY(${(window.innerHeight - 152) / 2}px)` }}/>
             <Box style={{ flexBasis: '50%', justifyContent: 'center', alignItems: 'center' }}>
               {/* This will render the images, if they exist */}
-              <Flex direction="column" gap="2">
+              <Flex direction="column" gap="2" style={{ justifyContent: 'center', alignItems: 'center', padding: '0px 30px' }}>
                 {this.props.img ? (
                   <img src={this.props.img} alt={`No plots yet`} onLoad={() => {}/*URL.revokeObjectURL(this.props.img)*/}/>
                 ) : (
