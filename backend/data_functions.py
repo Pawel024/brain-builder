@@ -332,6 +332,12 @@ class DataFromExcel(Dataset):
                                     ax[row, col].set_xlabel(self.data.columns[i].replace('_', ' '))
                                     ax[row, col].set_ylabel(self.data.columns[j].replace('_', ' '))
                                 k += 1
+                                if self.normalization:
+                                    ax.set_xlim(-0.1, 1.1)
+                                    ax.set_ylim(-0.1, 1.1)
+                                else:
+                                    ax.set_xlim(self.minima[i], self.maxima[i])
+                                    ax.set_ylim(self.minima[j], self.maxima[j])
                 img = BytesIO()
                 fig.tight_layout()
                 fig.savefig(img, format='png')
@@ -556,6 +562,12 @@ class DataFromSklearn1(Dataset):  # this one is for load_wine(), etc.
                                 ax[row, col].set_xlabel(self.feature_names[i].replace('_', ' '))
                                 ax[row, col].set_ylabel(self.feature_names[j].replace('_', ' '))
                             k += 1
+                            if self.normalization:
+                                ax.set_xlim(-0.1, 1.1)
+                                ax.set_ylim(-0.1, 1.1)
+                            else:
+                                ax.set_xlim(self.minima[i], self.maxima[i])
+                                ax.set_ylim(self.minima[j], self.maxima[j])
 
             img = BytesIO()
             fig.tight_layout()
@@ -773,6 +785,13 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
 
                 ax.set_xlabel("Feature 1")
                 ax.set_ylabel("Feature 2")
+
+                if self.normalization:
+                    ax.set_xlim(-0.1, 1.1)
+                    ax.set_ylim(-0.1, 1.1)
+                else:
+                    ax.set_xlim(self.minima[0], self.maxima[0])
+                    ax.set_ylim(self.minima[1], self.maxima[1])
         
         elif self.data_type == 2:
             if self.n_features == 1 and self.n_targets == 1:
@@ -794,6 +813,12 @@ class DataFromSklearn2(Dataset):  # this one is for make_moons(n_samples, noise)
                 ax.set_xlabel("Feature")
                 ax.set_ylabel("Target")
 
+                if self.normalization:
+                    ax.set_xlim(-0.1, 1.1)
+                    ax.set_ylim(-0.1, 1.1)
+                else:
+                    ax.set_xlim(mini, maxi)
+                    ax.set_ylim(self.target_minima[0], self.target_maxima[0])
 
         img = BytesIO()
         fig.tight_layout()
@@ -921,6 +946,13 @@ class DataFromFunction(Dataset):  # this one is for one to one regression on sim
         ax.plot(inp, Z, color=(185/255,38/255,4/255))
         ax.set_xlabel(self.feature_names[0].replace('_', ' '))
         ax.set_ylabel(self.target_names[0].replace('_', ' '))
+
+        if self.normalization:
+            ax.set_xlim(-0.1, 1.1)
+            ax.set_ylim(-0.1, 1.1)
+        else:
+            ax.set_xlim(mini, maxi)
+            ax.set_ylim(self.target_minima, self.target_maxima)
 
         img = BytesIO()
         fig.tight_layout()

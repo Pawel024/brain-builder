@@ -62,7 +62,6 @@ class BuildNetwork(torch.nn.Module):
             return x
 
     def forward(self, x):  # feed data through the network; pay attention to the right name!
-        print(x)
         for i in range(len(self.layers)):
             x = self.select_activation(self.layers[i](x), self.input[i+1][2])
         if torch.isnan(torch.tensor(x)).any() or torch.isinf(torch.tensor(x)).any():
