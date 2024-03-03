@@ -299,6 +299,11 @@ class Building extends React.Component {
     this.setState({ currentSlide: index });
     console.log("Going to slide " + index)
   };
+
+  handleAfClick = () => {
+    console.log("af clicked: ", !this.props.af);
+    this.props.setAf(this.props.index, !this.props.af);
+  }
   
 
   render() {
@@ -527,7 +532,7 @@ class Building extends React.Component {
           {this.props.afVisibility ? (
           <Text as="label" size="2">
             <Flex style={{ position:"absolute", top: Math.round(0.4 * (window.innerHeight-140)-20), left: Math.round(0.7 * (window.innerWidth * 0.97)), width: Math.round(0.27 * (window.innerWidth * 0.97)), justifyContent:"flex-start", alignItems:"flex-start"}} gap="2">          
-              <Checkbox disabled = { this.props.isTraining===1 } onChange={ (event) => {console.log('Checkbox clicked, af is currently:', this.props.af, ' new value:', event.target.checked); this.props.setAf(this.props.index, event.target.checked);}} checked={this.props.af} />
+              <Checkbox disabled = { this.props.isTraining===1 } onClick={() => this.handleAfClick()} onChange={ (event) => {console.log('Checkbox changed')}} checked={this.props.af} />
               Enable activation functions
             </Flex>
           </Text>):(<div></div>)}
