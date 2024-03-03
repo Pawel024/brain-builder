@@ -23,6 +23,7 @@ class Migration(migrations.Migration):
                 END IF;
             END
             $$;
-            """
+            """,
+            reverse_sql=migrations.RunSQL.noop
         ),
     ]
