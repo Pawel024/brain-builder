@@ -125,10 +125,10 @@ class Introduction extends React.Component {
             {this.state.content.length > 0 ? (
               <Flex direction="column" gap="3" style={{ width: '100%', height: '100%'}}>
                 {this.state.content.map(([subtitle, ...paragraphs], index) => (
-                  <Box style={{ boxShadow: '0 2px 8px var(--slate-a11)', borderRadius: "var(--radius-3)", padding: '10px 24px', textAlign: 'justify', backgroundColor: this.state.showContent[index] ? 'white' : 'white', cursor: 'pointer' }}
+                  <Box style={{ boxShadow: '0 2px 8px var(--slate-a10)', borderRadius: "var(--radius-3)", padding: '10px 24px', textAlign: 'justify', backgroundColor: this.state.showContent[index] ? 'white' : 'white', cursor: 'pointer' }}
                     onClick={this.state.showContent[index] ? () => this.handleShowContent(index, false) : () => this.handleShowContent(index, true)}
                   >
-                    <Flex direction="column" style={{textAlign: 'justify'}}>
+                    <Flex direction="column" style={{ textAlign: 'justify', marginBottom: this.state.showContent[index] ? 10 : 0 }}>
                       <Heading as='h2' size='5' style={{ color: 'var(--slate-12)', marginBottom:7, textAlign: 'start' }}>&gt;_{subtitle} </Heading>
                       { this.state.showContent[index] && paragraphs.map((paragraph, i) => (
                         <p key={i} dangerouslySetInnerHTML={{ __html: paragraph }} style={{ marginBottom: 0, textAlign: 'justify' }}></p>
