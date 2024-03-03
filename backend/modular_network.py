@@ -44,6 +44,8 @@ class BuildNetwork(torch.nn.Module):
             return torch.nn.Linear(input_nodes, output_nodes, bias=bias)
 
     def select_activation(self, x, activation):
+        if torch.isnan(torch.tensor(x)).any():
+            print("NaN after layer")
         if activation == 'Sigmoid':
             return torch.sigmoid(x)
         elif activation == 'ReLu':
@@ -56,8 +58,12 @@ class BuildNetwork(torch.nn.Module):
             return x
 
     def forward(self, x):  # feed data through the network; pay attention to the right name!
+        if torch.isnan(torch.tensor(x)).any():
+            print("NaN in input data")
         for i in range(len(self.layers)):
             x = self.select_activation(self.layers[i](x), self.input[i+1][2])
+        if torch.isnan(torch.tensor(x)).any():
+            print("NaN after activation")
         return x
 
     def predict(self, data, typ=1):
@@ -103,10 +109,7 @@ class BuildNetwork(torch.nn.Module):
                 output = self(X.float().view(-1, self.input[0][0]))
                 if typ == 2:  # regression
                     for idx, out in enumerate(output):
-                        if type(out) != torch.Tensor:
-                            out = torch.tensor([out])
-                        if torch.isnan(out).any():
-                            print("NaN in output: ", out, " at index ", idx)
+                        assert torch.isnan(torch.tensor(out)).any() == False, "NaN in output"
                         mse += torch.square(out - y[idx].float()).mean()
                         ys = torch.cat((ys, y[idx]), dim=0)
                         total += 1
@@ -128,9 +131,9 @@ class BuildNetwork(torch.nn.Module):
                 print("R^2 on test set: ", accuracy)
         
         else:
-            error = round((1 - correct / total), 2)
+            error = round((1 - correct / total), 3)
             if acc:
-                accuracy = round(correct / total, 3)
+                accuracy = 1 - error
                 print("Accuracy on test set: ", accuracy * 100, "%")
 
         return error, accuracy
