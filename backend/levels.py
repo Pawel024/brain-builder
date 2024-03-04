@@ -92,4 +92,4 @@ def get_data(tag, normalization=False, data=None):
         # load the dataset from Excel -> use custom dataset class
         data = df.DataFromExcel(os.path.join(os.path.dirname(__file__), games.loc[tag, 'dataset']), data_type=games.loc[tag, 'type'], normalize=normalization)
 
-    return data, train_test_split(data, test_size=0.2, random_state=np.random.randint(1000))
+    return data, train_test_split(data, test_size=0.2)

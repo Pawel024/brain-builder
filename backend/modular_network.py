@@ -59,6 +59,7 @@ class BuildNetwork(torch.nn.Module):
             parameters = list(self.parameters())
             for p in parameters:
                 p.data = torch.clamp(p.data, -100, 100)
+            x.data = torch.clamp(x.data, -1000, 1000)
             return x
 
     def forward(self, x):  # feed data through the network; pay attention to the right name!
@@ -126,12 +127,12 @@ class BuildNetwork(torch.nn.Module):
         if typ == 2:
             error = mse / total
             if acc:
-                y_var = torch.var(ys)
+                y_var = torch.var(ys).item()
                 if y_var <= 1*10**(-6):
                     y_var = 1*10**(-6)
-                r2 = 1 - mse / y_var
-                accuracy = r2.item()
+                accuracy = 1 - mse / y_var
                 print("R^2 on test set: ", accuracy)
+            assert error > 0 and y_var > 0, (error, y_var)
         
         else:
             error = round((1 - correct / total), 3)

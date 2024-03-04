@@ -158,9 +158,9 @@ class CustomBlock extends Component {
         const weightSlider = (
             <Slider.Root
               className="SliderRoot"
-              defaultValue={[45]}
+              defaultValue={[0]}
               onValueChange={(value) => this.handleWeightChange(value)}
-              min={0}
+              min={-85}
               max={85}
               step={1}
               style={{ width: Math.round(0.16 * (window.innerWidth * 0.97)) }}
