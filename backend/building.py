@@ -79,7 +79,7 @@ def train_nn_epoch(nn, training_set, test_set, current_epoch, epochs, learning_r
         errors += [error]
         weights, biases = get_parameters(nn)
         
-    if round(current_epoch/epochs, 2) >= 0.98:
+    if round(current_epoch/epochs, 2) >= 0.9:
         error, accuracy = nn.test(test_set, typ, acc=True)
 
     return errors, accuracy, weights, biases
