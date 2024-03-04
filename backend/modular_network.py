@@ -55,10 +55,10 @@ class BuildNetwork(torch.nn.Module):
         elif activation == 'Log_Softmax':
             return torch.nn.functional.log_softmax(x, dim=-1)
         else:
-            # cap the weights at 1000 to prevent overflow
+            # cap the weights at 100 to prevent overflow
             parameters = list(self.parameters())
             for p in parameters:
-                p.data = torch.clamp(p.data, -1000, 1000)
+                p.data = torch.clamp(p.data, -100, 100)
             return x
 
     def forward(self, x):  # feed data through the network; pay attention to the right name!
