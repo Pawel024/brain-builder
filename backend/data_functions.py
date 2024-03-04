@@ -49,7 +49,11 @@ def create_plot11(x=None, y=None, a=None, b=None):
         fig.savefig(img, format='png')
         img.seek(0)
         fig.clear()
-        return img.getvalue()
+
+        mse = torch.mean((a*x + b - y)**2).item()
+        r2 = 1 - mse / torch.var(y).item()
+
+        return img.getvalue(), (mse, r2)
 
     else: 
         # set up the plot

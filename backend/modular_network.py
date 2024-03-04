@@ -114,8 +114,8 @@ class BuildNetwork(torch.nn.Module):
                 if typ == 2:  # regression
                     for idx, out in enumerate(output):
                         assert torch.isnan(torch.tensor(out)).any() == False, "NaN in output"
-                        mse += torch.square(out - y[idx].float()).mean()
-                        ys = torch.cat((ys, y[idx]), dim=0)
+                        mse += torch.square(out - y[idx].float()).mean().item()
+                        ys = torch.cat((ys, y[idx].flatten), dim=0)
                         total += 1
                 else:  # classification
                     for idx, out in enumerate(output):
@@ -124,14 +124,13 @@ class BuildNetwork(torch.nn.Module):
                         total += 1
                     
         if typ == 2:
-            error = torch.mean(mse / total)
-            error = error.item()
+            error = mse / total
             if acc:
-                if torch.sum(torch.square(ys - torch.mean(ys, dim=0))) == 0:
-                    accuracy = torch.mean(1 - mse / 10**(-6))
-                else:
-                    accuracy = torch.mean(1 - mse / torch.sum(torch.square(ys - torch.mean(ys, dim=0)), dim=0))
-                accuracy = accuracy.item()
+                y_var = torch.var(ys)
+                if y_var <= 1*10**(-6):
+                    y_var = 1*10**(-6)
+                r2 = 1 - mse / y_var
+                accuracy = r2.item()
                 print("R^2 on test set: ", accuracy)
         
         else:

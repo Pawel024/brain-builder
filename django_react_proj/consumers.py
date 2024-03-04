@@ -55,7 +55,7 @@ class Plotter(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         if self.custom_id == '11':
             print(data['title'], " received")
-            plot = df.create_plot11(self.x, self.y, data['a'], data['b'])
+            plot, error = df.create_plot11(self.x, self.y, data['a'], data['b'])
             plot = b64encode(plot).decode()
-            await self.send(json.dumps({'title': 'plot', 'plot': plot}))
+            await self.send(json.dumps({'title': 'plot', 'plot': plot, 'error': error}))
             print("plot sent")

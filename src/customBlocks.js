@@ -46,6 +46,8 @@ class CustomBlock extends Component {
                 const url = URL.createObjectURL(blob);
                 // now images can be accessed with <img src={url} />
                 this.setState({ img: url });
+                this.setState({ error: data.error[0] });
+                this.setState({ r2: data.error[1] });
             }
         }
     }
@@ -87,9 +89,9 @@ class CustomBlock extends Component {
         const texts = {
             11: [
                 ["Perceptrons",
-                "The building block of a neural network is the 'perceptron', also called 'neuron' or 'node': a simple model which takes a number of inputs, multiplies each with a weight and then adds a bias. When we visualize this, we get a simple linear function like the one on the right. Note that this is a simplified version of the perceptron: many variations exist."],
+                "The building block of a neural network is the 'perceptron': a simple model which takes a number of inputs, multiplies each with a weight and then adds a bias. When we visualize this, we get a simple linear function like the one on the right. Note that this is a simplified version of the perceptron: many variations exist."],
                 ["Your Task",
-                "Your task here is quite simple: try to set the parameters of the perceptron in such a way that the function best matches the data. This is actually just a linear regression, since the output of this simplified perceptron will always be linear. This tweaking of the parameters is the essence of training a neural network. The magic of neural networks is that they can do this themselves, as we will see in the next module."],
+                "Your task here is quite simple: try to change the parameters of the perceptron so the error reduces (and the correlation increases). This is actually just a linear regression, since the output of this simplified perceptron will always be linear. This tweaking of the parameters is the essence of training a neural network. The magic of neural networks is that they can do this themselves, as we will see in the next module."],
                 ["The Data",
                 "The data consists of points generated along a line, with some random noise added."],
             ]
@@ -199,6 +201,10 @@ class CustomBlock extends Component {
                 </div>
                 <div>Bias: {this.state.bias}</div>
                 <img src={this.state.img} alt="No plot available" style={{ marginBottom:50 }}/>
+                <div>
+                    {/* Drag the sliders to change the weight and bias of the perceptron. Try to minimize the error. */}
+                    Current error: {this.state.error}
+                </div>
                 </Flex>
             </Box>
         );
