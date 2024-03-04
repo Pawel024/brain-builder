@@ -449,8 +449,8 @@ class Building extends React.Component {
                 <img src={this.props.img} alt={`No plots yet`} onLoad={() => {}/*URL.revokeObjectURL(this.props.img)*/} style={{ height: '200px', width: 'auto' }}/>
                 {this.props.taskId === 11 && this.props.weights[0] && this.props.biases[0] (
                   <Flex direction="column" gap="0">
-                  <p>Weight: {this.props.weights[0].tofixed(3)}</p>
-                  <p>Bias: {this.props.biases[0].tofixed(3)}</p>
+                  <p>Weight: {Number(this.props.weights[0]).tofixed(3)}</p>
+                  <p>Bias: {Number(this.props.biases[0]).tofixed(3)}</p>
                   </Flex>
                 )}
                 </Flex>
