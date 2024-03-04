@@ -447,7 +447,7 @@ class Building extends React.Component {
               {((this.props.imageVisibility && this.props.img && this.props.img !== '' && this.props.isTraining===1) &&
                 <Flex direction="column" gap="1" style={{ position: 'absolute', bottom: window.innerHeight*0.2, left: window.innerWidth*0.45 }}>
                 <img src={this.props.img} alt={`No plots yet`} onLoad={() => {}/*URL.revokeObjectURL(this.props.img)*/} style={{ height: '200px', width: 'auto' }}/>
-                {this.props.taskId === 11 && this.props.weights[0] && this.props.biases[0] (
+                {this.props.taskId === 11 && this.props.weights[0] && this.props.biases[0] && (
                   <Flex direction="column" gap="0">
                   <p>Weight: {Number(this.props.weights[0]).toFixed(3)}</p>
                   <p>Bias: {Number(this.props.biases[0]).toFixed(3)}</p>

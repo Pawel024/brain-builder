@@ -192,7 +192,7 @@ class CustomBlock extends Component {
         return (
             <Box style={{ flex:1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: window.innerHeight-52, padding:'30px 50px' }}>
                 <Flex direction='column' gap="0" style={{ alignItems: 'center', justifyContent: 'center' }}>
-                <div className="weightSlider" style={{ marginTop:60 }}>
+                <div className="weightSlider" style={{ marginTop:50 }}>
                     {weightSlider}
                 </div>
                 <div>Weight: {this.state.weight}</div>
@@ -200,7 +200,7 @@ class CustomBlock extends Component {
                     {biasSlider}
                 </div>
                 <div>Bias: {this.state.bias}</div>
-                <img src={this.state.img} alt="No plot available" style={{ height: window.innerHeight*0.55, marginBottom:5 }}/>
+                <img src={this.state.img} alt="No plot available" style={{ height: window.innerHeight*0.55, marginBottom:10 }}/>
                 <div>
                     {/* Drag the sliders to change the weight and bias of the perceptron. Try to minimize the error. */}
                     Current error: {this.state.error}
