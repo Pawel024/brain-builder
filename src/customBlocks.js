@@ -13,6 +13,7 @@ class CustomBlock extends Component {
         this.state = {
             weight: 1,
             bias: 0,
+            error: null,
             img: null,
         };
         this.ws = new WebSocket(`wss://${this.props.host}/custom/${this.props.userId}/${this.props.customId}/`);
@@ -47,7 +48,6 @@ class CustomBlock extends Component {
                 // now images can be accessed with <img src={url} />
                 this.setState({ img: url });
                 this.setState({ error: data.error[0] });
-                this.setState({ r2: data.error[1] });
             }
         }
     }
@@ -200,7 +200,7 @@ class CustomBlock extends Component {
                     {biasSlider}
                 </div>
                 <div>Bias: {this.state.bias}</div>
-                <img src={this.state.img} alt="No plot available" style={{ marginBottom:50 }}/>
+                <img src={this.state.img} alt="No plot available" style={{ height: window.innerHeight*0.6, marginBottom:80 }}/>
                 <div>
                     {/* Drag the sliders to change the weight and bias of the perceptron. Try to minimize the error. */}
                     Current error: {this.state.error}
