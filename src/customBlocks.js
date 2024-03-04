@@ -158,7 +158,7 @@ class CustomBlock extends Component {
         const weightSlider = (
             <Slider.Root
               className="SliderRoot"
-              defaultValue={[0]}
+              defaultValue={[45]}
               onValueChange={(value) => this.handleWeightChange(value)}
               min={-85}
               max={85}
@@ -200,7 +200,7 @@ class CustomBlock extends Component {
                     {biasSlider}
                 </div>
                 <div>Bias: {this.state.bias}</div>
-                <img src={this.state.img} alt="No plot available" style={{ height: window.innerHeight*0.4, marginBottom:80 }}/>
+                <img src={this.state.img} alt="No plot available" style={{ height: window.innerHeight*0.6, marginBottom:20 }}/>
                 <div>
                     {/* Drag the sliders to change the weight and bias of the perceptron. Try to minimize the error. */}
                     Current error: {this.state.error}
