@@ -115,7 +115,7 @@ class BuildNetwork(torch.nn.Module):
                     for idx, out in enumerate(output):
                         assert torch.isnan(torch.tensor(out)).any() == False, "NaN in output"
                         mse += torch.square(out - y[idx].float()).mean().item()
-                        ys = torch.cat((ys, y[idx].flatten), dim=0)
+                        ys = torch.cat((ys, y[idx].flatten()), dim=0)
                         total += 1
                 else:  # classification
                     for idx, out in enumerate(output):
