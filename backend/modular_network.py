@@ -130,7 +130,7 @@ class BuildNetwork(torch.nn.Module):
                 y_var = torch.var(ys).item()
                 if y_var <= 1*10**(-6):
                     y_var = 1*10**(-6)
-                accuracy = 1 - mse / y_var
+                accuracy = 1 - error / y_var
                 print("R^2 on test set: ", accuracy)
             assert error > 0 and y_var > 0, (error, y_var)
         
