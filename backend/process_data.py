@@ -91,7 +91,7 @@ async def process(req):
         
         u['title'] = 'update'
         
-        for epoch in range(1, epochs):
+        for epoch in range(1, epochs+1):
             if Coach.cancelVars.get((str(user_id), str(task_id))):
                 print("Training cancelled")
                 break
