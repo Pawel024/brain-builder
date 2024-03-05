@@ -150,6 +150,8 @@ async def process(req):
             print('Sending double data to coach')
             await coach.send_data(d)
             await coach.send_data(u)
+            # if the websocket is still open, close it
+            await coach.close()
 
 
 

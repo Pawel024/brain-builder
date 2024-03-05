@@ -804,6 +804,13 @@ function App() {
     const ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
 
     ws.onclose = () => {
+      if (progress[index] > 0.8 && isTraining[index] === 1) {
+        setIsTraining(prevIsTraining => {
+          const newIsTraining = [...prevIsTraining];
+          newIsTraining[index] = 2;
+          return newIsTraining;
+        });
+      }
       console.log('WebSocket connection closed');
     };
 
