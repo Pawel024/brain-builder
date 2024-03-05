@@ -803,18 +803,19 @@ function App() {
     }    
     const ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
 
+    let timeoutId = null;
+    
     ws.onclose = () => {
       if (progress[index] > 0.8 && isTraining[index] === 1) {
+        clearTimeout(timeoutId);
         setIsTraining(prevIsTraining => {
           const newIsTraining = [...prevIsTraining];
           newIsTraining[index] = 2;
           return newIsTraining;
         });
       }
-      console.log('WebSocket connection closed');
+      console.log('WebSocket connection closed', isTraining[index], progress[index]);
     };
-
-    let timeoutId = null;
 
     ws.onerror = function(event) {
       console.error('Error:', event);
