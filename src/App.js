@@ -967,12 +967,12 @@ function App() {
       }
       clearTimeout(timeoutId);
       if (progress[index] >= 0.8 && isTraining[index] === 1) {
-          clearTimeout(timeoutId);
           setIsTraining(prevIsTraining => {
             const newIsTraining = [...prevIsTraining];
             newIsTraining[index] = 2;
             return newIsTraining;
           });
+          console.log("Setting isTraining to 2 - the progress is over 80%!!!")
         } else {
         setIsTraining(prevIsTraining => {
           const newIsTraining = [...prevIsTraining];
