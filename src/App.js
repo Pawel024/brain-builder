@@ -418,7 +418,7 @@ function App() {
         setLRSliderVisibility(currentTaskData.map(entry => entry.lr_slider_visibility));
         setImageVisibility(currentTaskData.map(entry => entry.decision_boundary_visibility));
         setCytoLayers(currentTaskIds.map(() => []));
-        setIsTraining(currentTaskIds.map(() => false));
+        setIsTraining(currentTaskIds.map(() => 0));
         setApiData(currentTaskIds.map(() => null));
         setAccuracy(currentTaskIds.map(() => 0));
         setIsResponding(currentTaskIds.map(() => false));
@@ -445,7 +445,7 @@ function App() {
         setIsTraining(defaultTaskIds.map(() => false));
         setApiData(defaultTaskIds.map(() => null));
         setAccuracy(defaultTaskIds.map(() => 0));
-        setIsResponding(defaultTaskIds.map(() => false));
+        setIsResponding(defaultTaskIds.map(() => 0));
         setProgress(defaultTaskIds.map(() => 0));
         setErrorList(defaultTaskIds.map(() => [[], null]));
         setFeatureNames(defaultTaskIds.map(() => []));  // TODO: load these somewhere else
@@ -806,6 +806,7 @@ function App() {
     let timeoutId = null;
     
     ws.onclose = () => {
+      /*
       if (progress[index] > 0.8 && isTraining[index] === 1) {
         clearTimeout(timeoutId);
         setIsTraining(prevIsTraining => {
@@ -814,6 +815,7 @@ function App() {
           return newIsTraining;
         });
       }
+      */
       console.log('WebSocket connection closed', isTraining[index], progress[index]);
     };
 
@@ -964,13 +966,22 @@ function App() {
         ws.close();
       }
       clearTimeout(timeoutId);
-      setIsTraining(prevIsTraining => {
-        const newIsTraining = [...prevIsTraining];
-        newIsTraining[index] = 0;
-        return newIsTraining;
-      });
-      console.log("Training cancelled")
-    };
+      if (progress[index] >= 0.8 && isTraining[index] === 1) {
+          clearTimeout(timeoutId);
+          setIsTraining(prevIsTraining => {
+            const newIsTraining = [...prevIsTraining];
+            newIsTraining[index] = 2;
+            return newIsTraining;
+          });
+        } else {
+        setIsTraining(prevIsTraining => {
+          const newIsTraining = [...prevIsTraining];
+          newIsTraining[index] = 0;
+          return newIsTraining;
+        });
+      }
+        console.log("Training cancelled")
+      };
     cancelRequestRef.current = cancelRequest;
 
   };
