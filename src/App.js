@@ -153,11 +153,8 @@ export function generateCytoStyle(list = []) {
 function App() {
 
     // Setting the interval- and timing-related states
-  const cancelTokenSourceRef = useRef(null);
-  const intervalIdRef = useRef(null);
-  const intervalTimestep = 1000;  // in milliseconds, the time between each progress check -> low values mean low latency but high server load
-  const intervalTimeout = 60000;  // in milliseconds, the time to wait before ending the interval
-  const pendingTime = 2000;  // in milliseconds, the time to wait when putting or posting a request -> set this close to 0 in production, but higher for debugging
+  const intervalTimeout = 20000;  // in milliseconds, the time to wait before ending the interval
+  const pendingTime = 1000;  // in milliseconds, the time to wait when putting or posting a request -> set this close to 0 in production, but higher for debugging
 
   // ------- WINDOW RESIZING -------
 
@@ -182,6 +179,11 @@ function App() {
   }, []);
 
   const loadData = (taskId, index, normalization) => {
+    setIsTraining(prevIsTraining => {
+      const newIsTraining = [...prevIsTraining];
+      newIsTraining[index] = -1;
+      return newIsTraining;
+    });
     var userId = getCookie('user_id');
     var csrftoken = getCookie('csrftoken');
 
@@ -200,8 +202,15 @@ function App() {
     };
     // first, set up the websocket
     const ws = new WebSocket(`wss://${window.location.host}/ws/${userId}/${taskId}/`);
+    let timeoutId;
 
     ws.onclose = () => {
+
+      setIsTraining(prevIsTraining => {
+        const newIsTraining = [...prevIsTraining];
+        newIsTraining[index] = 0;
+        return newIsTraining;
+      });
       console.log('WebSocket connection closed');
     };
 
@@ -245,7 +254,7 @@ function App() {
         }
       });
     };
-    let timeoutId = setTimeout(() => {
+    timeoutId = setTimeout(() => {
       ws.close();
       console.log('Failed to load data for challenge ' + taskId);
       alert("Failed to load data for challenge " + taskId + ". Try reloading the page, if the problem persists, please contact us.");
@@ -290,6 +299,8 @@ function App() {
     };
 
     ws.onerror = function(event) {
+      console.log('Failed to load data for challenge ' + taskId);
+      alert("Failed to load data for challenge " + taskId + ". Try reloading the page, if the problem persists, please contact us.");
       console.error('Error:', event);
     };
     };
@@ -537,11 +548,13 @@ function App() {
       // cytoLayers is not empty, proceed as usual
       cytoLayers.forEach((cytoLayer, index) => {
         localStorage.setItem(`cytoLayers${taskIds[index]}`, JSON.stringify(cytoLayer));
+        if (isTraining[index] !== -1) {
         setIsTraining(prevIsTraining => {
         const newIsTraining = [...prevIsTraining];
         newIsTraining[index] = 0;
         return newIsTraining;
       });
+    }
     });
     }
   }, [cytoLayers, taskIds, nInputs, nOutputs]);
@@ -888,6 +901,19 @@ function App() {
     };
 
     ws.onmessage = function(event) {
+      
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        ws.close();
+        setIsTraining(prevIsTraining => {
+          const newIsTraining = [...prevIsTraining];
+          newIsTraining[index] = 0;
+          return newIsTraining;
+        });
+        console.log("Training failed")
+        alert("Training failed. Please try again. If the problem persists, please contact us.");
+      }, intervalTimeout); // stop after n milliseconds
+
       const data = JSON.parse(event.data);
       if (data.title === 'progress') {  // every 1%; includes progress, error_list, and network_weights
 
@@ -898,7 +924,7 @@ function App() {
             return newProgress;
           });
 
-          if (data.progress >= 0.98 ) {
+          if (data.progress >= 0.98 || (iterations <=30 && data.progress >= 0.95) || (iterations <=20 && data.progress*iterations >= (iterations - 1))) {
             ws.close();
             clearTimeout(timeoutId);
             setIsTraining(prevIsTraining => {
@@ -1488,6 +1514,7 @@ function App() {
                   setErrorList={setErrorList}
                   setWeights={setWeights}
                   setBiases={setBiases}
+                  pendingTime={pendingTime}
                   cancelRequest={cancelRequestRef.current}
                 />
                 </>
@@ -1554,6 +1581,7 @@ function App() {
                   setErrorList={setErrorList}
                   setWeights={setWeights}
                   setBiases={setBiases}
+                  pendingTime={pendingTime}
                   cancelRequest={cancelRequestRef.current}
                 />
                 </>
