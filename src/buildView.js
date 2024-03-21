@@ -619,7 +619,7 @@ class Building extends React.Component {
             </IconButton>
           </Flex>
           </Box>
-
+          {this.state.showCode && <CodePreview code="Your code here" /> }
         </Tabs.Content>
       
         <Tabs.Content value="stuff">
@@ -748,7 +748,6 @@ class Building extends React.Component {
               {/* TODO: Turn this into a pretty animation */}
               </Flex>
             </Box>
-            {this.state.showCode && <CodePreview code="Your code here" /> }
           </Flex>
         )}
         </Tabs.Content>
