@@ -9,9 +9,10 @@ import color_scale_pic from "./color_scale_2.png";
 import Slider from 'react-animated-slider';
 import { Link } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
-import { PlayIcon, ChevronLeftIcon, ChevronRightIcon, HomeIcon } from '@radix-ui/react-icons';
+import { PlayIcon, ChevronLeftIcon, ChevronRightIcon, HomeIcon, CodeIcon } from '@radix-ui/react-icons';
 import Joyride from 'react-joyride';
 import { useNavigate } from 'react-router-dom';
+import CodePreview from './codePreview';
 import { 
   Chart, 
   CategoryScale, 
@@ -104,6 +105,7 @@ class Building extends React.Component {
       runTutorial: false,
       currentSlide: 0,
       activeTab: 'building',
+      showCode: false,
       steps: [
         {
           target: '.buildBody',
@@ -602,6 +604,18 @@ class Building extends React.Component {
                 {this.props.isTraining === -1 ? "Loading..." : (this.props.isTraining === 1 ? "Cancel" : (<><PlayIcon width="18" height="18" />Start training!</>))}
               </Flex>
           </IconButton>
+          <IconButton
+            onClick={(event) => {
+              this.setState({ showCode: true });
+              window.scrollTo(0, document.body.scrollHeight); // Scroll to the bottom of the page
+          }}
+            variant="solid"
+            style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.92 * (window.innerHeight-140)), left: Math.round(0.835 * (window.innerWidth * 0.97)), borderRadius: 'var(--radius-3)', width: Math.round(0.12 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}
+            disabled = { this.props.isTraining < 0 || (this.props.iterationsSliderVisibility && !this.props.iterations) || (this.props.lrSliderVisibility && !this.props.learningRate) }>
+              <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
+                {<><CodeIcon width="18" height="18" />Preview in code</>}
+              </Flex>
+          </IconButton>
           </Box>
 
         </Tabs.Content>
@@ -732,6 +746,7 @@ class Building extends React.Component {
               {/* TODO: Turn this into a pretty animation */}
               </Flex>
             </Box>
+            {this.state.showCode && <CodePreview code="Your code here" /> }
           </Flex>
         )}
         </Tabs.Content>
