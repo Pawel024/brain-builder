@@ -1,5 +1,8 @@
 function layersToCode(nodes, learningRate, epochs, taskId, af=true, optimizer='SGD', lossFunction='NLLLoss') {
     // Takes a list of numbers of nodes per layer, e.g. [2, 3, 1], and some more parameters of the network, and returns the pytorch code to create the model.
+    if (learningRate === undefined) {
+        learningRate = 0.01;
+    }
     if (nodes.length < 2) {
         throw new Error(`The 'nodes' array has length ${nodes.length}: ${nodes}. It must have at least 2 elements.`);
     }
