@@ -635,7 +635,9 @@ class Building extends React.Component {
             </IconButton>
           </Flex>
           </Box>
-          {this.state.showCode && <CodePreview code={this.state.code} /> }
+          <Box style={{ width: window.innerWidth*0.97, height: window.innerHeight-120, border: "solid", borderColor: "var(--slate-8)", borderRadius: "var(--radius-3)"}} >
+            {this.state.showCode && <CodePreview code={this.state.code} /> }
+          </Box>
         </Tabs.Content>
       
         <Tabs.Content value="stuff">
