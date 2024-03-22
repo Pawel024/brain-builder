@@ -1,7 +1,7 @@
 // component to print the code with syntax highlighting below the building view
 
 import React from 'react';
-import { Box, Heading } from '@radix-ui/themes';
+import { Box } from '@radix-ui/themes';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import a11yDark from './a11y-dark';
 
@@ -22,7 +22,7 @@ function CodePreview({ code }) {
             justifyContent: 'center', 
             alignItems: 'center'
         }}>
-            <Box style={{ textAlign: 'center', color: 'white', backgroundColor: 'transparent' }}>
+            <Box style={{ textAlign: 'center', color: 'white', backgroundColor: 'transparent', width: window.innerWidth*0.97, height: window.innerHeight*0.97, border: "solid", borderRadius: "var(--radius-3)" }}>
                 <SyntaxHighlighter language="javascript" style={a11yDark}>
                     {code}
                 </SyntaxHighlighter>
