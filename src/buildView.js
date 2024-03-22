@@ -599,7 +599,7 @@ class Building extends React.Component {
             <IconButton
               onClick={(event) => this.throttle(() => this.handleStartClick(event), 2*this.props.pendingTime)}
               variant="solid"
-              color="plum"
+              color="cyan"
               style={{ borderRadius: 'var(--radius-3)', width: Math.round(0.12 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}
               disabled = { this.props.isTraining < 0 || (this.props.iterationsSliderVisibility && !this.props.iterations) || (this.props.lrSliderVisibility && !this.props.learningRate) }>
                 <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
