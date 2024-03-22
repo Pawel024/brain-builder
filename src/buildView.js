@@ -330,14 +330,20 @@ class Building extends React.Component {
   }
 
   handleStartClick = (event) => {
-    console.log("Click detected")
-    if (this.props.taskId !== 0) { if (this.props.isTraining === 1) 
-      {this.props.cancelRequest(this.props.taskId, this.props.index)
-      } else { this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs, this.props.normalization, this.props.af)
+    let inThrottle;
+    return (event) => {
+      console.log("Click detected")
+      if (!inThrottle && this.props.taskId !== 0) { 
+        if (this.props.isTraining === 1) {
+        this.props.cancelRequest(this.props.taskId, this.props.index)
+        } else { 
+        this.props.putRequest(event, this.props.cytoLayers, this.props.apiData, this.props.setApiData, this.props.setAccuracy, this.props.setIsTraining, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.index, this.props.nOfInputs, this.props.nOfOutputs, this.props.normalization, this.props.af)
+        }
+        console.log("Click executed")
+        inThrottle=true
+        setTimeout(() => inThrottle = false, 2*this.props.pendingTime);
       }
-      console.log("Click executed")
-    }
-  }
+    }}
 
   render() {
 
@@ -601,7 +607,7 @@ class Building extends React.Component {
           {console.log("type of isTraining: ", typeof(this.props.isTraining))}
           <Flex direction="row" gap="3" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.92 * (window.innerHeight-140)), left: Math.round(0.835 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
             <IconButton
-              onClick={(event) => this.throttle(() => this.handleStartClick(event), 2*this.props.pendingTime)}
+              onClick={(event) => this.handleStartClick(event)}
               variant="solid"
               color="cyan"
               style={{ borderRadius: 'var(--radius-3)', width: Math.round(0.12 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}
