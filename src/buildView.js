@@ -194,7 +194,6 @@ class Building extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (this.cy) {this.cy.resize();console.log("Resizing cytoscape");} // this seems to do nothing
-    this.setState({ code: layersToCode(this.props.cytoLayers, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.af)});
     if (this.props.taskId !== 0 && this.chartRef.current) {
       const ctx = this.chartRef.current.getContext('2d');
 
@@ -613,7 +612,10 @@ class Building extends React.Component {
             </IconButton>
             <IconButton
               onClick={(event) => {
-                this.setState({ showCode: true });
+                this.setState({
+                  code: layersToCode(this.props.cytoLayers, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.af),
+                  showCode: true
+                });
                 window.scrollTo(0, document.body.scrollHeight); // Scroll to the bottom of the page
             }}
               variant="outline"
