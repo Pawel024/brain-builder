@@ -1,4 +1,4 @@
-function layerListToCode(nodes, learningRate, epochs, type, af=true, optimizer='SGD', lossFunction='NLLLoss') {
+function layersToCode(nodes, learningRate, epochs, type, af=true, optimizer='SGD', lossFunction='NLLLoss') {
     // Takes a list of numbers of nodes per layer, e.g. [2, 3, 1], and some more parameters of the network, and returns the pytorch code to create the model.
     let activations = Array(nodes.length-1).fill('Sigmoid');
     if (type === 1) {
@@ -39,4 +39,4 @@ function layerListToCode(nodes, learningRate, epochs, type, af=true, optimizer='
 }
 
 
-console.log(layerListToCode([1, 3, 1], 0.01, 100, 2, true, 'SGD', 'MSELoss'));
+export default layersToCode;
