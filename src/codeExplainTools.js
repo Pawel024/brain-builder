@@ -1,12 +1,12 @@
 function layersToCode(nodes, learningRate, epochs, type, af=true, optimizer='SGD', lossFunction='NLLLoss') {
     // Takes a list of numbers of nodes per layer, e.g. [2, 3, 1], and some more parameters of the network, and returns the pytorch code to create the model.
     let activations = Array(nodes.length-1).fill('Sigmoid');
-    if (type === 1) {
-        lossFunction = 'NLLLoss';
-        activations[nodes.length-2] = 'LogSoftmax';
-    } else {
+    if (Math.floor(taskId/10) === 1) {
         lossFunction = 'MSELoss';
         activations[nodes.length-2] = '';
+    } else {
+        lossFunction = 'NLLLoss';
+        activations[nodes.length-2] = 'LogSoftmax';
     }
     let code = "import torch\n\n";
     code += `def train_nn(X_train, y_train):\n\n`;
@@ -16,7 +16,9 @@ function layersToCode(nodes, learningRate, epochs, type, af=true, optimizer='SGD
         code += `        torch.nn.Linear(${nodes[i]}, ${nodes[i+1]}),\n`;
         if (af && activations[i] !== '') {
             code += `        torch.nn.${activations[i]}(),\n`;
-        }
+        } else { if (activations[i] === 'LogSoftmax') {
+            code += `        torch.nn.${activations[i]}(dim=1),\n`;
+        }}
     }
     code += "        )\n\n";
     code += `    # Define the optimizer and loss function\n`;
@@ -26,7 +28,7 @@ function layersToCode(nodes, learningRate, epochs, type, af=true, optimizer='SGD
     code += `    for epoch in range(${epochs}):\n\n`;
     code += `        # Forward pass\n`;
     code += `        y_pred = model(X_train)\n\n`;
-    code += `        # Compute and print loss\n`;
+    code += `        # Compute and print the loss\n`;
     code += `        loss = loss_fn(y_pred, y_train)\n`;
     code += `        if epoch % (${epochs}/10) == 0:\n`;
     code += `            print('Epoch ', epoch, '; loss = ', round(loss.item(), 3))\n\n`;
@@ -40,3 +42,4 @@ function layersToCode(nodes, learningRate, epochs, type, af=true, optimizer='SGD
 
 
 export default layersToCode;
+// console.log(layerListToCode([1, 3, 1], 0.01, 100, 1, true));
