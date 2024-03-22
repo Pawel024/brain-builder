@@ -17,16 +17,14 @@ function CodePreview({ code }) {
     return (
         <Box style={{ 
             overflow: 'hidden', 
-            width: '100vw',
-            height: '100vh',
+            width: window.innerWidth*0.97,
+            height: window.innerHeight*0.97,
             justifyContent: 'center', 
             alignItems: 'center'
         }}>
-            <Box style={{ textAlign: 'center', color: 'white', backgroundColor: 'transparent', width: window.innerWidth*0.97, height: window.innerHeight*0.97, border: "solid", borderRadius: "var(--radius-3)" }}>
-                <SyntaxHighlighter language="javascript" style={a11yDark}>
-                    {code}
-                </SyntaxHighlighter>
-            </Box>
+            <SyntaxHighlighter language="javascript" style={{ a11yDark, textAlign: 'center', color: 'white', backgroundColor: 'transparent', width: window.innerWidth*0.97, height: window.innerHeight*0.97, borderRadius: "var(--radius-3)" }}>
+                {code}
+            </SyntaxHighlighter>
         </Box>
     );
 }
