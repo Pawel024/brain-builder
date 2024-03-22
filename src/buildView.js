@@ -13,6 +13,7 @@ import { PlayIcon, ChevronLeftIcon, ChevronRightIcon, HomeIcon, CodeIcon } from 
 import Joyride from 'react-joyride';
 import { useNavigate } from 'react-router-dom';
 import CodePreview from './codePreview';
+import layersToCode from './codeExplainTools';
 import { 
   Chart, 
   CategoryScale, 
@@ -106,6 +107,7 @@ class Building extends React.Component {
       currentSlide: 0,
       activeTab: 'building',
       showCode: false,
+      code: '',
       steps: [
         {
           target: '.buildBody',
@@ -192,6 +194,7 @@ class Building extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (this.cy) {this.cy.resize();console.log("Resizing cytoscape");} // this seems to do nothing
+    this.setState({ code: layersToCode(this.props.cytoLayers, this.props.learningRate, this.props.iterations, this.props.taskId, this.props.af)});
     if (this.props.taskId !== 0 && this.chartRef.current) {
       const ctx = this.chartRef.current.getContext('2d');
 
@@ -611,8 +614,8 @@ class Building extends React.Component {
                 this.setState({ showCode: true });
                 window.scrollTo(0, document.body.scrollHeight); // Scroll to the bottom of the page
             }}
-              variant="solid"
-              color="teal"
+              variant="outline"
+              color="cyan"
               style={{ borderRadius: 'var(--radius-3)', width: Math.round(0.12 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}
               disabled = { this.props.isTraining < 0 || (this.props.iterationsSliderVisibility && !this.props.iterations) || (this.props.lrSliderVisibility && !this.props.learningRate) }>
                 <Flex direction="horizontal" gap="2" style={{alignItems: "center", fontFamily:'monospace' }}>
@@ -621,7 +624,7 @@ class Building extends React.Component {
             </IconButton>
           </Flex>
           </Box>
-          {this.state.showCode && <CodePreview code="Your code here" /> }
+          {this.state.showCode && <CodePreview code={this.state.code} /> }
         </Tabs.Content>
       
         <Tabs.Content value="stuff">
