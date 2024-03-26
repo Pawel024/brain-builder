@@ -31,12 +31,13 @@ function layersToCode(nodes, learningRate, epochs, taskId, af=true, optimizer='S
     code += `    optimizer = torch.optim.${optimizer}(model.parameters(), lr=${learningRate})\n`;
     code += `    loss_fn = torch.nn.${lossFunction}()\n\n`;
     code += `    # Train the network\n`;
-    code += `    for epoch in range(${epochs}):\n\n`;
+    code += `    epochs = ${epochs}\n`;
+    code += `    for epoch in range(epochs):\n\n`;
     code += `        # Forward pass\n`;
     code += `        y_pred = model(X_train)\n\n`;
     code += `        # Compute and print the loss\n`;
     code += `        loss = loss_fn(y_pred, y_train)\n`;
-    code += `        if epoch % (${epochs}/10) == 0:\n`;
+    code += `        if epoch % int(epochs/10) == 0:\n`;
     code += `            print('Epoch ', epoch, '; loss = ', round(loss.item(), 3))\n\n`;
     code += `        # Backpropagate the loss\n`;
     code += `        optimizer.zero_grad()\n`;
