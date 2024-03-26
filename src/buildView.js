@@ -329,9 +329,9 @@ class Building extends React.Component {
     };
   }
 
-  handleStartClick = ((event) => {
+  handleStartClick = (() => {
     let inThrottle;
-    return () => {
+    return (event) => {
       console.log("Click detected")
       if (!inThrottle && this.props.taskId !== 0) { 
         if (this.props.isTraining === 1) {
@@ -608,7 +608,7 @@ class Building extends React.Component {
           {console.log("type of isTraining: ", typeof(this.props.isTraining))}
           <Flex direction="row" gap="3" style={{ position: 'absolute', transform: 'translateX(-50%)', top: Math.round(0.92 * (window.innerHeight-140)), left: Math.round(0.835 * (window.innerWidth * 0.97)), fontFamily:'monospace' }}>
             <IconButton
-              onClick={(event) => this.handleStartClick(event)}
+              onClick={this.handleStartClick}
               variant="solid"
               color="cyan"
               style={{ borderRadius: 'var(--radius-3)', width: Math.round(0.12 * (window.innerWidth * 0.97)), height: 36, fontSize: 'var(--font-size-2)', fontWeight: "500" }}

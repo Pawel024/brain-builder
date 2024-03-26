@@ -23,7 +23,7 @@ function CodePreview({ code }) {
             alignItems: 'center'
         }}>
             <Box style={{ textAlign: 'center', color: 'white', backgroundColor: 'transparent', width: window.innerWidth*0.97, height: window.innerHeight*0.97, borderRadius: "var(--radius-3)" }}>
-                <SyntaxHighlighter language="javascript" style={a11yDark}>
+                <SyntaxHighlighter language="python" style={a11yDark}>
                     {code}
                 </SyntaxHighlighter>
             </Box>
