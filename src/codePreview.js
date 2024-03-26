@@ -22,13 +22,15 @@ function CodePreview({ code }) {
             justifyContent: 'center', 
             alignItems: 'center'
         }}>
-            <Box style={{ textAlign: 'center', color: 'white', backgroundColor: 'transparent', width: window.innerWidth*0.97, height: window.innerHeight*0.97, borderRadius: "var(--radius-3)" }}>
-                <SyntaxHighlighter language="javascript" style={a11yDark}>
-                    {code}
-                </SyntaxHighlighter>
-            </Box>
+            <SyntaxHighlighter language="javascript" style={a11yDark}>
+                {code}
+            </SyntaxHighlighter>
         </Box>
     );
 }
 
 export default CodePreview;
+
+/*
+<Box style={{ textAlign: 'center', color: 'white', backgroundColor: 'transparent', width: window.innerWidth*0.97, height: window.innerHeight*0.97, borderRadius: "var(--radius-3)" }}>
+*/
