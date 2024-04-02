@@ -17,7 +17,7 @@ import a11yDark from './a11y-dark';
 const steps = [
     {
         target: '#allparts',
-        content: "This is an example of how you would train this neural network using PyTorch. We'll walk you through the most important parts of the code. \nIf any concepts are unclear, have a look at the 'The Basics' modules.",
+        content: "This is an example of how you would train this neural network using PyTorch. We'll walk you through the most important parts of the code. \nIf any concepts are unclear, have a look at the 'Key Concepts' modules.",
         disableBeacon: true,
         placement: 'top',
     },
