@@ -106,6 +106,7 @@ function CodePreview({ code }) {
                         zIndex: 10000,
                     }
                 }}
+                locale={{ last: 'Finish' }}
             />
         </div>
     );
