@@ -347,6 +347,7 @@ class Building extends React.Component {
   })();
 
   render() {
+    let level = Number(String(this.props.taskId)[0]);
 
     return(
     <div className='buildBody'>
@@ -636,7 +637,7 @@ class Building extends React.Component {
             </IconButton>
           </Flex>
           </Box>
-          {this.state.showCode && <CodePreview code={this.state.code} /> }
+          {this.state.showCode && <CodePreview code={this.state.code} level={level} /> }
         </Tabs.Content>
       
         <Tabs.Content value="stuff">
