@@ -69,7 +69,7 @@ function CodePreview({ code, level }) {
             if (level === 1) {
                 newSteps[2].content = "'SGD' indicates we are using stochastic gradient descent to make the network learn. The 'lr' variable is the learning rate. \nYou can also see the loss function we use - mean squared error, which is built into PyTorch.";
             } else if (level === 2) {
-                newSteps[2].content = "'SGD' indicates we are using stochastic gradient descent to make the network learn. The 'lr' variable is the learning rate. \nYou can also see the loss function we use - negative log likelihood loss, which is built into PyTorch. In its place, you can use another function, such as the cross entropy loss (nn.CrossEntropyLoss).";
+                newSteps[2].content = "'SGD' indicates we are using stochastic gradient descent to make the network learn. The 'lr' variable is the learning rate. \nYou can also see the loss function we use - negative log likelihood loss, which is built into PyTorch. In its place, you can use another function, such as the cross entropy loss (torch.nn.CrossEntropyLoss).";
             }
             return newSteps;
         });
