@@ -532,7 +532,7 @@ function App() {
     */
 
     
-  setTimeout(() => alert("Welcome to brAIn bUIlder! This is a beta version, so please know that bugs are possible. We would love to hear your feedback. Have fun!"), 1000);
+  setTimeout(() => alert("Welcome to brAIn bUIlder! This is a beta version, so please know that bugs are possible and stick to using a computer - we don't support mobile browsers just yet. We'd love to hear your feedback. Have fun!"), 1000);
   
 
   }, []);
