@@ -535,7 +535,7 @@ function App() {
     setTimeout(() => {
       const isLikelyMobile = window.innerWidth <= 768 || window.innerHeight/window.innerWidth > 1.5;
       const message = isLikelyMobile
-        ? "Welcome to brAIn bUIlder! Please note this is still a work in progress so we don't support mobile browsers just yet..."
+        ? "Welcome to brAIn bUIlder! Unfortunately we don't support mobile browsers just yet. Hope to see you soon on a computer!"
         : "Welcome to brAIn bUIlder! Please keep in mind that this is still a work in progress so bugs are possible. We'd love to hear your feedback. Have fun!";
       alert(message);
     }, 1000);
