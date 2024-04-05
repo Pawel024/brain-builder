@@ -532,8 +532,13 @@ function App() {
     */
 
     
-  setTimeout(() => alert("Welcome to brAIn bUIlder! This is a beta version, so please know that bugs are possible and stick to using a computer - we don't support mobile browsers just yet. We'd love to hear your feedback. Have fun!"), 1000);
-  
+    setTimeout(() => {
+      const isLikelyMobile = window.innerWidth <= 768 || window.innerHeight/window.innerWidth > 1.5;
+      const message = isLikelyMobile
+        ? "Welcome to brAIn bUIlder! Please note this is still a work in progress so we don't support mobile browsers just yet..."
+        : "Welcome to brAIn bUIlder! Please keep in mind that this is still a work in progress so bugs are possible. We'd love to hear your feedback. Have fun!";
+      alert(message);
+    }, 1000);
 
   }, []);
   
